@@ -1,0 +1,162 @@
+@model QuanLiKhoaHocTrucTuyen.Services.Interfaces.AdminReportDto
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Tổng quan & Báo cáo Admin";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+    var labelsJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.Label));
+    var grossJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.GrossRevenue));
+    var platformJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.PlatformAmount));
+    var instructorJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.InstructorAmount));
+    var usersJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.NewUsers));
+    var enrollsJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.NewEnrollments));
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Báo cáo tổng thể hệ thống</h1>
+        <p class="text-muted small mb-0">Doanh thu, phân chia hoa hồng, biến động tài khoản và khóa học tương tác cao</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <div class="btn-group btn-group-sm">
+            <a asp-action="Index" asp-route-period="week" class="btn @(Model.Period == "week" ? "btn-orange" : "btn-outline-secondary")">Theo tuần</a>
+            <a asp-action="Index" asp-route-period="month" class="btn @(Model.Period == "month" ? "btn-orange" : "btn-outline-secondary")">Theo tháng</a>
+        </div>
+        <a asp-action="ExportCsv" asp-route-period="@Model.Period" class="btn btn-sm btn-outline-orange">
+            <i class="bi bi-filetype-csv me-1"></i> Xuất báo cáo CSV
+        </a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Tổng doanh thu</div>
+                    <div class="fs-4 fw-bold text-orange mt-1">@Model.TotalGrossRevenue.ToString("N0") đ</div>
+                    <div class="small text-muted">Chiết khấu hiện tại: @Model.CurrentCommissionRate.ToString("0.#")%</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Phân chia hoa hồng</div>
+                    <div class="fw-bold text-dark mt-1">Sàn: @Model.TotalPlatformCommission.ToString("N0") đ</div>
+                    <div class="small text-muted">GV: @Model.TotalInstructorPayout.ToString("N0") đ</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-pie-chart-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Tài khoản &amp; Duyệt GV</div>
+                    <div class="fs-4 fw-bold text-dark mt-1">@Model.TotalUsers</div>
+                    <div class="small text-warning-emphasis">Chờ duyệt GV: @Model.PendingInstructorRequests</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Khóa học</div>
+                    <div class="fs-4 fw-bold text-dark mt-1">@Model.TotalCourses</div>
+                    <div class="small text-orange">Chờ kiểm duyệt: @Model.PendingCourses</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-journal-check"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="app-card p-4 h-100">
+            <h2 class="h6 fw-bold mb-3">Doanh thu &amp; Phân chia hoa hồng (@(Model.Period == "week" ? "8 tuần gần nhất" : "6 tháng gần nhất"))</h2>
+            <canvas id="adminRevenueChart" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="app-card p-4 h-100">
+            <h2 class="h6 fw-bold mb-3">Biến động tài khoản &amp; Ghi danh mới</h2>
+            <canvas id="adminUsersChart" height="190"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="app-card p-4">
+    <h2 class="h5 mb-3">Khóa học có tương tác cao</h2>
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Khóa học</th>
+                    <th>Giảng viên</th>
+                    <th>Học viên</th>
+                    <th>Tiến độ TB</th>
+                    <th>Đánh giá TB</th>
+                    <th class="text-end">Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.TopCourses)
+                {
+                    <tr>
+                        <td class="fw-semibold">@c.Title</td>
+                        <td class="small text-muted">@c.InstructorName</td>
+                        <td><span class="badge badge-orange">@c.EnrollmentCount</span></td>
+                        <td style="min-width: 140px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress progress-orange flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar" style="width: @c.AvgProgressPercent.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                                </div>
+                                <span class="small">@c.AvgProgressPercent.ToString("0.#")%</span>
+                            </div>
+                        </td>
+                        <td class="small">@(c.AvgRating > 0 ? $"{c.AvgRating:0.0} ★" : "-")</td>
+                        <td class="text-end fw-bold text-orange">@c.Revenue.ToString("N0") đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const labels = @Html.Raw(labelsJson);
+        new Chart(document.getElementById('adminRevenueChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Hoa hồng sàn', data: @Html.Raw(platformJson), backgroundColor: '#ff6b00' },
+                    { label: 'Phần Giảng viên', data: @Html.Raw(instructorJson), backgroundColor: '#fdba74' }
+                ]
+            },
+            options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+        });
+
+        new Chart(document.getElementById('adminUsersChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Tài khoản mới', data: @Html.Raw(usersJson), borderColor: '#ea580c', backgroundColor: 'rgba(234,88,12,0.12)', fill: true, tension: 0.3 },
+                    { label: 'Đăng ký khóa mới', data: @Html.Raw(enrollsJson), borderColor: '#0f172a', backgroundColor: 'transparent', tension: 0.3 }
+                ]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+}

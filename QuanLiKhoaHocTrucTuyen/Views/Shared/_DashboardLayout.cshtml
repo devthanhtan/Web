@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EduSpark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="sticky-top">
+        <nav class="navbar app-navbar py-2 px-3">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-light border d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#dashboardOffcanvas" aria-controls="dashboardOffcanvas" aria-label="Mở menu điều hướng">
+                    <i class="bi bi-list fs-5 text-orange"></i>
+                </button>
+                <a class="navbar-brand brand-mark mb-0" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+                    <span>Edu<span class="text-orange">Spark</span></span>
+                </a>
+                <span class="badge badge-orange d-none d-sm-inline-block ms-1">@(ViewData["AreaTitle"] ?? "Không gian làm việc")</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a class="btn btn-sm btn-outline-orange d-none d-md-inline-flex align-items-center gap-1" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-globe"></i> Trang công khai
+                </a>
+                <partial name="_LoginPartial" />
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar d-none d-lg-block p-3">
+            <partial name="_DashboardSidebarPartial" />
+        </aside>
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="dashboardOffcanvas" aria-labelledby="dashboardOffcanvasLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="dashboardOffcanvasLabel">
+                    <span class="text-orange">EduSpark</span> Menu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng"></button>
+            </div>
+            <div class="offcanvas-body p-3">
+                <partial name="_DashboardSidebarPartial" />
+            </div>
+        </div>
+
+        <main class="dashboard-main">
+            <partial name="_AlertsPartial" />
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

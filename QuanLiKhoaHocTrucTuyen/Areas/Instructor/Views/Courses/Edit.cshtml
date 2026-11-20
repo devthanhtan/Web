@@ -1,0 +1,78 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Instructor.ViewModels.CourseFormViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin khóa học";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="app-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0">Chỉnh sửa thông tin khóa học</h1>
+                <a asp-action="Curriculum" asp-route-id="@Model.Id" class="btn btn-outline-orange btn-sm">Quản lý chương &amp; bài</a>
+            </div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Title" class="form-label fw-semibold"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+                        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Level" class="form-label fw-semibold"></label>
+                        <select asp-for="Level" class="form-select">
+                            <option value="Cơ bản">Cơ bản</option>
+                            <option value="Trung cấp">Trung cấp</option>
+                            <option value="Nâng cao">Nâng cao</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Price" class="form-label fw-semibold"></label>
+                        <input asp-for="Price" type="number" step="1000" min="0" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ShortDescription" class="form-label fw-semibold"></label>
+                        <input asp-for="ShortDescription" class="form-control" />
+                        <span asp-validation-for="ShortDescription" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Description" rows="5" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ThumbnailFile" class="form-label fw-semibold"></label>
+                        <input asp-for="ThumbnailFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+                        @if (!string.IsNullOrEmpty(Model.CurrentThumbnailUrl))
+                        {
+                            <img src="@Model.CurrentThumbnailUrl" alt="Thumbnail" class="mt-2 rounded" style="height:70px;object-fit:cover;" />
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="IntroYoutubeId" class="form-label fw-semibold"></label>
+                        <input asp-for="IntroYoutubeId" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-orange px-4">Lưu thay đổi</button>
+                    <a asp-action="Index" class="btn btn-light border">Quay lại danh sách</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

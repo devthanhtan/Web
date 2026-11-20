@@ -1,0 +1,28 @@
+@if (TempData["Success"] is string successMsg && !string.IsNullOrWhiteSpace(successMsg))
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@successMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+    </div>
+}
+@if (TempData["Error"] is string errorMsg && !string.IsNullOrWhiteSpace(errorMsg))
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+    </div>
+}
+@if (TempData["Warning"] is string warnMsg && !string.IsNullOrWhiteSpace(warnMsg))
+{
+    <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>@warnMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+    </div>
+}
+@if (TempData["Info"] is string infoMsg && !string.IsNullOrWhiteSpace(infoMsg))
+{
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>@infoMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+    </div>
+}

@@ -1,0 +1,87 @@
+@using Microsoft.AspNetCore.Identity
+@using QuanLiKhoaHocTrucTuyen.Data
+@using QuanLiKhoaHocTrucTuyen.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "Tài khoản";
+    var avatarInitial = string.IsNullOrWhiteSpace(displayName) ? "U" : displayName[0].ToString().ToUpper();
+
+    <div class="d-flex align-items-center gap-2">
+        @await Component.InvokeAsync("CartCount")
+        @await Component.InvokeAsync("UnreadNotifications")
+
+        <div class="dropdown">
+            <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2 py-1 px-2 pe-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                {
+                    <img src="@currentUser.AvatarUrl" alt="@displayName" class="avatar-circle" />
+                }
+                else
+                {
+                    <span class="avatar-circle">@avatarInitial</span>
+                }
+                <span class="d-none d-md-inline small fw-semibold text-dark text-truncate" style="max-width: 140px;">@displayName</span>
+                <i class="bi bi-chevron-down small text-muted"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
+                <li class="px-3 py-2 border-bottom">
+                    <div class="fw-bold small text-dark">@displayName</div>
+                    <div class="text-muted" style="font-size: 0.78rem;">@currentUser?.Email</div>
+                </li>
+                @if (User.IsInRole(AppRoles.Admin))
+                {
+                    <li>
+                        <a class="dropdown-item fw-semibold text-orange" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                            <i class="bi bi-shield-lock me-2"></i>Quản trị hệ thống
+                        </a>
+                    </li>
+                }
+                @if (User.IsInRole(AppRoles.Instructor))
+                {
+                    <li>
+                        <a class="dropdown-item fw-semibold" asp-area="Instructor" asp-controller="Dashboard" asp-action="Index">
+                            <i class="bi bi-easel2 me-2 text-orange"></i>Kênh Giảng viên
+                        </a>
+                    </li>
+                }
+                <li>
+                    <a class="dropdown-item" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-journal-bookmark me-2 text-orange"></i>Khóa học của tôi
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-area="Student" asp-controller="Profile" asp-action="Index">
+                        <i class="bi bi-person-gear me-2 text-orange"></i>Hồ sơ cá nhân
+                    </a>
+                </li>
+                @if (!User.IsInRole(AppRoles.Instructor) && !User.IsInRole(AppRoles.Admin))
+                {
+                    <li>
+                        <a class="dropdown-item" asp-area="Student" asp-controller="InstructorApplication" asp-action="Index">
+                            <i class="bi bi-award me-2 text-orange"></i>Đăng ký làm Giảng viên
+                        </a>
+                    </li>
+                }
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <form class="m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+else
+{
+    <div class="d-flex align-items-center gap-2">
+        <a class="btn btn-outline-orange px-3" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+        <a class="btn btn-orange px-3" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
+    </div>
+}

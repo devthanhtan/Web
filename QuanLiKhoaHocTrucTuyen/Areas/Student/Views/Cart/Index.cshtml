@@ -1,0 +1,80 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng của tôi";
+    ViewData["AreaTitle"] = "Góc Học viên";
+    var total = Model.Sum(c => c.Course.Price);
+}
+
+<h1 class="h3 mb-4">Giỏ hàng của tôi (@Model.Count khóa học)</h1>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center">
+        <div class="stat-icon mx-auto mb-3"><i class="bi bi-cart-x"></i></div>
+        <h2 class="h5 mb-2">Giỏ hàng đang trống</h2>
+        <p class="text-muted small mb-3">Hãy chọn khóa học yêu thích để bắt đầu thanh toán.</p>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">Tìm khóa học</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="app-card p-3 vstack gap-3">
+                @foreach (var item in Model)
+                {
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="@(string.IsNullOrEmpty(item.Course.ThumbnailUrl) ? "/images/course-dotnet.svg" : item.Course.ThumbnailUrl)"
+                                 alt="@item.Course.Title" class="rounded" style="width:96px;height:56px;object-fit:cover;" />
+                            <div>
+                                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@item.CourseId" class="fw-bold text-dark">
+                                    @item.Course.Title
+                                </a>
+                                <div class="small text-muted">GV: @item.Course.Instructor.FullName · @item.Course.Category.Name</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold text-orange">@item.Course.Price.ToString("N0") đ</span>
+                            <form asp-action="Remove" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="courseId" value="@item.CourseId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="app-card p-4">
+                <h2 class="h5 mb-3">Thanh toán</h2>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Tổng thanh toán:</span>
+                    <span class="fs-4 fw-bold text-orange">@total.ToString("N0") đ</span>
+                </div>
+
+                <form asp-action="Checkout" method="post" data-loading-form="true">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Chọn cổng thanh toán (Sandbox)</label>
+                        <div class="vstack gap-2">
+                            <label class="border rounded p-2 d-flex align-items-center gap-2 cursor-pointer">
+                                <input type="radio" name="provider" value="VNPAY" checked class="form-check-input mt-0" />
+                                <span class="fw-semibold">VNPAY Sandbox</span>
+                            </label>
+                            <label class="border rounded p-2 d-flex align-items-center gap-2 cursor-pointer">
+                                <input type="radio" name="provider" value="MoMo" class="form-check-input mt-0" />
+                                <span class="fw-semibold">MoMo E-Wallet Sandbox</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-orange w-100 py-2">
+                        <i class="bi bi-credit-card me-1"></i> Tiến hành thanh toán
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,80 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Instructor.ViewModels.CourseFormViewModel
+@{
+    ViewData["Title"] = "Tạo khóa học mới";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="app-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h4 mb-1">Tạo khóa học mới</h1>
+                    <p class="text-muted small mb-0">Khóa học mới tạo sẽ ở trạng thái Nháp (chỉ bạn nhìn thấy)</p>
+                </div>
+                <a asp-action="Index" class="btn btn-light border btn-sm">Quay lại</a>
+            </div>
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Title" class="form-label fw-semibold"></label>
+                        <input asp-for="Title" class="form-control" placeholder="Ví dụ: Lập trình Web ASP.NET Core 8 Toàn Tập" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+                        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"></select>
+                        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Level" class="form-label fw-semibold"></label>
+                        <select asp-for="Level" class="form-select">
+                            <option value="Cơ bản">Cơ bản</option>
+                            <option value="Trung cấp">Trung cấp</option>
+                            <option value="Nâng cao">Nâng cao</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Price" class="form-label fw-semibold"></label>
+                        <input asp-for="Price" type="number" step="1000" min="0" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ShortDescription" class="form-label fw-semibold"></label>
+                        <input asp-for="ShortDescription" class="form-control" placeholder="Tóm tắt ngắn gọn giá trị khóa học trong 1-2 câu" />
+                        <span asp-validation-for="ShortDescription" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Description" rows="5" class="form-control" placeholder="Mô tả chi tiết nội dung, đối tượng học viên và kết quả đạt được..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ThumbnailFile" class="form-label fw-semibold"></label>
+                        <input asp-for="ThumbnailFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+                        <span asp-validation-for="ThumbnailFile" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="IntroYoutubeId" class="form-label fw-semibold"></label>
+                        <input asp-for="IntroYoutubeId" class="form-control" placeholder="Ví dụ: BfEjDD8mWYg" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-orange px-4">
+                        <i class="bi bi-save me-1"></i> Lưu &amp; Soạn bài học
+                    </button>
+                    <a asp-action="Index" class="btn btn-light border">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

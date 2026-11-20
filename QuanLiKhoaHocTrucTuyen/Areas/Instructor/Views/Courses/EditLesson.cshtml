@@ -1,0 +1,146 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Instructor.ViewModels.LessonFormViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa bài học";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+    var attachments = ViewBag.ExistingAttachments as List<Attachment> ?? new List<Attachment>();
+    var videoStatus = (VideoUploadStatus)(ViewBag.VideoStatus ?? VideoUploadStatus.None);
+    var ytId = ViewBag.YoutubeVideoId as string;
+    var localPath = ViewBag.LocalVideoPath as string;
+    var videoErr = ViewBag.VideoErrorMessage as string;
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="app-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h4 mb-0">Chỉnh sửa bài học</h1>
+                <a asp-action="Curriculum" asp-route-id="@Model.CourseId" class="btn btn-sm btn-light border">Quay lại chương trình học</a>
+            </div>
+
+            <form asp-action="EditLesson" method="post" enctype="multipart/form-data" data-loading-form="true">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="ChapterId" type="hidden" />
+                <input asp-for="CourseId" type="hidden" />
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Title" class="form-label fw-semibold"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="LessonType" class="form-label fw-semibold"></label>
+                        <select asp-for="LessonType" asp-items="Html.GetEnumSelectList<LessonType>()" class="form-select"></select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Description" rows="2" class="form-control"></textarea>
+                    </div>
+                    <div class="col-md-8">
+                        <label asp-for="VideoFile" class="form-label fw-semibold">Tải lên video mới / Tải lại khi lỗi</label>
+                        <input asp-for="VideoFile" id="editVideoFile" type="file" accept=".mp4,.webm,.mov" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="DurationSeconds" class="form-label fw-semibold"></label>
+                        <input asp-for="DurationSeconds" id="editDurationSeconds" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ContentHtml" class="form-label fw-semibold"></label>
+                        <textarea asp-for="ContentHtml" rows="5" class="form-control"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="AttachmentFile" class="form-label fw-semibold">Thêm tệp tài liệu đính kèm</label>
+                        <input asp-for="AttachmentFile" type="file" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input asp-for="IsFreePreview" class="form-check-input" />
+                            <label asp-for="IsFreePreview" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-orange px-4"><i class="bi bi-save me-1"></i> Cập nhật bài học</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="app-card p-4 mb-4">
+            <h2 class="h6 fw-bold mb-2">Trạng thái Video YouTube</h2>
+            @if (videoStatus == VideoUploadStatus.Ready)
+            {
+                <div class="alert alert-success small py-2 mb-3">Ready · ID: <code>@ytId</code></div>
+                @if (!string.IsNullOrEmpty(localPath) && (ytId?.StartsWith("MOCK_") == true))
+                {
+                    <video src="@localPath" controls class="w-100 rounded"></video>
+                }
+                else if (!string.IsNullOrEmpty(ytId) && !ytId.StartsWith("MOCK_"))
+                {
+                    <div class="video-frame-wrapper">
+                        <iframe src="https://www.youtube.com/embed/@ytId" allowfullscreen></iframe>
+                    </div>
+                }
+            }
+            else if (videoStatus == VideoUploadStatus.Processing)
+            {
+                <div class="alert alert-warning small py-2 mb-0">Đang xử lý nền... Vui lòng tải lại trang sau vài giây.</div>
+            }
+            else if (videoStatus == VideoUploadStatus.Error)
+            {
+                <div class="alert alert-danger small py-2 mb-0">Lỗi: @videoErr. Hãy chọn file video mới và lưu để tải lại.</div>
+            }
+            else
+            {
+                <div class="text-muted small">Bài học không sử dụng video hoặc chưa tải lên.</div>
+            }
+        </div>
+
+        <div class="app-card p-4">
+            <h2 class="h6 fw-bold mb-2">Tài liệu đính kèm (@attachments.Count)</h2>
+            @if (!attachments.Any())
+            {
+                <p class="small text-muted mb-0">Chưa có tệp đính kèm.</p>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var att in attachments)
+                    {
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <a href="@att.FilePath" target="_blank" class="small text-truncate me-2">@att.FileName</a>
+                            <form asp-action="DeleteAttachment" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="attachmentId" value="@att.Id" />
+                                <input type="hidden" name="lessonId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('editVideoFile')?.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function () {
+                URL.revokeObjectURL(video.src);
+                if (video.duration && !isNaN(video.duration)) {
+                    document.getElementById('editDurationSeconds').value = Math.max(10, Math.round(video.duration));
+                }
+            };
+            video.src = URL.createObjectURL(file);
+        });
+    </script>
+}

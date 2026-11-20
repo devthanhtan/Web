@@ -1,0 +1,58 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Enrollment>
+@{
+    ViewData["Title"] = "Khóa học của tôi";
+    ViewData["AreaTitle"] = "Góc Học viên";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Khóa học của tôi</h1>
+        <p class="text-muted small mb-0">Theo dõi tiến độ học tập và tiếp tục từ vị trí gần nhất</p>
+    </div>
+    <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">
+        <i class="bi bi-plus-circle me-1"></i> Tìm thêm khóa học
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center">
+        <div class="stat-icon mx-auto mb-3"><i class="bi bi-journal-x"></i></div>
+        <h2 class="h5 mb-2">Bạn chưa đăng ký khóa học nào</h2>
+        <p class="text-muted small mb-3">Hãy khám phá danh mục khóa học và bắt đầu hành trình học tập ngay.</p>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">Khám phá khóa học</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var en in Model)
+        {
+            <div class="col">
+                <div class="card app-card h-100 border-0">
+                    <img src="@(string.IsNullOrEmpty(en.Course.ThumbnailUrl) ? "/images/course-dotnet.svg" : en.Course.ThumbnailUrl)" class="course-thumb" alt="@en.Course.Title" />
+                    <div class="card-body d-flex flex-column p-3">
+                        <span class="badge badge-orange align-self-start mb-2">@en.Course.Category.Name</span>
+                        <h3 class="h6 fw-bold mb-1">@en.Course.Title</h3>
+                        <p class="small text-muted mb-3">GV: @en.Course.Instructor.FullName</p>
+
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                <span>Tiến độ hoàn thành</span>
+                                <span class="text-orange">@en.ProgressPercent.ToString("0.#")%</span>
+                            </div>
+                            <div class="progress progress-orange mb-3" style="height: 8px;">
+                                <div class="progress-bar" style="width: @en.ProgressPercent.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@en.CourseId" class="btn btn-orange btn-sm">
+                                    <i class="bi bi-play-circle-fill me-1"></i> Vào học ngay
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,87 @@
+@model QuanLiKhoaHocTrucTuyen.Models.Course
+@{
+    ViewData["Title"] = "Chi tiết kiểm duyệt khóa học";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <a asp-action="Index" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left me-1"></i> Danh sách duyệt</a>
+    <div class="d-flex gap-2">
+        <form asp-action="Approve" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i> Phê duyệt công khai</button>
+        </form>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectCourseModal">
+            <i class="bi bi-x-circle me-1"></i> Từ chối kèm lý do
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="app-card p-4">
+            <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/course-dotnet.svg" : Model.ThumbnailUrl)" class="w-100 rounded mb-3" style="aspect-ratio:16/9;object-fit:cover;" alt="@Model.Title" />
+            <h1 class="h4 mb-2">@Model.Title</h1>
+            <p class="small text-muted mb-3">@Model.ShortDescription</p>
+            <div class="small mb-2"><strong>Giảng viên:</strong> @Model.Instructor.FullName (@Model.Instructor.Email)</div>
+            <div class="small mb-2"><strong>Danh mục:</strong> @Model.Category.Name · <strong>Trình độ:</strong> @Model.Level</div>
+            <div class="small mb-3"><strong>Học phí:</strong> <span class="text-orange fw-bold">@Model.Price.ToString("N0") đ</span></div>
+            <div class="p-3 bg-light rounded small">@Model.Description</div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="app-card p-4">
+            <h2 class="h5 mb-3">Đề cương &amp; Nội dung kiểm tra</h2>
+            @foreach (var ch in Model.Chapters.OrderBy(c => c.SortOrder))
+            {
+                <div class="mb-3 border rounded overflow-hidden">
+                    <div class="p-2 px-3 bg-orange-soft fw-bold small">Chương @ch.SortOrder: @ch.Title</div>
+                    <div class="list-group list-group-flush">
+                        @foreach (var l in ch.Lessons.OrderBy(x => x.SortOrder))
+                        {
+                            <div class="list-group-item small">
+                                <div class="d-flex justify-content-between">
+                                    <strong>@l.Title</strong>
+                                    <span class="badge bg-light text-dark border">@(l.LessonType == LessonType.Video ? l.VideoStatus.ToString() : "Tài liệu")</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(l.YoutubeVideoId) && !l.YoutubeVideoId.StartsWith("MOCK_"))
+                                {
+                                    <div class="text-muted">YouTube ID: <code>@l.YoutubeVideoId</code></div>
+                                }
+                                else if (!string.IsNullOrEmpty(l.LocalVideoPath))
+                                {
+                                    <video src="@l.LocalVideoPath" controls class="w-100 rounded mt-2" style="max-height: 220px;"></video>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Reject Course Modal -->
+<div class="modal fade" id="rejectCourseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reject" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CourseId" value="@Model.Id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Từ chối duyệt khóa học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label fw-semibold">Lý do từ chối (bắt buộc)</label>
+                    <textarea name="RejectionReason" class="form-control" rows="4" required placeholder="Ghi rõ vấn đề nội dung, bản quyền hoặc chất lượng để giảng viên sửa..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

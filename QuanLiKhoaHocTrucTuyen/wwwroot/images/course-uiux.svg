@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="800" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EA580C"/>
+      <stop offset="100%" stop-color="#FDBA74"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" rx="24" fill="url(#g2)"/>
+  <rect x="490" y="70" width="240" height="310" rx="20" fill="#FFFFFF" fill-opacity="0.2"/>
+  <rect x="520" y="105" width="180" height="24" rx="8" fill="#FFFFFF"/>
+  <rect x="520" y="148" width="140" height="16" rx="6" fill="#FFFFFF" fill-opacity="0.7"/>
+  <rect x="520" y="185" width="180" height="110" rx="12" fill="#FFFFFF" fill-opacity="0.85"/>
+  <rect x="64" y="72" width="144" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.22"/>
+  <text x="136" y="96" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">UI/UX &amp; CSS</text>
+  <text x="64" y="190" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="38" font-weight="800">Responsive UI</text>
+  <text x="64" y="242" fill="#FFF7ED" font-family="Segoe UI, sans-serif" font-size="24" font-weight="600">Bootstrap 5 &amp; Design System</text>
+  <rect x="64" y="295" width="200" height="52" rx="14" fill="#FFFFFF"/>
+  <text x="164" y="327" text-anchor="middle" fill="#EA580C" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700">Đa thiết bị mượt mà</text>
+</svg>

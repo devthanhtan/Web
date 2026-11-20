@@ -1,0 +1,86 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Review>
+@{
+    ViewData["Title"] = "Kiểm soát đánh giá";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+    bool? hiddenOnly = ViewBag.HiddenOnly as bool?;
+}
+
+<div class="app-card p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h1 class="h4 mb-1">Kiểm soát đánh giá khóa học</h1>
+            <p class="text-muted small mb-0">Ẩn hoặc xóa các đánh giá có nội dung vi phạm tiêu chuẩn cộng đồng</p>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <a asp-action="Index" class="btn @(hiddenOnly == null ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
+            <a asp-action="Index" asp-route-hiddenOnly="false" class="btn @(hiddenOnly == false ? "btn-orange" : "btn-outline-secondary")">Đang hiển thị</a>
+            <a asp-action="Index" asp-route-hiddenOnly="true" class="btn @(hiddenOnly == true ? "btn-orange" : "btn-outline-secondary")">Đã ẩn</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Khóa học</th>
+                    <th>Học viên</th>
+                    <th>Sao &amp; Nhận xét</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Chưa có đánh giá nào.</td></tr>
+                }
+                else
+                {
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold small">@r.Course.Title</td>
+                            <td class="small">@r.User.FullName<br /><span class="text-muted">@r.User.Email</span></td>
+                            <td>
+                                <div class="text-warning small mb-1">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi @(i <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                    }
+                                </div>
+                                <div class="small">@r.Comment</div>
+                            </td>
+                            <td>
+                                @if (r.IsHidden)
+                                {
+                                    <span class="badge bg-secondary">Đã ẩn</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Hiển thị</span>
+                                }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <form asp-action="ToggleHide" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
+                                    <button type="submit" class="btn btn-sm btn-outline-orange">
+                                        <i class="bi @(r.IsHidden ? "bi-eye" : "bi-eye-slash") me-1"></i>
+                                        @(r.IsHidden ? "Hiện lại" : "Ẩn")
+                                    </button>
+                                </form>
+                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Xóa vĩnh viễn đánh giá này?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

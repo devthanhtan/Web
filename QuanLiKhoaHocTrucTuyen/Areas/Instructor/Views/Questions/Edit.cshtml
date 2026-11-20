@@ -1,0 +1,69 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Instructor.ViewModels.QuestionFormViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa câu hỏi";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="app-card p-4">
+            <h1 class="h4 mb-1">Chỉnh sửa câu hỏi</h1>
+            <p class="small text-muted mb-3">Khóa học: <strong>@ViewBag.CourseTitle</strong></p>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="CourseId" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Topic" class="form-label fw-semibold"></label>
+                    <input asp-for="Topic" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Content" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Content" rows="3" class="form-control"></textarea>
+                    <span asp-validation-for="Content" class="text-danger small"></span>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="OptionA" class="form-label fw-semibold"></label>
+                        <input asp-for="OptionA" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionB" class="form-label fw-semibold"></label>
+                        <input asp-for="OptionB" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionC" class="form-label fw-semibold"></label>
+                        <input asp-for="OptionC" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionD" class="form-label fw-semibold"></label>
+                        <input asp-for="OptionD" class="form-control" />
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="CorrectOption" class="form-label fw-semibold"></label>
+                        <select asp-for="CorrectOption" class="form-select">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label asp-for="Explanation" class="form-label fw-semibold"></label>
+                        <input asp-for="Explanation" class="form-control" />
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-orange px-4">Lưu thay đổi</button>
+                    <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="btn btn-light border">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

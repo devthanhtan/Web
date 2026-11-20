@@ -1,0 +1,117 @@
+@model QuanLiKhoaHocTrucTuyen.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Trang chủ - Học & Quản lý khóa học trực tuyến";
+}
+
+<section class="hero-orange p-4 p-md-5 mb-5 shadow-sm">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <span class="badge badge-orange rounded-pill px-3 py-2 mb-3">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Nền tảng đào tạo trực tuyến hiện đại
+            </span>
+            <h1 class="display-5 fw-bold mb-3">
+                Nâng tầm kỹ năng công nghệ cùng <span class="text-orange">EduSpark</span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                Học qua video chuẩn HD, thực hành bài kiểm tra có đếm ngược, theo dõi tiến độ từng giây và nhận chứng chỉ điện tử xác thực bằng mã QR.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange btn-lg px-4">
+                    <i class="bi bi-compass me-1"></i> Khám phá khóa học
+                </a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-orange btn-lg px-4">
+                        Đăng ký miễn phí
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-orange btn-lg px-4">
+                        Vào học ngay
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="app-card p-3 text-center">
+                        <div class="stat-icon mx-auto mb-2"><i class="bi bi-collection-play-fill"></i></div>
+                        <div class="fs-4 fw-bold text-dark">@Model.TotalCourses+</div>
+                        <div class="small text-muted">Khóa học đã duyệt</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="app-card p-3 text-center">
+                        <div class="stat-icon mx-auto mb-2"><i class="bi bi-people-fill"></i></div>
+                        <div class="fs-4 fw-bold text-dark">@Model.TotalStudents+</div>
+                        <div class="small text-muted">Học viên đang học</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="app-card p-3 text-center">
+                        <div class="stat-icon mx-auto mb-2"><i class="bi bi-person-video3"></i></div>
+                        <div class="fs-4 fw-bold text-dark">@Model.TotalInstructors+</div>
+                        <div class="small text-muted">Giảng viên chuyên môn</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="app-card p-3 text-center">
+                        <div class="stat-icon mx-auto mb-2"><i class="bi bi-qr-code-scan"></i></div>
+                        <div class="fs-4 fw-bold text-dark">PDF + QR</div>
+                        <div class="small text-muted">Chứng chỉ xác thực</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h2 class="h4 mb-1">Danh mục nổi bật</h2>
+            <p class="text-muted small mb-0">Lựa chọn lộ trình phù hợp mục tiêu nghề nghiệp của bạn</p>
+        </div>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-sm btn-outline-orange">
+            Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+        @foreach (var cat in Model.Categories)
+        {
+            <div class="col">
+                <a asp-area="" asp-controller="Courses" asp-action="Index" asp-route-categoryId="@cat.Id" class="app-card app-card-hover p-3 d-flex align-items-center gap-3 text-decoration-none h-100">
+                    <div class="stat-icon flex-shrink-0"><i class="bi @cat.IconClass"></i></div>
+                    <div>
+                        <div class="fw-bold text-dark">@cat.Name</div>
+                        <div class="small text-muted text-truncate" style="max-width: 190px;">@cat.Description</div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h2 class="h4 mb-1">Khóa học tiêu biểu</h2>
+            <p class="text-muted small mb-0">Các khóa học đã qua kiểm duyệt chất lượng và được học viên đánh giá cao</p>
+        </div>
+    </div>
+    @if (!Model.FeaturedCourses.Any())
+    {
+        <div class="app-card p-5 text-center text-muted">Hiện chưa có khóa học công khai nào.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var course in Model.FeaturedCourses)
+            {
+                <partial name="_CourseCardPartial" model="course" />
+            }
+        </div>
+    }
+</section>

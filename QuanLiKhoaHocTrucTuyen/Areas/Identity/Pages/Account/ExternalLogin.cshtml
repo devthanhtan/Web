@@ -1,0 +1,28 @@
+@page
+@model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.ExternalLoginModel
+@{
+    ViewData["Title"] = "Hoàn tất đăng nhập";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-md-7 col-lg-5">
+        <div class="app-card p-4">
+            <h1 class="h4 mb-2">Liên kết tài khoản @Model.ProviderDisplayName</h1>
+            <p class="small text-muted mb-3">Xác nhận thông tin để hoàn tất tạo tài khoản Học viên.</p>
+            <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.FullName" class="form-label fw-semibold"></label>
+                    <input asp-for="Input.FullName" class="form-control" />
+                    <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label fw-semibold"></label>
+                    <input asp-for="Input.Email" class="form-control" readonly />
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-orange w-100">Hoàn tất đăng nhập</button>
+            </form>
+        </div>
+    </div>
+</div>

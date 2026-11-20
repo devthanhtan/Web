@@ -1,0 +1,86 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Quiz>
+@{
+    ViewData["Title"] = "Quản lý bài kiểm tra & thi";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+    var selectedCourseId = (int)(ViewBag.SelectedCourseId ?? 0);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Bài kiểm tra &amp; Bài thi cuối khóa</h1>
+        <p class="text-muted small mb-0">Thiết lập thời gian làm bài, điểm chuẩn đạt và số lần thi lại tối đa</p>
+    </div>
+    @if (selectedCourseId > 0)
+    {
+        <a asp-action="Create" asp-route-courseId="@selectedCourseId" class="btn btn-orange">
+            <i class="bi bi-plus-lg me-1"></i> Tạo bài kiểm tra
+        </a>
+    }
+</div>
+
+<div class="app-card p-3 p-md-4 mb-4">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-8">
+            <label class="form-label small fw-semibold">Chọn khóa học</label>
+            <select name="courseId" asp-items="ViewBag.Courses" class="form-select" onchange="this.form.submit()"></select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-outline-orange w-100">Xem bài kiểm tra</button>
+        </div>
+    </form>
+</div>
+
+<div class="app-card p-3 p-md-4">
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-4">Chưa có bài kiểm tra nào cho khóa học này.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Loại</th>
+                        <th>Thời gian</th>
+                        <th>Điểm đạt</th>
+                        <th>Thi lại</th>
+                        <th>Số câu</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@q.Title</td>
+                            <td>
+                                @if (q.IsFinalExam)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">Thi cuối khóa (Cấp chứng chỉ)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-orange">Theo chương: @(q.Chapter?.Title ?? "-")</span>
+                                }
+                            </td>
+                            <td>@q.DurationMinutes phút</td>
+                            <td>@q.PassingScorePercent%</td>
+                            <td>@(q.MaxAttempts == 0 ? "Không giới hạn" : $"{q.MaxAttempts} lần")</td>
+                            <td>@q.QuizQuestions.Count câu</td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@q.Id" class="btn btn-sm btn-outline-orange"><i class="bi bi-pencil"></i></a>
+                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Xóa bài kiểm tra này?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@q.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

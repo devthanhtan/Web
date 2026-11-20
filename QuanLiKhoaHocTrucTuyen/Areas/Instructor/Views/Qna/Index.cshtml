@@ -1,0 +1,58 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.CourseQuestion>
+@{
+    ViewData["Title"] = "Hộp thư hỏi đáp học viên";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+    bool? unansweredOnly = ViewBag.UnansweredOnly as bool?;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Hộp thư hỏi đáp của học viên</h1>
+        <p class="text-muted small mb-0">Giải đáp thắc mắc theo từng khóa học và bài giảng</p>
+    </div>
+    <div class="btn-group btn-group-sm">
+        <a asp-action="Index" class="btn @(unansweredOnly != true ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
+        <a asp-action="Index" asp-route-unansweredOnly="true" class="btn @(unansweredOnly == true ? "btn-orange" : "btn-outline-secondary")">Chưa trả lời</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center text-muted">Không có câu hỏi nào.</div>
+}
+else
+{
+    <div class="vstack gap-3">
+        @foreach (var q in Model)
+        {
+            <div class="app-card p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                    <div>
+                        <span class="badge badge-orange me-1">@q.Course.Title</span>
+                        @if (q.Lesson != null)
+                        {
+                            <span class="badge bg-light text-dark border">@q.Lesson.Title</span>
+                        }
+                    </div>
+                    <span class="small text-muted">@q.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                <div class="fw-bold small mb-1">@q.Student.FullName (@q.Student.Email) hỏi:</div>
+                <p class="mb-3">@q.QuestionText</p>
+
+                @if (!string.IsNullOrEmpty(q.AnswerText))
+                {
+                    <div class="p-3 bg-orange-soft rounded small mb-2">
+                        <strong class="text-orange">Câu trả lời của bạn:</strong> @q.AnswerText
+                    </div>
+                }
+
+                <form asp-action="Reply" method="post" class="input-group input-group-sm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@q.Id" />
+                    <input type="text" name="answerText" value="@q.AnswerText" class="form-control" required placeholder="Nhập nội dung phản hồi cho học viên..." />
+                    <button type="submit" class="btn btn-orange">@(string.IsNullOrEmpty(q.AnswerText) ? "Gửi trả lời" : "Cập nhật")</button>
+                </form>
+            </div>
+        }
+    </div>
+}

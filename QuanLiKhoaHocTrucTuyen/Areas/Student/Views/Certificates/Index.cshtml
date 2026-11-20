@@ -1,0 +1,44 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Certificate>
+@{
+    ViewData["Title"] = "Chứng chỉ của tôi";
+    ViewData["AreaTitle"] = "Góc Học viên";
+}
+
+<h1 class="h3 mb-4">Chứng chỉ điện tử của tôi</h1>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center text-muted">
+        Bạn chưa có chứng chỉ nào. Hãy hoàn thành 100% bài học và vượt qua bài thi cuối khóa để nhận chứng chỉ PDF kèm mã QR.
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var cert in Model)
+        {
+            <div class="col">
+                <div class="app-card p-4 h-100 border-top border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <span class="badge badge-orange mb-2">@cert.Code</span>
+                            <h2 class="h5 mb-1">@cert.CourseTitle</h2>
+                            <div class="small text-muted mb-2">Học viên: <strong>@cert.HolderName</strong></div>
+                            <div class="small text-muted">Ngày cấp: @cert.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <img src="@Url.Action("QrImage", "Certificate", new { area = "", code = cert.Code })" alt="QR @cert.Code" style="width:84px;height:84px;" class="border rounded p-1" />
+                    </div>
+                    <hr />
+                    <div class="d-flex flex-wrap gap-2">
+                        <a asp-action="DownloadPdf" asp-route-id="@cert.Id" class="btn btn-orange btn-sm">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Tải PDF
+                        </a>
+                        <a asp-area="" asp-controller="Certificate" asp-action="Verify" asp-route-code="@cert.Code" class="btn btn-outline-orange btn-sm">
+                            <i class="bi bi-qr-code-scan me-1"></i> Trang xác thực công khai
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

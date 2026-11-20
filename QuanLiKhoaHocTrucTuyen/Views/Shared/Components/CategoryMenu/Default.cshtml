@@ -1,0 +1,22 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Category>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-grid-3x3-gap text-orange me-1"></i> Danh mục
+    </a>
+    <ul class="dropdown-menu border-0 shadow-lg">
+        <li>
+            <a class="dropdown-item fw-semibold" asp-area="" asp-controller="Courses" asp-action="Index">
+                <i class="bi bi-collection me-2 text-orange"></i>Tất cả khóa học
+            </a>
+        </li>
+        <li><hr class="dropdown-divider" /></li>
+        @foreach (var cat in Model)
+        {
+            <li>
+                <a class="dropdown-item" asp-area="" asp-controller="Courses" asp-action="Index" asp-route-categoryId="@cat.Id">
+                    <i class="bi @cat.IconClass me-2 text-orange"></i>@cat.Name
+                </a>
+            </li>
+        }
+    </ul>
+</li>

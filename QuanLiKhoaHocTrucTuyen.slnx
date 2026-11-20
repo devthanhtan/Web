@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="QuanLiKhoaHocTrucTuyen.Tests/QuanLiKhoaHocTrucTuyen.Tests.csproj" />
+  <Project Path="QuanLiKhoaHocTrucTuyen/QuanLiKhoaHocTrucTuyen.csproj" />
+</Solution>

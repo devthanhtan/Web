@@ -1,0 +1,18 @@
+## Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+TestResults/
+*.trx
+
+## Secrets & local overrides
+appsettings.Development.json
+secrets.json
+
+## Runtime uploads & generated files
+QuanLiKhoaHocTrucTuyen/wwwroot/uploads/
+QuanLiKhoaHocTrucTuyen/App_Data/

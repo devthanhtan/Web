@@ -1,0 +1,62 @@
+@model QuanLiKhoaHocTrucTuyen.Models.Certificate?
+@{
+    ViewData["Title"] = "Tra cứu & Xác thực chứng chỉ";
+    var searchCode = ViewBag.SearchCode as string;
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="app-card p-4 p-md-5 mb-4">
+            <div class="text-center mb-4">
+                <div class="stat-icon mx-auto mb-3"><i class="bi bi-qr-code-scan"></i></div>
+                <h1 class="h3 mb-1">Tra cứu &amp; Xác thực chứng chỉ</h1>
+                <p class="text-muted small mb-0">Nhập mã chứng chỉ định danh (ví dụ: <code>CERT-2026-...</code>) để kiểm tra tính hợp lệ.</p>
+            </div>
+
+            <form method="get" asp-action="Verify" class="input-group input-group-lg mb-3">
+                <input type="text" name="code" value="@searchCode" class="form-control" placeholder="Nhập mã chứng chỉ..." required />
+                <button type="submit" class="btn btn-orange px-4"><i class="bi bi-search me-1"></i> Tra cứu</button>
+            </form>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(searchCode))
+        {
+            if (Model == null)
+            {
+                <div class="app-card p-4 text-center border-danger">
+                    <i class="bi bi-x-octagon-fill text-danger fs-1 d-block mb-2"></i>
+                    <h2 class="h5 text-danger">Không tìm thấy chứng chỉ</h2>
+                    <p class="text-muted small mb-0">Mã chứng chỉ <code>@searchCode</code> không tồn tại trên hệ thống EduSpark.</p>
+                </div>
+            }
+            else
+            {
+                <div class="app-card p-4 p-md-5 border border-2 border-warning">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                        <span class="badge bg-success fs-6"><i class="bi bi-patch-check-fill me-1"></i> CHỨNG CHỈ HỢP LỆ</span>
+                        <code class="fs-6">@Model.Code</code>
+                    </div>
+
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-8">
+                            <div class="small text-muted">Cấp cho học viên:</div>
+                            <h2 class="h3 text-orange mb-2">@Model.HolderName</h2>
+                            <div class="small text-muted">Hoàn thành khóa học:</div>
+                            <div class="h5 mb-3">@Model.CourseTitle</div>
+                            <div class="small text-muted">Giảng viên: <strong>@Model.Course.Instructor.FullName</strong></div>
+                            <div class="small text-muted">Ngày cấp: <strong>@Model.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</strong></div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <img src="@Url.Action("QrImage", "Certificate", new { code = Model.Code })" alt="QR Code" class="img-fluid border rounded p-2 mb-2" style="max-width: 150px;" />
+                            <div class="d-grid">
+                                <a asp-action="DownloadPdf" asp-route-code="@Model.Code" class="btn btn-orange btn-sm">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> Tải bản PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

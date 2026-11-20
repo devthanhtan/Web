@@ -1,0 +1,433 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Student.ViewModels.LearningRoomViewModel
+@{
+    ViewData["Title"] = $"Học: {Model.Course.Title}";
+    ViewData["AreaTitle"] = "Giao diện học";
+    var lesson = Model.CurrentLesson;
+    var watchedSec = Model.CurrentProgress?.WatchedSeconds ?? 0;
+    var lastPosSec = Model.CurrentProgress?.LastPositionSeconds ?? 0;
+    var isCurrentCompleted = Model.CurrentProgress?.IsCompleted == true;
+    var finalExam = Model.Course.Quizzes.FirstOrDefault(q => q.IsFinalExam);
+    var chapterQuizzes = Model.Course.Quizzes.Where(q => !q.IsFinalExam && q.ChapterId.HasValue).ToList();
+}
+
+@Html.AntiForgeryToken()
+
+<!-- Top Course Progress Header -->
+<div class="app-card p-3 mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-6">
+            <div class="small text-orange fw-semibold">@Model.Course.Category.Name · GV: @Model.Course.Instructor.FullName</div>
+            <h1 class="h5 mb-0">@Model.Course.Title</h1>
+        </div>
+        <div class="col-lg-6">
+            <div class="d-flex justify-content-between align-items-center small fw-semibold mb-1">
+                <span>Tiến độ: <span id="completedCountSpan">@Model.CompletedLessonsCount</span> / @Model.TotalLessonsCount bài học</span>
+                <span class="text-orange" id="courseProgressText">@Model.Enrollment.ProgressPercent.ToString("0.#")%</span>
+            </div>
+            <div class="progress progress-orange" style="height: 10px;">
+                <div id="courseProgressBar" class="progress-bar" role="progressbar"
+                     style="width: @Model.Enrollment.ProgressPercent.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Player & Tabs Column -->
+    <div class="col-lg-8">
+        @if (lesson == null)
+        {
+            <div class="app-card p-5 text-center text-muted">Khóa học này chưa có bài học nào.</div>
+        }
+        else
+        {
+            <div class="app-card p-3 p-md-4 mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <span class="badge badge-orange me-1">@(lesson.LessonType == LessonType.Video ? "Video" : "Tài liệu")</span>
+                        <h2 class="h5 d-inline align-middle mb-0">@lesson.Title</h2>
+                    </div>
+                    <span id="lessonCompletionBadge" class="badge @(isCurrentCompleted ? "bg-success" : "bg-secondary")">
+                        <i class="bi @(isCurrentCompleted ? "bi-check-circle-fill" : "bi-clock") me-1"></i>
+                        @(isCurrentCompleted ? "Đã hoàn thành" : "Chưa hoàn thành")
+                    </span>
+                </div>
+
+                @if (lesson.LessonType == LessonType.Video)
+                {
+                    bool useLocalVideo = !string.IsNullOrEmpty(lesson.LocalVideoPath) && (lesson.YoutubeVideoId?.StartsWith("MOCK_") == true);
+
+                    <div class="video-frame-wrapper mb-3">
+                        @if (useLocalVideo)
+                        {
+                            <video id="localVideoPlayer" controls playsinline class="w-100 h-100">
+                                <source src="@lesson.LocalVideoPath" />
+                            </video>
+                        }
+                        else if (!string.IsNullOrEmpty(lesson.YoutubeVideoId) && !lesson.YoutubeVideoId.StartsWith("MOCK_"))
+                        {
+                            <div id="ytPlayer"></div>
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center h-100 text-white p-4 text-center">
+                                <div>
+                                    <i class="bi bi-film fs-1 text-orange d-block mb-2"></i>
+                                    <div>Video chưa sẵn sàng (@lesson.VideoStatus).</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center bg-orange-soft rounded p-2 px-3 small">
+                        <div>
+                            <i class="bi bi-stopwatch text-orange me-1"></i>
+                            Thời lượng xem thực tế: <strong id="watchedSecondsSpan">@watchedSec</strong> / <strong>@lesson.DurationSeconds</strong> giây
+                            <span class="text-muted ms-1">(tự hoàn thành khi đạt ≥ 90%, không tính tua)</span>
+                        </div>
+                        <div class="text-muted">Vị trí lưu: <strong id="lastPosSpan">@lastPosSec</strong>s</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 bg-light rounded border mb-3">
+                        @if (!string.IsNullOrWhiteSpace(lesson.ContentHtml))
+                        {
+                            @Html.Raw(lesson.ContentHtml)
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">@lesson.Description</p>
+                        }
+                    </div>
+                    <div class="alert alert-success small py-2 mb-0">
+                        <i class="bi bi-check-circle-fill me-1"></i> Bài học dạng tài liệu đã được ghi nhận hoàn thành khi bạn mở xem.
+                    </div>
+                }
+
+                @if (lesson.Attachments.Any())
+                {
+                    <div class="mt-3 pt-3 border-top">
+                        <h3 class="h6 fw-bold mb-2"><i class="bi bi-paperclip text-orange me-1"></i> Tài liệu đính kèm</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var att in lesson.Attachments)
+                            {
+                                <a asp-area="Student" asp-controller="Learn" asp-action="DownloadAttachment" asp-route-attachmentId="@att.Id"
+                                   class="btn btn-sm btn-outline-orange">
+                                    <i class="bi bi-download me-1"></i> @att.FileName (@((att.FileSizeBytes / 1024.0).ToString("0.#")) KB)
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Tabs: Overview / Q&A / Review -->
+            <div class="app-card p-4">
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#tabDesc" type="button">Mô tả bài học</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tabQna" type="button">Hỏi đáp (@Model.Questions.Count)</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tabReview" type="button">Đánh giá khóa học</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tabDesc">
+                        <p class="mb-0">@(string.IsNullOrWhiteSpace(lesson.Description) ? "Không có mô tả thêm cho bài học này." : lesson.Description)</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="tabQna">
+                        <form asp-area="Student" asp-controller="Learn" asp-action="AskQuestion" method="post" class="mb-4">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="courseId" value="@Model.Course.Id" />
+                            <input type="hidden" name="lessonId" value="@lesson.Id" />
+                            <label class="form-label small fw-semibold">Đặt câu hỏi cho Giảng viên</label>
+                            <div class="input-group">
+                                <input type="text" name="questionText" class="form-control" required placeholder="Nhập thắc mắc của bạn về bài học này..." />
+                                <button type="submit" class="btn btn-orange">Gửi câu hỏi</button>
+                            </div>
+                        </form>
+
+                        @if (!Model.Questions.Any())
+                        {
+                            <p class="text-muted small mb-0">Chưa có câu hỏi nào.</p>
+                        }
+                        else
+                        {
+                            <div class="vstack gap-3">
+                                @foreach (var q in Model.Questions)
+                                {
+                                    <div class="p-3 bg-light rounded">
+                                        <div class="small fw-bold text-dark">
+                                            @q.Student.FullName
+                                            @if (q.Lesson != null)
+                                            {
+                                                <span class="badge bg-white text-muted border ms-1">@q.Lesson.Title</span>
+                                            }
+                                        </div>
+                                        <p class="small mb-2 mt-1">@q.QuestionText</p>
+                                        @if (!string.IsNullOrEmpty(q.AnswerText))
+                                        {
+                                            <div class="p-2 bg-white border-start border-3 border-warning rounded small">
+                                                <strong class="text-orange">Giảng viên @(q.AnsweredBy?.FullName ?? ""):</strong> @q.AnswerText
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning-emphasis">Đang chờ giảng viên trả lời</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="tab-pane fade" id="tabReview">
+                        @if (!Model.CanReview)
+                        {
+                            <div class="alert alert-warning border-0 mb-3">
+                                <i class="bi bi-lock-fill me-1"></i>
+                                Bạn cần đạt tiến độ học từ <strong>50% trở lên</strong> (hiện tại: <strong>@Model.Enrollment.ProgressPercent.ToString("0.#")%</strong>) mới có thể đánh giá khóa học. Hãy tiếp tục học nhé!
+                            </div>
+                            <button type="button" class="btn btn-secondary" disabled>Đánh giá (Chưa đạt 50%)</button>
+                        }
+                        else
+                        {
+                            <form asp-area="Student" asp-controller="Reviews" asp-action="Save" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="CourseId" value="@Model.Course.Id" />
+                                <input type="hidden" name="ReturnLessonId" value="@lesson.Id" />
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Số sao (1 - 5)</label>
+                                    <select name="Rating" class="form-select" style="max-width: 220px;">
+                                        @for (int s = 5; s >= 1; s--)
+                                        {
+                                            <option value="@s" selected="@((Model.ExistingReview?.Rating ?? 5) == s)">@s sao</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Nhận xét của bạn</label>
+                                    <textarea name="Comment" rows="3" class="form-control" placeholder="Chia sẻ cảm nhận về khóa học...">@Model.ExistingReview?.Comment</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-orange">
+                                    @(Model.ExistingReview == null ? "Gửi đánh giá" : "Cập nhật đánh giá")
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Curriculum Sidebar -->
+    <div class="col-lg-4">
+        <div class="app-card p-3 sticky-top" style="top: 84px;">
+            <h2 class="h6 fw-bold mb-3"><i class="bi bi-list-check text-orange me-1"></i> Nội dung khóa học</h2>
+            <div class="vstack gap-2" style="max-height: 60vh; overflow-y: auto;">
+                @foreach (var ch in Model.Course.Chapters.OrderBy(c => c.SortOrder))
+                {
+                    <div class="border rounded overflow-hidden">
+                        <div class="p-2 px-3 bg-orange-soft fw-bold small">Chương @ch.SortOrder: @ch.Title</div>
+                        <div class="list-group list-group-flush">
+                            @foreach (var item in ch.Lessons.OrderBy(l => l.SortOrder))
+                            {
+                                var done = Model.ProgressByLessonId.TryGetValue(item.Id, out var lp) && lp.IsCompleted;
+                                var active = lesson != null && item.Id == lesson.Id;
+                                <a asp-area="Student" asp-controller="Learn" asp-action="Index"
+                                   asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@item.Id"
+                                   class="list-group-item list-group-item-action py-2 px-3 small d-flex justify-content-between align-items-center @(active ? "bg-orange-soft fw-bold text-orange" : "")">
+                                    <span class="text-truncate me-2">
+                                        <i class="bi @(item.LessonType == LessonType.Video ? "bi-play-circle" : "bi-file-text") me-1"></i>
+                                        @item.Title
+                                    </span>
+                                    <i id="sidebarLessonIcon_@item.Id"
+                                       class="bi @(done ? "bi-check-circle-fill text-success" : "bi-circle text-muted") flex-shrink-0"></i>
+                                </a>
+                            }
+                            @foreach (var cq in chapterQuizzes.Where(q => q.ChapterId == ch.Id))
+                            {
+                                <a asp-area="Student" asp-controller="Quiz" asp-action="Info" asp-route-id="@cq.Id"
+                                   class="list-group-item list-group-item-action py-2 px-3 small text-primary">
+                                    <i class="bi bi-ui-checks-grid me-1"></i> @cq.Title
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <hr />
+            @if (finalExam != null)
+            {
+                <div class="d-grid gap-2">
+                    <a id="finalExamBtn"
+                       asp-area="Student" asp-controller="Quiz" asp-action="Info" asp-route-id="@finalExam.Id"
+                       class="btn @(Model.CanTakeFinalExam ? "btn-orange" : "btn-outline-secondary disabled")">
+                        <i class="bi @(Model.CanTakeFinalExam ? "bi-award-fill" : "bi-lock-fill") me-1"></i>
+                        Bài thi cuối khóa
+                    </a>
+                    @if (!Model.CanTakeFinalExam)
+                    {
+                        <div id="finalExamHint" class="small text-muted text-center">Hoàn thành 100% bài học để mở bài thi cuối khóa &amp; nhận chứng chỉ.</div>
+                    }
+                </div>
+            }
+
+            @if (Model.ExistingCertificate != null)
+            {
+                <div class="mt-2 d-grid">
+                    <a asp-area="Student" asp-controller="Certificates" asp-action="Index" class="btn btn-success btn-sm">
+                        <i class="bi bi-patch-check-fill me-1"></i> Xem chứng chỉ (@Model.ExistingCertificate.Code)
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (lesson != null && lesson.LessonType == LessonType.Video && lesson.VideoStatus == VideoUploadStatus.Ready)
+    {
+        <script>
+            (function () {
+                const lessonId = @lesson.Id;
+                const durationSec = @lesson.DurationSeconds;
+                const resumePos = @lastPosSec;
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                let isPlaying = false;
+                let lastTickMs = null;
+                let pendingDelta = 0;
+
+                function sendHeartbeat(currentPos) {
+                    const deltaToSend = Math.floor(pendingDelta);
+                    pendingDelta = pendingDelta - deltaToSend;
+                    if (deltaToSend <= 0 && currentPos <= 0) return;
+
+                    fetch('@Url.Action("TrackProgress", "Learn", new { area = "Student" })', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify({
+                            lessonId: lessonId,
+                            deltaWatchedSeconds: deltaToSend,
+                            currentPositionSeconds: Math.round(currentPos || 0)
+                        })
+                    })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data || !data.success) return;
+                        document.getElementById('watchedSecondsSpan').textContent = data.watchedSeconds;
+                        document.getElementById('lastPosSpan').textContent = data.lastPositionSeconds;
+                        document.getElementById('courseProgressText').textContent = data.courseProgressPercent + '%';
+                        document.getElementById('courseProgressBar').style.width = data.courseProgressPercent + '%';
+                        document.getElementById('completedCountSpan').textContent = data.completedLessons;
+
+                        if (data.lessonCompleted) {
+                            const badge = document.getElementById('lessonCompletionBadge');
+                            badge.className = 'badge bg-success';
+                            badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Đã hoàn thành';
+                            const sideIcon = document.getElementById('sidebarLessonIcon_' + lessonId);
+                            if (sideIcon) sideIcon.className = 'bi bi-check-circle-fill text-success flex-shrink-0';
+                        }
+
+                        if (data.finalExamUnlocked) {
+                            const examBtn = document.getElementById('finalExamBtn');
+                            if (examBtn) {
+                                examBtn.classList.remove('btn-outline-secondary', 'disabled');
+                                examBtn.classList.add('btn-orange');
+                            }
+                            const hint = document.getElementById('finalExamHint');
+                            if (hint) hint.remove();
+                        }
+                    });
+                }
+
+                // Wall-clock tick: only counts elapsed seconds while video is actually playing (anti-skip)
+                setInterval(function () {
+                    if (isPlaying && lastTickMs !== null) {
+                        const now = Date.now();
+                        const elapsed = (now - lastTickMs) / 1000.0;
+                        lastTickMs = now;
+                        if (elapsed > 0 && elapsed < 10) {
+                            pendingDelta += elapsed;
+                        }
+                    }
+                }, 1000);
+
+                // HTML5 local video player branch (mock mode)
+                const localVideo = document.getElementById('localVideoPlayer');
+                if (localVideo) {
+                    localVideo.addEventListener('loadedmetadata', function () {
+                        if (resumePos > 0 && resumePos < localVideo.duration) {
+                            localVideo.currentTime = resumePos;
+                        }
+                    });
+                    localVideo.addEventListener('play', function () {
+                        isPlaying = true;
+                        lastTickMs = Date.now();
+                    });
+                    localVideo.addEventListener('pause', function () {
+                        isPlaying = false;
+                        lastTickMs = null;
+                        sendHeartbeat(localVideo.currentTime);
+                    });
+                    localVideo.addEventListener('ended', function () {
+                        isPlaying = false;
+                        lastTickMs = null;
+                        sendHeartbeat(durationSec);
+                    });
+                    setInterval(function () {
+                        if (isPlaying) sendHeartbeat(localVideo.currentTime);
+                    }, 5000);
+                }
+
+                // YouTube IFrame Player API branch
+                const ytDiv = document.getElementById('ytPlayer');
+                if (ytDiv) {
+                    let ytPlayer = null;
+                    window.onYouTubeIframeAPIReady = function () {
+                        ytPlayer = new YT.Player('ytPlayer', {
+                            videoId: '@lesson.YoutubeVideoId',
+                            playerVars: { start: resumePos, rel: 0, modestbranding: 1 },
+                            events: {
+                                onStateChange: function (event) {
+                                    if (event.data === YT.PlayerState.PLAYING) {
+                                        isPlaying = true;
+                                        lastTickMs = Date.now();
+                                    } else if (event.data === YT.PlayerState.PAUSED) {
+                                        isPlaying = false;
+                                        lastTickMs = null;
+                                        sendHeartbeat(ytPlayer.getCurrentTime());
+                                    } else if (event.data === YT.PlayerState.ENDED) {
+                                        isPlaying = false;
+                                        lastTickMs = null;
+                                        sendHeartbeat(durationSec);
+                                    }
+                                }
+                            }
+                        });
+                    };
+                    setInterval(function () {
+                        if (isPlaying && ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+                            sendHeartbeat(ytPlayer.getCurrentTime());
+                        }
+                    }, 5000);
+
+                    const tag = document.createElement('script');
+                    tag.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(tag);
+                }
+            })();
+        </script>
+    }
+}

@@ -1,0 +1,68 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.CommissionConfig>
+@{
+    ViewData["Title"] = "Cấu hình hoa hồng";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+    var latest = ViewBag.Latest as QuanLiKhoaHocTrucTuyen.Models.CommissionConfig;
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="app-card p-4">
+            <h1 class="h4 mb-1">Cấu hình tỷ lệ chiết khấu / hoa hồng</h1>
+            <p class="small text-muted mb-4">Mỗi đơn hàng thanh toán thành công sẽ ghi nhận tỷ lệ hoa hồng tại thời điểm thanh toán.</p>
+
+            <div class="p-3 bg-orange-soft rounded mb-4">
+                <div class="small text-muted">Tỷ lệ hiện hành:</div>
+                <div class="fs-3 fw-bold text-orange">
+                    Nền tảng @(latest?.PlatformRatePercent.ToString("0.#") ?? "20")% · Giảng viên @((100 - (latest?.PlatformRatePercent ?? 20)).ToString("0.#"))%
+                </div>
+            </div>
+
+            <form asp-action="Update" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chiết khấu nền tảng mới (%)</label>
+                    <input type="number" name="platformRatePercent" step="0.5" min="0" max="90"
+                           value="@(latest?.PlatformRatePercent ?? 20)" class="form-control" required />
+                    <div class="form-text">Phần còn lại (100% - chiết khấu) thuộc về Giảng viên.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Ghi chú thay đổi</label>
+                    <input type="text" name="note" class="form-control" placeholder="Ví dụ: Điều chỉnh ưu đãi tháng 11..." />
+                </div>
+                <button type="submit" class="btn btn-orange w-100">Lưu cấu hình hoa hồng</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="app-card p-4">
+            <h2 class="h5 mb-3">Lịch sử thay đổi cấu hình</h2>
+            <div class="table-responsive">
+                <table class="table align-middle small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Thời điểm</th>
+                            <th>Chiết khấu sàn</th>
+                            <th>Giảng viên nhận</th>
+                            <th>Người cập nhật</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-bold text-orange">@item.PlatformRatePercent.ToString("0.#")%</td>
+                                <td>@((100m - item.PlatformRatePercent).ToString("0.#"))%</td>
+                                <td>@(item.UpdatedByAdmin?.FullName ?? "Hệ thống")</td>
+                                <td>@item.Note</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

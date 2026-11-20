@@ -1,0 +1,23 @@
+@page
+@model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Gửi lại email xác thực";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-md-7 col-lg-5">
+        <div class="app-card p-4">
+            <h1 class="h4 mb-2">Gửi lại email xác thực</h1>
+            <p class="small text-muted mb-3">Nhập email đã đăng ký để nhận lại liên kết kích hoạt.</p>
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger small mb-2"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label fw-semibold">Email</label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-orange w-100">Gửi lại liên kết</button>
+            </form>
+        </div>
+    </div>
+</div>

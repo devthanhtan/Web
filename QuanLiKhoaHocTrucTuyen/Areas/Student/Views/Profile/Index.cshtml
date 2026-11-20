@@ -1,0 +1,79 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Student.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    ViewData["AreaTitle"] = "Hồ sơ";
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="app-card p-4">
+            <h1 class="h4 mb-1">Cập nhật hồ sơ cá nhân</h1>
+            <p class="text-muted small mb-4">Quản lý thông tin hiển thị trên chứng chỉ và hồ sơ giảng dạy</p>
+
+            <form asp-action="Index" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label fw-semibold"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <input asp-for="Email" class="form-control" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="090xxxxxxx" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Headline" class="form-label fw-semibold"></label>
+                        <input asp-for="Headline" class="form-control" placeholder="Ví dụ: Lập trình viên .NET" />
+                        <span asp-validation-for="Headline" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Bio" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Bio" rows="4" class="form-control" placeholder="Giới thiệu ngắn về bản thân..."></textarea>
+                        <span asp-validation-for="Bio" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="AvatarFile" class="form-label fw-semibold"></label>
+                        <input asp-for="AvatarFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+                        <span asp-validation-for="AvatarFile" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-orange px-4">
+                        <i class="bi bi-save me-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="app-card p-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.CurrentAvatarUrl))
+            {
+                <img src="@Model.CurrentAvatarUrl" alt="@Model.FullName" class="rounded-circle object-fit-cover mb-3 border border-3 border-warning-subtle" style="width: 112px; height: 112px;" />
+            }
+            else
+            {
+                <div class="avatar-circle mx-auto mb-3 fs-2" style="width: 112px; height: 112px;">
+                    @(string.IsNullOrWhiteSpace(Model.FullName) ? "U" : Model.FullName[0].ToString().ToUpper())
+                </div>
+            }
+            <h2 class="h5 mb-1">@Model.FullName</h2>
+            <p class="small text-orange fw-semibold mb-2">@(Model.Headline ?? "Thành viên EduSpark")</p>
+            <p class="small text-muted mb-0">@(Model.Bio ?? "Chưa có tiểu sử giới thiệu.")</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

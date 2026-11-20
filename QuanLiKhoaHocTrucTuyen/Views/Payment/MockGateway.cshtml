@@ -1,0 +1,50 @@
+@model QuanLiKhoaHocTrucTuyen.ViewModels.MockPaymentViewModel
+@{
+    ViewData["Title"] = $"Cổng thanh toán {Model.Provider} (Sandbox Mock)";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="app-card p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge badge-orange">@Model.Provider Sandbox Simulator</span>
+                <span class="small text-muted">UseMockServices = true</span>
+            </div>
+            <h1 class="h4 mb-2">Xác nhận thanh toán đơn hàng</h1>
+            <p class="small text-muted mb-3">
+                Hệ thống mô phỏng cổng thanh toán và tạo chữ ký HMAC chuẩn trước khi gọi về <code>ReturnUrl</code> để kiểm chứng xác thực chữ ký &amp; idempotent.
+            </p>
+
+            <div class="p-3 bg-orange-soft rounded mb-4">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span>Mã đơn hàng:</span>
+                    <strong>@Model.Order.OrderCode</strong>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span>Số khóa học:</span>
+                    <strong>@Model.Order.Items.Count</strong>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-2">
+                    <span class="fw-semibold">Tổng thanh toán:</span>
+                    <strong class="fs-5 text-orange">@Model.Order.TotalAmount.ToString("N0") đ</strong>
+                </div>
+            </div>
+
+            <form asp-action="SimulateMockCallback" method="post" class="vstack gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderCode" value="@Model.Order.OrderCode" />
+                <input type="hidden" name="provider" value="@Model.Provider" />
+
+                <button type="submit" name="outcome" value="success" class="btn btn-success py-2">
+                    <i class="bi bi-check-circle-fill me-1"></i> Mô phỏng: Thanh toán thành công (Ký HMAC chuẩn)
+                </button>
+                <button type="submit" name="outcome" value="fail" class="btn btn-outline-danger py-2">
+                    <i class="bi bi-x-circle me-1"></i> Mô phỏng: Giao dịch thất bại
+                </button>
+                <button type="submit" name="outcome" value="cancel" class="btn btn-light border py-2">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Mô phỏng: Hủy thanh toán (Giữ lại giỏ hàng)
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,139 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Admin.ViewModels.InstructorRequestsIndexViewModel
+@{
+    ViewData["Title"] = "Thẩm định hồ sơ Giảng viên";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+}
+
+<div class="app-card p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h1 class="h4 mb-1">Thẩm định yêu cầu nâng cấp Giảng viên</h1>
+            <p class="text-muted small mb-0">Xem hồ sơ năng lực, phê duyệt cấp quyền Giảng viên hoặc từ chối kèm lý do</p>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <a asp-action="Index" class="btn @(Model.StatusFilter == null ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
+            <a asp-action="Index" asp-route-status="@InstructorRequestStatus.Pending" class="btn @(Model.StatusFilter == InstructorRequestStatus.Pending ? "btn-orange" : "btn-outline-secondary")">Chờ duyệt</a>
+            <a asp-action="Index" asp-route-status="@InstructorRequestStatus.Approved" class="btn @(Model.StatusFilter == InstructorRequestStatus.Approved ? "btn-orange" : "btn-outline-secondary")">Đã duyệt</a>
+            <a asp-action="Index" asp-route-status="@InstructorRequestStatus.Rejected" class="btn @(Model.StatusFilter == InstructorRequestStatus.Rejected ? "btn-orange" : "btn-outline-secondary")">Từ chối</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Ứng viên</th>
+                    <th>Chuyên môn &amp; Kinh nghiệm</th>
+                    <th>Tài liệu</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Requests.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Không có yêu cầu nào.</td></tr>
+                }
+                else
+                {
+                    @foreach (var req in Model.Requests)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@req.User.FullName</div>
+                                <div class="small text-muted">@req.User.Email</div>
+                                <div class="small text-muted">Gửi lúc: @req.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold">@req.Expertise (@req.ExperienceYears năm)</div>
+                                <div class="small text-muted">@req.Bio</div>
+                                @if (!string.IsNullOrEmpty(req.RejectionReason))
+                                {
+                                    <div class="small text-danger mt-1"><strong>Lý do từ chối:</strong> @req.RejectionReason</div>
+                                }
+                            </td>
+                            <td>
+                                <a href="@req.CvFilePath" target="_blank" class="btn btn-sm btn-light border mb-1">
+                                    <i class="bi bi-file-earmark-text me-1"></i> Xem CV
+                                </a>
+                                @if (!string.IsNullOrEmpty(req.CertificateFilePath))
+                                {
+                                    <br />
+                                    <a href="@req.CertificateFilePath" target="_blank" class="btn btn-sm btn-light border">
+                                        <i class="bi bi-award me-1"></i> Chứng chỉ
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                @switch (req.Status)
+                                {
+                                    case InstructorRequestStatus.Pending:
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">Chờ duyệt</span>
+                                        break;
+                                    case InstructorRequestStatus.Approved:
+                                        <span class="badge bg-success">Đã duyệt</span>
+                                        break;
+                                    case InstructorRequestStatus.Rejected:
+                                        <span class="badge bg-danger">Từ chối</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (req.Status == InstructorRequestStatus.Pending)
+                                {
+                                    <form asp-action="Approve" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@req.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success mb-1">
+                                            <i class="bi bi-check2-circle me-1"></i> Phê duyệt
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mb-1"
+                                            data-bs-toggle="modal" data-bs-target="#rejectModal"
+                                            data-request-id="@req.Id" data-applicant="@req.User.FullName">
+                                        <i class="bi bi-x-circle me-1"></i> Từ chối
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reject" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="RequestId" id="rejectRequestId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Từ chối hồ sơ Giảng viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">Ứng viên: <strong id="rejectApplicantName"></strong></p>
+                    <label class="form-label fw-semibold">Lý do từ chối (bắt buộc)</label>
+                    <textarea name="RejectionReason" class="form-control" rows="3" required placeholder="Nhập lý do chi tiết để ứng viên bổ sung hồ sơ..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('rejectModal')?.addEventListener('show.bs.modal', function (event) {
+            const btn = event.relatedTarget;
+            document.getElementById('rejectRequestId').value = btn.getAttribute('data-request-id');
+            document.getElementById('rejectApplicantName').textContent = btn.getAttribute('data-applicant');
+        });
+    </script>
+}

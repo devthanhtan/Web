@@ -1,0 +1,99 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Course>
+@{
+    ViewData["Title"] = "Khóa học của tôi (Giảng viên)";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Quản lý khóa học</h1>
+        <p class="text-muted small mb-0">Tạo mới, biên soạn chương bài học, tải video và gửi duyệt xuất bản</p>
+    </div>
+    <a asp-action="Create" class="btn btn-orange">
+        <i class="bi bi-plus-lg me-1"></i> Tạo khóa học mới
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center">
+        <div class="stat-icon mx-auto mb-3"><i class="bi bi-collection-play"></i></div>
+        <h2 class="h5 mb-2">Bạn chưa tạo khóa học nào</h2>
+        <p class="text-muted small mb-3">Tạo khóa học đầu tiên để bắt đầu chia sẻ kiến thức và kiếm thu nhập.</p>
+        <a asp-action="Create" class="btn btn-orange">Tạo khóa học ngay</a>
+    </div>
+}
+else
+{
+    <div class="app-card p-3 p-md-4">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Danh mục</th>
+                        <th>Học phí</th>
+                        <th>Nội dung</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        var totalLessons = c.Chapters.Sum(ch => ch.Lessons.Count);
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(c.ThumbnailUrl) ? "/images/course-dotnet.svg" : c.ThumbnailUrl)"
+                                         alt="@c.Title" class="rounded" style="width:76px;height:44px;object-fit:cover;" />
+                                    <div>
+                                        <div class="fw-bold text-dark">@c.Title</div>
+                                        <div class="small text-muted">@c.Level · @c.Enrollments.Count học viên</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-orange">@c.Category.Name</span></td>
+                            <td class="fw-semibold text-orange">@c.Price.ToString("N0") đ</td>
+                            <td class="small">@c.Chapters.Count chương · @totalLessons bài</td>
+                            <td>
+                                @switch (c.Status)
+                                {
+                                    case CourseStatus.Draft:
+                                        <span class="badge bg-secondary">Nháp (chỉ mình bạn thấy)</span>
+                                        break;
+                                    case CourseStatus.PendingReview:
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">Chờ Admin duyệt</span>
+                                        break;
+                                    case CourseStatus.Approved:
+                                        <span class="badge bg-success">Đã duyệt công khai</span>
+                                        break;
+                                    case CourseStatus.Rejected:
+                                        <span class="badge bg-danger">Bị từ chối</span>
+                                        <div class="small text-danger mt-1">@c.RejectionReason</div>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex flex-wrap gap-1 justify-content-end">
+                                    <a asp-action="Curriculum" asp-route-id="@c.Id" class="btn btn-sm btn-orange">
+                                        <i class="bi bi-diagram-3 me-1"></i> Chương &amp; Bài
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-orange">
+                                        <i class="bi bi-pencil"></i> Sửa
+                                    </a>
+                                    <a asp-area="Instructor" asp-controller="Questions" asp-action="Index" asp-route-courseId="@c.Id" class="btn btn-sm btn-light border" title="Ngân hàng câu hỏi">
+                                        <i class="bi bi-patch-question"></i>
+                                    </a>
+                                    <a asp-area="Instructor" asp-controller="Quizzes" asp-action="Index" asp-route-courseId="@c.Id" class="btn btn-sm btn-light border" title="Bài kiểm tra">
+                                        <i class="bi bi-ui-checks-grid"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

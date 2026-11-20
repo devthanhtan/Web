@@ -1,0 +1,294 @@
+@model QuanLiKhoaHocTrucTuyen.Models.Course
+@{
+    ViewData["Title"] = "Trình dựng chương & bài học";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+            <h1 class="h3 mb-0">@Model.Title</h1>
+            @switch (Model.Status)
+            {
+                case CourseStatus.Draft:
+                    <span class="badge bg-secondary">Nháp</span>
+                    break;
+                case CourseStatus.PendingReview:
+                    <span class="badge bg-warning-subtle text-warning-emphasis">Chờ Admin duyệt</span>
+                    break;
+                case CourseStatus.Approved:
+                    <span class="badge bg-success">Đã duyệt công khai</span>
+                    break;
+                case CourseStatus.Rejected:
+                    <span class="badge bg-danger">Bị từ chối</span>
+                    break;
+            }
+        </div>
+        <p class="text-muted small mb-0">Sắp xếp chương, tải lên bài học video (tự động đẩy lên YouTube unlisted) và bài học tài liệu.</p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-orange btn-sm">
+            <i class="bi bi-pencil me-1"></i> Sửa thông tin chung
+        </a>
+        @if (Model.Status == CourseStatus.Draft || Model.Status == CourseStatus.Rejected)
+        {
+            <form asp-action="SubmitForReview" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="courseId" value="@Model.Id" />
+                <button type="submit" class="btn btn-orange btn-sm">
+                    <i class="bi bi-send-check me-1"></i> Gửi Admin kiểm duyệt
+                </button>
+            </form>
+        }
+        <a asp-action="Curriculum" asp-route-id="@Model.Id" class="btn btn-light border btn-sm" title="Làm mới trạng thái video">
+            <i class="bi bi-arrow-clockwise"></i> Cập nhật trạng thái
+        </a>
+    </div>
+</div>
+
+@if (Model.Status == CourseStatus.Rejected && !string.IsNullOrEmpty(Model.RejectionReason))
+{
+    <div class="alert alert-danger border-0 shadow-sm mb-4">
+        <div class="fw-bold"><i class="bi bi-x-octagon-fill me-1"></i> Lý do khóa học bị từ chối:</div>
+        <div class="small mt-1">@Model.RejectionReason</div>
+    </div>
+}
+
+<!-- Add Chapter Form -->
+<div class="app-card p-4 mb-4">
+    <h2 class="h5 mb-3"><i class="bi bi-folder-plus text-orange me-1"></i> Thêm chương mới</h2>
+    <form asp-action="AddChapter" method="post" class="row g-2 align-items-end">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="courseId" value="@Model.Id" />
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold">Tên chương</label>
+            <input type="text" name="title" class="form-control" required placeholder="Ví dụ: Chương 1: Giới thiệu & Cài đặt" />
+        </div>
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold">Mô tả ngắn (tùy chọn)</label>
+            <input type="text" name="description" class="form-control" placeholder="Mục tiêu của chương..." />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-orange"><i class="bi bi-plus-lg me-1"></i> Thêm chương</button>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Chapters.Any())
+{
+    <div class="app-card p-5 text-center text-muted">
+        Khóa học chưa có chương nào. Hãy thêm chương đầu tiên ở phía trên.
+    </div>
+}
+else
+{
+    @foreach (var chapter in Model.Chapters.OrderBy(c => c.SortOrder))
+    {
+        <div class="app-card mb-4 overflow-hidden">
+            <div class="p-3 bg-orange-soft border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <span class="badge badge-orange me-2">Chương @chapter.SortOrder</span>
+                    <strong class="text-dark">@chapter.Title</strong>
+                    @if (!string.IsNullOrEmpty(chapter.Description))
+                    {
+                        <span class="small text-muted ms-2">— @chapter.Description</span>
+                    }
+                </div>
+                <div class="d-flex flex-wrap gap-1">
+                    <form asp-action="MoveChapter" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="chapterId" value="@chapter.Id" />
+                        <input type="hidden" name="courseId" value="@Model.Id" />
+                        <button type="submit" name="direction" value="-1" class="btn btn-sm btn-light border" title="Lên"><i class="bi bi-arrow-up"></i></button>
+                        <button type="submit" name="direction" value="1" class="btn btn-sm btn-light border" title="Xuống"><i class="bi bi-arrow-down"></i></button>
+                    </form>
+                    <button type="button" class="btn btn-sm btn-orange"
+                            data-bs-toggle="modal" data-bs-target="#addLessonModal"
+                            data-chapter-id="@chapter.Id" data-chapter-title="@chapter.Title">
+                        <i class="bi bi-plus-circle me-1"></i> Thêm bài học
+                    </button>
+                    <form asp-action="DeleteChapter" method="post" class="d-inline" onsubmit="return confirm('Xóa chương này và toàn bộ bài học bên trong?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="chapterId" value="@chapter.Id" />
+                        <input type="hidden" name="courseId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="list-group list-group-flush">
+                @if (!chapter.Lessons.Any())
+                {
+                    <div class="list-group-item text-muted small py-3">Chưa có bài học nào trong chương này.</div>
+                }
+                else
+                {
+                    @foreach (var lesson in chapter.Lessons.OrderBy(l => l.SortOrder))
+                    {
+                        <div class="list-group-item py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-start gap-2">
+                                <span class="badge bg-light text-dark border mt-1">
+                                    <i class="bi @(lesson.LessonType == LessonType.Video ? "bi-play-btn text-orange" : "bi-file-text text-primary")"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-semibold text-dark">
+                                        @lesson.Title
+                                        @if (lesson.IsFreePreview)
+                                        {
+                                            <span class="badge bg-info-subtle text-info-emphasis ms-1">Học thử</span>
+                                        }
+                                    </div>
+                                    <div class="small text-muted">
+                                        Loại: @(lesson.LessonType == LessonType.Video ? "Video" : "Tài liệu")
+                                        · Thời lượng: @TimeSpan.FromSeconds(lesson.DurationSeconds).ToString(@"mm\:ss")
+                                        · Đính kèm: @lesson.Attachments.Count tệp
+                                    </div>
+                                    @if (lesson.LessonType == LessonType.Video)
+                                    {
+                                        <div class="mt-1">
+                                            @switch (lesson.VideoStatus)
+                                            {
+                                                case VideoUploadStatus.Processing:
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                        <span class="spinner-border spinner-border-sm me-1" style="width:10px;height:10px;"></span>
+                                                        Processing (Đang đẩy lên YouTube...)
+                                                    </span>
+                                                    break;
+                                                case VideoUploadStatus.Ready:
+                                                    <span class="badge bg-success-subtle text-success">
+                                                        <i class="bi bi-check-circle me-1"></i> Ready (ID: @lesson.YoutubeVideoId)
+                                                    </span>
+                                                    break;
+                                                case VideoUploadStatus.Error:
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i> Error: @lesson.VideoErrorMessage
+                                                    </span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary">Chưa tải video</span>
+                                                    break;
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-1">
+                                <form asp-action="MoveLesson" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="lessonId" value="@lesson.Id" />
+                                    <input type="hidden" name="courseId" value="@Model.Id" />
+                                    <button type="submit" name="direction" value="-1" class="btn btn-sm btn-light border"><i class="bi bi-arrow-up"></i></button>
+                                    <button type="submit" name="direction" value="1" class="btn btn-sm btn-light border"><i class="bi bi-arrow-down"></i></button>
+                                </form>
+                                <a asp-action="EditLesson" asp-route-id="@lesson.Id" class="btn btn-sm btn-outline-orange">
+                                    <i class="bi bi-pencil-square me-1"></i> Sửa / Tải lại
+                                </a>
+                                <form asp-action="DeleteLesson" method="post" class="d-inline" onsubmit="return confirm('Xóa bài học này?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="lessonId" value="@lesson.Id" />
+                                    <input type="hidden" name="courseId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}
+
+<!-- Add Lesson Modal -->
+<div class="modal fade" id="addLessonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="AddLesson" method="post" enctype="multipart/form-data" data-loading-form="true">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CourseId" value="@Model.Id" />
+                <input type="hidden" name="ChapterId" id="modalChapterId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm bài học vào: <span id="modalChapterTitle" class="text-orange"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Tên bài học</label>
+                            <input type="text" name="Title" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Loại bài học</label>
+                            <select name="LessonType" id="addLessonType" class="form-select">
+                                <option value="0">Video</option>
+                                <option value="1">Tài liệu</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Mô tả ngắn</label>
+                            <textarea name="Description" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-8" id="videoFileGroup">
+                            <label class="form-label fw-semibold">Tệp video bài giảng (.mp4, .webm, .mov)</label>
+                            <input type="file" name="VideoFile" id="addVideoFile" accept=".mp4,.webm,.mov" class="form-control" />
+                            <div class="form-text">Video sẽ được hệ thống đẩy nền lên YouTube (unlisted).</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Thời lượng (giây)</label>
+                            <input type="number" name="DurationSeconds" id="addDurationSeconds" value="300" min="10" class="form-control" />
+                        </div>
+                        <div class="col-12 d-none" id="docContentGroup">
+                            <label class="form-label fw-semibold">Nội dung bài học tài liệu</label>
+                            <textarea name="ContentHtml" class="form-control" rows="4" placeholder="Nhập nội dung bài đọc hoặc hướng dẫn..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Tài liệu đính kèm (tùy chọn)</label>
+                            <input type="file" name="AttachmentFile" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt" />
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="IsFreePreview" value="true" id="addIsPreview" />
+                                <label class="form-check-label" for="addIsPreview">Cho phép khách xem thử miễn phí ở trang chi tiết khóa học</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-orange">Lưu bài học</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('addLessonModal')?.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            document.getElementById('modalChapterId').value = btn.getAttribute('data-chapter-id');
+            document.getElementById('modalChapterTitle').textContent = btn.getAttribute('data-chapter-title');
+        });
+
+        document.getElementById('addLessonType')?.addEventListener('change', function () {
+            const isVideo = this.value === '0';
+            document.getElementById('videoFileGroup').classList.toggle('d-none', !isVideo);
+            document.getElementById('docContentGroup').classList.toggle('d-none', isVideo);
+        });
+
+        document.getElementById('addVideoFile')?.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function () {
+                URL.revokeObjectURL(video.src);
+                if (video.duration && !isNaN(video.duration)) {
+                    document.getElementById('addDurationSeconds').value = Math.max(10, Math.round(video.duration));
+                }
+            };
+            video.src = URL.createObjectURL(file);
+        });
+    </script>
+}

@@ -1,0 +1,111 @@
+@model QuanLiKhoaHocTrucTuyen.ViewModels.CourseCatalogViewModel
+@{
+    ViewData["Title"] = "Danh sách khóa học";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Khám phá khóa học</h1>
+        <p class="text-muted small mb-0">Tìm thấy <strong>@Model.TotalCount</strong> khóa học phù hợp</p>
+    </div>
+    <button class="btn btn-outline-orange btn-sm d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+        <i class="bi bi-funnel me-1"></i> Bộ lọc tìm kiếm
+    </button>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="collapse d-lg-block" id="filterPanel">
+            <div class="app-card p-3 p-md-4">
+                <h2 class="h6 fw-bold mb-3"><i class="bi bi-sliders text-orange me-1"></i> Bộ lọc</h2>
+                <form method="get" asp-action="Index">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Từ khóa</label>
+                        <input type="text" name="keyword" value="@Model.Keyword" class="form-control form-control-sm" placeholder="Tên khóa học, giảng viên..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Danh mục</label>
+                        <select name="categoryId" class="form-select form-select-sm">
+                            <option value="">Tất cả danh mục</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Mức giá tối đa</label>
+                        <select name="maxPrice" class="form-select form-select-sm">
+                            <option value="">Không giới hạn</option>
+                            <option value="500000" selected="@(Model.MaxPrice == 500000)">Dưới 500.000 đ</option>
+                            <option value="700000" selected="@(Model.MaxPrice == 700000)">Dưới 700.000 đ</option>
+                            <option value="1000000" selected="@(Model.MaxPrice == 1000000)">Dưới 1.000.000 đ</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Đánh giá tối thiểu</label>
+                        <select name="minRating" class="form-select form-select-sm">
+                            <option value="">Tất cả</option>
+                            <option value="4" selected="@(Model.MinRating == 4)">Từ 4 sao trở lên</option>
+                            <option value="3" selected="@(Model.MinRating == 3)">Từ 3 sao trở lên</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Sắp xếp</label>
+                        <select name="sort" class="form-select form-select-sm">
+                            <option value="">Phổ biến nhất</option>
+                            <option value="rating" selected="@(Model.Sort == "rating")">Đánh giá cao nhất</option>
+                            <option value="price_asc" selected="@(Model.Sort == "price_asc")">Giá tăng dần</option>
+                            <option value="price_desc" selected="@(Model.Sort == "price_desc")">Giá giảm dần</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-orange btn-sm">Áp dụng bộ lọc</button>
+                        <a asp-action="Index" class="btn btn-light border btn-sm">Xóa bộ lọc</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        @if (!Model.Courses.Any())
+        {
+            <div class="app-card p-5 text-center">
+                <div class="stat-icon mx-auto mb-3"><i class="bi bi-search"></i></div>
+                <h2 class="h5 mb-2">Không tìm thấy khóa học phù hợp</h2>
+                <p class="text-muted small mb-3">Thử thay đổi từ khóa hoặc xóa bớt điều kiện lọc.</p>
+                <a asp-action="Index" class="btn btn-outline-orange btn-sm">Xem tất cả khóa học</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                @foreach (var item in Model.Courses)
+                {
+                    <partial name="_CourseCardPartial" model="item" />
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-4" aria-label="Phân trang khóa học">
+                    <ul class="pagination justify-content-center">
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <li class="page-item @(p == Model.Page ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-keyword="@Model.Keyword"
+                                   asp-route-categoryId="@Model.CategoryId"
+                                   asp-route-maxPrice="@Model.MaxPrice"
+                                   asp-route-minRating="@Model.MinRating"
+                                   asp-route-sort="@Model.Sort"
+                                   asp-route-page="@p">@p</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
+</div>

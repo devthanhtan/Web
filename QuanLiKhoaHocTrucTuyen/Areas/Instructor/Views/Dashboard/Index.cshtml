@@ -1,0 +1,130 @@
+@model QuanLiKhoaHocTrucTuyen.Services.Interfaces.InstructorReportDto
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Thống kê Giảng viên";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+    var labelsJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.Label));
+    var revenueJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.InstructorAmount));
+    var enrollsJson = JsonSerializer.Serialize(Model.Buckets.Select(b => b.NewEnrollments));
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h1 class="h3 mb-1">Thống kê doanh thu &amp; học viên</h1>
+        <p class="text-muted small mb-0">Theo dõi hiệu quả các khóa học bạn giảng dạy</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <div class="btn-group btn-group-sm">
+            <a asp-action="Index" asp-route-period="week" class="btn @(Model.Period == "week" ? "btn-orange" : "btn-outline-secondary")">Theo tuần</a>
+            <a asp-action="Index" asp-route-period="month" class="btn @(Model.Period == "month" ? "btn-orange" : "btn-outline-secondary")">Theo tháng</a>
+        </div>
+        <a asp-area="Instructor" asp-controller="Courses" asp-action="Create" class="btn btn-sm btn-orange">
+            <i class="bi bi-plus-lg me-1"></i> Tạo khóa học mới
+        </a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Doanh thu cá nhân</div>
+                    <div class="fs-4 fw-bold text-orange mt-1">@Model.TotalNetRevenue.ToString("N0") đ</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Tổng học viên</div>
+                    <div class="fs-4 fw-bold text-dark mt-1">@Model.TotalStudents</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Đánh giá trung bình</div>
+                    <div class="fs-4 fw-bold text-dark mt-1">@(Model.AverageRating > 0 ? $"{Model.AverageRating:0.0} ★" : "Chưa có")</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card h-100">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Hỏi đáp chờ trả lời</div>
+                    <div class="fs-4 fw-bold text-dark mt-1">@Model.UnreadQna</div>
+                    <div class="small text-muted">Khóa đã duyệt: @Model.ApprovedCourses/@Model.TotalCourses</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-chat-dots"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-card p-4 mb-4">
+    <h2 class="h6 fw-bold mb-3">Biểu đồ doanh thu &amp; đăng ký mới (@(Model.Period == "week" ? "Theo tuần" : "Theo tháng"))</h2>
+    <canvas id="instructorChart" height="105"></canvas>
+</div>
+
+<div class="app-card p-4">
+    <h2 class="h5 mb-3">Chi tiết theo từng khóa học</h2>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Khóa học</th>
+                    <th>Học viên</th>
+                    <th>Tiến độ TB</th>
+                    <th>Đánh giá</th>
+                    <th class="text-end">Doanh thu ròng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.CourseStats)
+                {
+                    <tr>
+                        <td class="fw-semibold">@c.Title</td>
+                        <td>@c.EnrollmentCount</td>
+                        <td>@c.AvgProgressPercent.ToString("0.#")%</td>
+                        <td>@(c.AvgRating > 0 ? $"{c.AvgRating:0.0} ★" : "-")</td>
+                        <td class="text-end fw-bold text-orange">@c.Revenue.ToString("N0") đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        new Chart(document.getElementById('instructorChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(labelsJson),
+                datasets: [
+                    { label: 'Doanh thu ròng (VNĐ)', data: @Html.Raw(revenueJson), backgroundColor: '#ff6b00', yAxisID: 'y' },
+                    { label: 'Học viên mới', data: @Html.Raw(enrollsJson), type: 'line', borderColor: '#0f172a', backgroundColor: '#0f172a', yAxisID: 'y1', tension: 0.3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, position: 'left' },
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+                }
+            }
+        });
+    </script>
+}

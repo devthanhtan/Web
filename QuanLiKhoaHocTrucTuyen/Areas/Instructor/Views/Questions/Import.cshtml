@@ -1,0 +1,53 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Instructor.ViewModels.QuestionImportViewModel
+@{
+    ViewData["Title"] = "Nhập câu hỏi từ Excel/CSV";
+    ViewData["AreaTitle"] = "Kênh Giảng viên";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="app-card p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <div>
+                    <h1 class="h4 mb-1">Nhập hàng loạt câu hỏi (.xlsx / .csv)</h1>
+                    <p class="small text-muted mb-0">Khóa học: <strong>@Model.CourseTitle</strong></p>
+                </div>
+                <a asp-action="DownloadTemplate" class="btn btn-outline-orange btn-sm">
+                    <i class="bi bi-download me-1"></i> Tải file Excel mẫu (.xlsx)
+                </a>
+            </div>
+
+            <div class="alert bg-orange-soft small mb-4">
+                <strong>Cấu trúc cột chuẩn (hàng 1 là tiêu đề):</strong>
+                <code>Topic | Content | OptionA | OptionB | OptionC | OptionD | CorrectOption (A/B/C/D) | Explanation</code>
+            </div>
+
+            @if (Model.RowErrors.Any())
+            {
+                <div class="alert alert-danger mb-4">
+                    <div class="fw-bold mb-1">Phát hiện lỗi theo từng dòng:</div>
+                    <ul class="small mb-0">
+                        @foreach (var err in Model.RowErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form asp-action="Import" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input asp-for="CourseId" type="hidden" />
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chọn tệp .xlsx hoặc .csv</label>
+                    <input asp-for="File" type="file" accept=".xlsx,.csv" class="form-control" />
+                    <span asp-validation-for="File" class="text-danger small"></span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-orange px-4"><i class="bi bi-upload me-1"></i> Tải lên &amp; Nhập dữ liệu</button>
+                    <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="btn btn-light border">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

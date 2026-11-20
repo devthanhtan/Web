@@ -1,0 +1,75 @@
+@model QuanLiKhoaHocTrucTuyen.Areas.Admin.ViewModels.AdminCoursesIndexViewModel
+@{
+    ViewData["Title"] = "Kiểm duyệt khóa học";
+    ViewData["AreaTitle"] = "Quản trị Admin";
+}
+
+<div class="app-card p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h1 class="h4 mb-1">Kiểm duyệt khóa học</h1>
+            <p class="text-muted small mb-0">Kiểm tra nội dung, bản quyền, chất lượng video trước khi xuất bản công khai</p>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <a asp-action="Index" class="btn @(Model.StatusFilter == null ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
+            <a asp-action="Index" asp-route-status="@CourseStatus.PendingReview" class="btn @(Model.StatusFilter == CourseStatus.PendingReview ? "btn-orange" : "btn-outline-secondary")">Chờ duyệt</a>
+            <a asp-action="Index" asp-route-status="@CourseStatus.Approved" class="btn @(Model.StatusFilter == CourseStatus.Approved ? "btn-orange" : "btn-outline-secondary")">Đã duyệt</a>
+            <a asp-action="Index" asp-route-status="@CourseStatus.Rejected" class="btn @(Model.StatusFilter == CourseStatus.Rejected ? "btn-orange" : "btn-outline-secondary")">Từ chối</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Khóa học</th>
+                    <th>Giảng viên</th>
+                    <th>Học phí</th>
+                    <th>Bài học</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Kiểm duyệt</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Courses.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Không có khóa học nào.</td></tr>
+                }
+                else
+                {
+                    @foreach (var c in Model.Courses)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@c.Title</div>
+                                <div class="small text-muted">@c.Category.Name · @c.Level</div>
+                            </td>
+                            <td class="small">@c.Instructor.FullName<br /><span class="text-muted">@c.Instructor.Email</span></td>
+                            <td class="fw-semibold text-orange">@c.Price.ToString("N0") đ</td>
+                            <td class="small">@c.Chapters.Count chương · @c.Chapters.Sum(ch => ch.Lessons.Count) bài</td>
+                            <td>
+                                @switch (c.Status)
+                                {
+                                    case CourseStatus.PendingReview:
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">Chờ duyệt</span>
+                                        break;
+                                    case CourseStatus.Approved:
+                                        <span class="badge bg-success">Đã duyệt</span>
+                                        break;
+                                    case CourseStatus.Rejected:
+                                        <span class="badge bg-danger">Từ chối</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-orange">
+                                    <i class="bi bi-eye me-1"></i> Xem &amp; Duyệt
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

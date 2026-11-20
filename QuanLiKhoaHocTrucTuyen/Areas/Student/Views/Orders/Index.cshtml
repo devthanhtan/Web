@@ -1,0 +1,78 @@
+@model List<QuanLiKhoaHocTrucTuyen.Models.Order>
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+    ViewData["AreaTitle"] = "Góc Học viên";
+}
+
+<h1 class="h3 mb-4">Lịch sử đơn hàng &amp; giao dịch</h1>
+
+@if (!Model.Any())
+{
+    <div class="app-card p-5 text-center text-muted">Bạn chưa có đơn hàng nào.</div>
+}
+else
+{
+    <div class="app-card p-3 p-md-4">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khóa học</th>
+                        <th>Tổng tiền</th>
+                        <th>Cổng TT</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@o.OrderCode</strong>
+                                <div class="small text-muted">@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                            </td>
+                            <td class="small">
+                                @foreach (var item in o.Items)
+                                {
+                                    <div>• @item.Course.Title</div>
+                                }
+                            </td>
+                            <td class="fw-bold text-orange">@o.TotalAmount.ToString("N0") đ</td>
+                            <td><span class="badge bg-light text-dark border">@o.PaymentProvider</span></td>
+                            <td>
+                                @switch (o.Status)
+                                {
+                                    case OrderStatus.Paid:
+                                        <span class="badge bg-success">Đã thanh toán</span>
+                                        break;
+                                    case OrderStatus.PendingPayment:
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">Chờ thanh toán</span>
+                                        break;
+                                    case OrderStatus.Cancelled:
+                                        <span class="badge bg-danger">Đã hủy / Thất bại</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (o.Status != OrderStatus.Paid)
+                                {
+                                    <form asp-action="Retry" method="post" class="d-inline-flex gap-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@o.Id" />
+                                        <select name="provider" class="form-select form-select-sm" style="width:auto;">
+                                            <option value="VNPAY">VNPAY</option>
+                                            <option value="MoMo">MoMo</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-orange">Thanh toán lại</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
