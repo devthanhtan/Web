@@ -12,6 +12,8 @@ using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddDotEnvFile(Path.Combine(builder.Environment.ContentRootPath, ".env"));
+
 QuestPDF.Settings.License = LicenseType.Community;
 
 // Strongly-typed configuration options

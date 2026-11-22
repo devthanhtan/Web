@@ -113,18 +113,20 @@ DOTNET_ROLL_FORWARD=Major dotnet test QuanLiKhoaHocTrucTuyen.slnx
 ## 3. Chạy với VNPAY Sandbox thật
 
 1. Đăng ký tài khoản test tại <https://pay.vnpaytest.vn/dev-registration> → nhận `vnp_TmnCode` và `vnp_HashSecret` qua email.
-2. Cấu hình bí mật (trong thư mục `QuanLiKhoaHocTrucTuyen`):
+2. Tạo file `QuanLiKhoaHocTrucTuyen/.env` (đã nằm trong `.gitignore`, **không commit**) với đúng tên tham số VNPAY gửi qua email:
+   ```env
+   vnp_TmnCode=<TMN_CODE>
+   vnp_HashSecret=<HASH_SECRET>
+   vnp_Url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+   ```
+   Khi khởi động, `Options/DotEnvConfiguration.cs` đọc file này (nếu có) và ánh xạ sang `Vnpay:TmnCode`, `Vnpay:HashSecret`, `Vnpay:BaseUrl`. Có đủ TmnCode + HashSecret thì tự bật `Vnpay:UseRealGateway = true` (muốn quay về giả lập: thêm dòng `Vnpay__UseRealGateway=false`). File cũng nhận dạng chung `Section__Key=value` cho các cấu hình khác.
+
+   Thứ tự ưu tiên: biến môi trường thật > `.env` > user-secrets > `appsettings.*.json`. File `.env` không được đưa vào output `dotnet publish`; production cấu hình qua `appsettings.Production.json` hoặc biến môi trường (xem `DEPLOYMENT.md`).
+
+   Không dùng `.env` thì có thể dùng user-secrets như cũ:
    ```bash
    dotnet user-secrets set "Vnpay:TmnCode" "<TMN_CODE>"
    dotnet user-secrets set "Vnpay:HashSecret" "<HASH_SECRET>"
-   dotnet user-secrets set "Vnpay:UseRealGateway" "true"
-   ```
-   Nếu đã lưu thông tin VNPAY gửi trong file `QuanLiKhoaHocTrucTuyen/.env` (`vnp_TmnCode`, `vnp_HashSecret`, `vnp_Url`; file này đã nằm trong `.gitignore`), có thể nạp một lần bằng Git Bash:
-   ```bash
-   set -a && . ./.env && set +a
-   dotnet user-secrets set "Vnpay:TmnCode" "$vnp_TmnCode"
-   dotnet user-secrets set "Vnpay:HashSecret" "$vnp_HashSecret"
-   dotnet user-secrets set "Vnpay:BaseUrl" "$vnp_Url"
    dotnet user-secrets set "Vnpay:UseRealGateway" "true"
    ```
 3. Chạy ứng dụng, thêm khóa học vào giỏ, chọn **VNPAY** → được chuyển sang trang sandbox VNPAY.
