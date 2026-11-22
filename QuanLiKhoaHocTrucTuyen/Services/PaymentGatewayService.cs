@@ -42,12 +42,52 @@ public class PaymentGatewayService : IPaymentGatewayService
         _logger = logger;
     }
 
+    private static readonly Dictionary<string, string> VnpayResponseMessages = new()
+    {
+        ["07"] = "Trừ tiền thành công nhưng giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).",
+        ["09"] = "Thẻ/Tài khoản chưa đăng ký dịch vụ InternetBanking tại ngân hàng.",
+        ["10"] = "Xác thực thông tin thẻ/tài khoản không đúng quá 3 lần.",
+        ["11"] = "Đã hết hạn chờ thanh toán.",
+        ["12"] = "Thẻ/Tài khoản bị khóa.",
+        ["13"] = "Nhập sai mật khẩu xác thực giao dịch (OTP).",
+        ["24"] = "Khách hàng hủy giao dịch.",
+        ["51"] = "Tài khoản không đủ số dư.",
+        ["65"] = "Tài khoản đã vượt quá hạn mức giao dịch trong ngày.",
+        ["75"] = "Ngân hàng thanh toán đang bảo trì.",
+        ["79"] = "Nhập sai mật khẩu thanh toán quá số lần quy định.",
+        ["99"] = "Lỗi khác."
+    };
+
+    private bool UseRealVnpay => _vnpay.UseRealGateway || !_features.UseMockServices;
+
+    public bool IsMockGateway(PaymentProvider provider) =>
+        provider == PaymentProvider.VNPAY ? !UseRealVnpay : _features.UseMockServices;
+
+    // Mock mode signs and verifies its own callbacks, so it can fall back to a demo secret.
+    private string VnpayHashSecret =>
+        !string.IsNullOrWhiteSpace(_vnpay.HashSecret) ? _vnpay.HashSecret
+        : UseRealVnpay ? string.Empty
+        : VnpayOptions.MockHashSecret;
+
+    private string? ValidateGatewayConfig(PaymentProvider provider)
+    {
+        if (provider == PaymentProvider.VNPAY && UseRealVnpay &&
+            (string.IsNullOrWhiteSpace(_vnpay.TmnCode) || string.IsNullOrWhiteSpace(_vnpay.HashSecret)))
+        {
+            return "Cổng VNPAY chưa được cấu hình (thiếu Vnpay:TmnCode hoặc Vnpay:HashSecret).";
+        }
+        return null;
+    }
+
     public async Task<(bool Success, Order? Order, string? RedirectUrl, string? Error)> CreateOrderAndPaymentUrlAsync(
         string userId,
         PaymentProvider provider,
         string baseUrl,
         string clientIp)
     {
+        if (ValidateGatewayConfig(provider) is string configError)
+            return (false, null, null, configError);
+
         var cartItems = await _db.CartItems
             .Include(c => c.Course)
             .Where(c => c.UserId == userId)
@@ -119,6 +159,9 @@ public class PaymentGatewayService : IPaymentGatewayService
         string baseUrl,
         string clientIp)
     {
+        if (ValidateGatewayConfig(provider) is string configError)
+            return (false, null, configError);
+
         var order = await _db.Orders
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
@@ -138,20 +181,42 @@ public class PaymentGatewayService : IPaymentGatewayService
 
     private async Task<string> BuildGatewayUrlAsync(Order order, PaymentProvider provider, string baseUrl, string clientIp)
     {
-        if (_features.UseMockServices)
-        {
-            return $"{baseUrl}/Payment/MockGateway?orderCode={Uri.EscapeDataString(order.OrderCode)}&provider={provider}";
-        }
+        var mockUrl = $"{baseUrl}/Payment/MockGateway?orderCode={Uri.EscapeDataString(order.OrderCode)}&provider={provider}";
 
         if (provider == PaymentProvider.VNPAY)
         {
-            return BuildVnpayUrl(order, baseUrl, clientIp);
+            var now = DateTime.UtcNow.AddHours(7);
+            order.PaymentTxnRef = BuildVnpayTxnRef(order.OrderCode, now);
+            await _db.SaveChangesAsync();
+
+            return UseRealVnpay ? BuildVnpayUrl(order, baseUrl, clientIp, now) : mockUrl;
+        }
+
+        if (_features.UseMockServices)
+        {
+            return mockUrl;
         }
 
         return await CreateMomoSandboxUrlAsync(order, baseUrl);
     }
 
-    private string BuildVnpayUrl(Order order, string baseUrl, string clientIp)
+    // vnp_TxnRef must be alphanumeric and unique within a day, so each payment attempt gets a time suffix.
+    public static string BuildVnpayTxnRef(string orderCode, DateTime vietnamNow)
+    {
+        var baseCode = new string(orderCode.Where(char.IsAsciiLetterOrDigit).ToArray());
+        return $"{baseCode}{vietnamNow:HHmmss}";
+    }
+
+    public static string NormalizeClientIp(string? clientIp)
+    {
+        if (string.IsNullOrWhiteSpace(clientIp) || !IPAddress.TryParse(clientIp, out var address))
+            return "127.0.0.1";
+        if (address.IsIPv4MappedToIPv6)
+            address = address.MapToIPv4();
+        return IPAddress.IsLoopback(address) ? "127.0.0.1" : address.ToString();
+    }
+
+    private string BuildVnpayUrl(Order order, string baseUrl, string clientIp, DateTime vietnamNow)
     {
         var returnUrl = $"{baseUrl}{_vnpay.ReturnPath}";
         var vnpParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
@@ -160,18 +225,20 @@ public class PaymentGatewayService : IPaymentGatewayService
             ["vnp_Command"] = "pay",
             ["vnp_TmnCode"] = _vnpay.TmnCode,
             ["vnp_Amount"] = ((long)(order.TotalAmount * 100)).ToString(),
-            ["vnp_CreateDate"] = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"),
+            ["vnp_CreateDate"] = vietnamNow.ToString("yyyyMMddHHmmss"),
+            ["vnp_ExpireDate"] = vietnamNow.AddMinutes(_vnpay.ExpireMinutes).ToString("yyyyMMddHHmmss"),
             ["vnp_CurrCode"] = "VND",
-            ["vnp_IpAddr"] = string.IsNullOrWhiteSpace(clientIp) ? "127.0.0.1" : clientIp,
+            ["vnp_IpAddr"] = NormalizeClientIp(clientIp),
             ["vnp_Locale"] = "vn",
             ["vnp_OrderInfo"] = $"Thanh toan khoa hoc {order.OrderCode}",
             ["vnp_OrderType"] = "other",
             ["vnp_ReturnUrl"] = returnUrl,
-            ["vnp_TxnRef"] = order.OrderCode
+            ["vnp_TxnRef"] = order.PaymentTxnRef ?? order.OrderCode
         };
 
         var query = BuildEncodedQuery(vnpParams);
-        var hash = ComputeHmacSha512(_vnpay.HashSecret, query);
+        var hash = ComputeHmacSha512(VnpayHashSecret, query);
+        _logger.LogInformation("[VNPAY] Tạo URL thanh toán cho đơn {OrderCode}, TxnRef {TxnRef}", order.OrderCode, vnpParams["vnp_TxnRef"]);
         return $"{_vnpay.BaseUrl}?{query}&vnp_SecureHash={hash}";
     }
 
@@ -232,10 +299,10 @@ public class PaymentGatewayService : IPaymentGatewayService
                 ["vnp_TmnCode"] = _vnpay.TmnCode,
                 ["vnp_TransactionNo"] = transactionNo,
                 ["vnp_TransactionStatus"] = "00",
-                ["vnp_TxnRef"] = order.OrderCode
+                ["vnp_TxnRef"] = order.PaymentTxnRef ?? order.OrderCode
             };
             var query = BuildEncodedQuery(dict);
-            var sig = ComputeHmacSha512(_vnpay.HashSecret, query);
+            var sig = ComputeHmacSha512(VnpayHashSecret, query);
             return $"{query}&vnp_SecureHash={sig}";
         }
         else
@@ -286,10 +353,10 @@ public class PaymentGatewayService : IPaymentGatewayService
                 ["vnp_TmnCode"] = _vnpay.TmnCode,
                 ["vnp_TransactionNo"] = "0",
                 ["vnp_TransactionStatus"] = "02",
-                ["vnp_TxnRef"] = order.OrderCode
+                ["vnp_TxnRef"] = order.PaymentTxnRef ?? order.OrderCode
             };
             var query = BuildEncodedQuery(dict);
-            var sig = ComputeHmacSha512(_vnpay.HashSecret, query);
+            var sig = ComputeHmacSha512(VnpayHashSecret, query);
             return $"{query}&vnp_SecureHash={sig}";
         }
         else
@@ -328,60 +395,92 @@ public class PaymentGatewayService : IPaymentGatewayService
         }
     }
 
-    public async Task<PaymentCallbackResult> ProcessVnpayCallbackAsync(IReadOnlyDictionary<string, string> queryParams, string rawPayload)
+    public async Task<PaymentCallbackResult> ProcessVnpayCallbackAsync(IReadOnlyDictionary<string, string> queryParams, string rawPayload, bool updateOrder = true)
     {
-        queryParams.TryGetValue("vnp_TxnRef", out var orderCode);
+        queryParams.TryGetValue("vnp_TxnRef", out var txnRef);
         queryParams.TryGetValue("vnp_SecureHash", out var providedHash);
         queryParams.TryGetValue("vnp_ResponseCode", out var responseCode);
+        queryParams.TryGetValue("vnp_TransactionStatus", out var transactionStatus);
         queryParams.TryGetValue("vnp_Amount", out var vnpAmountStr);
         queryParams.TryGetValue("vnp_TransactionNo", out var txnNo);
 
-        orderCode ??= string.Empty;
+        txnRef ??= string.Empty;
 
-        var signatureValid = VerifyVnpaySignature(queryParams, _vnpay.HashSecret, providedHash);
-        var order = await _db.Orders
-            .Include(o => o.Items).ThenInclude(i => i.Course)
-            .Include(o => o.User)
-            .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+        var signatureValid = VerifyVnpaySignature(queryParams, VnpayHashSecret, providedHash);
+        var order = string.IsNullOrEmpty(txnRef)
+            ? null
+            : await _db.Orders
+                .Include(o => o.Items).ThenInclude(i => i.Course)
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(o => o.PaymentTxnRef == txnRef || o.OrderCode == txnRef);
+
+        // Theo tài liệu VNPAY: kiểm tra checksum trước mọi xử lý khác (RspCode 97)
+        if (!signatureValid)
+        {
+            _logger.LogWarning("[VNPAY] Chữ ký HMAC không hợp lệ cho TxnRef {TxnRef}", txnRef);
+            if (order != null && updateOrder)
+                await RecordTransactionAsync(order.Id, PaymentProvider.VNPAY, txnNo, order.TotalAmount, TransactionStatus.Failed, false, rawPayload);
+            return new PaymentCallbackResult(false, false, false, order?.OrderCode ?? txnRef, "Chữ ký giao dịch không hợp lệ.", PaymentCallbackStatus.InvalidSignature);
+        }
 
         if (order == null)
         {
-            _logger.LogWarning("[VNPAY] Không tìm thấy đơn hàng {OrderCode}", orderCode);
-            return new PaymentCallbackResult(false, signatureValid, false, orderCode, "Không tìm thấy đơn hàng.");
+            _logger.LogWarning("[VNPAY] Không tìm thấy đơn hàng với TxnRef {TxnRef}", txnRef);
+            return new PaymentCallbackResult(false, true, false, txnRef, "Không tìm thấy đơn hàng.", PaymentCallbackStatus.OrderNotFound);
         }
 
-        if (!signatureValid)
-        {
-            _logger.LogWarning("[VNPAY] Chữ ký HMAC không hợp lệ cho đơn {OrderCode}", orderCode);
-            await RecordTransactionAsync(order.Id, PaymentProvider.VNPAY, txnNo, order.TotalAmount, TransactionStatus.Failed, false, rawPayload);
-            return new PaymentCallbackResult(false, false, false, orderCode, "Chữ ký giao dịch không hợp lệ.");
-        }
+        var orderCode = order.OrderCode;
 
-        // Verify amount (VNPAY multiplies by 100)
+        // VNPAY trả về số tiền đã nhân 100 (RspCode 04 nếu lệch)
         if (!long.TryParse(vnpAmountStr, out var vnpAmount) || vnpAmount != (long)(order.TotalAmount * 100))
         {
             _logger.LogWarning("[VNPAY] Sai lệch số tiền đơn {OrderCode}: nhận {Received}, mong đợi {Expected}",
                 orderCode, vnpAmountStr, order.TotalAmount * 100);
-            await RecordTransactionAsync(order.Id, PaymentProvider.VNPAY, txnNo, order.TotalAmount, TransactionStatus.Failed, true, rawPayload);
-            return new PaymentCallbackResult(false, true, false, orderCode, "Số tiền giao dịch không khớp.");
+            if (updateOrder)
+                await RecordTransactionAsync(order.Id, PaymentProvider.VNPAY, txnNo, order.TotalAmount, TransactionStatus.Failed, true, rawPayload);
+            return new PaymentCallbackResult(false, true, false, orderCode, "Số tiền giao dịch không khớp.", PaymentCallbackStatus.InvalidAmount);
         }
 
-        // BR-C4: Idempotent check
+        // BR-C4: Idempotent check (RspCode 02)
         if (order.Status == OrderStatus.Paid)
         {
             _logger.LogInformation("[VNPAY] Đơn hàng {OrderCode} đã xử lý Paid trước đó (idempotent).", orderCode);
-            return new PaymentCallbackResult(true, true, true, orderCode, "Giao dịch đã được ghi nhận trước đó.");
+            return new PaymentCallbackResult(true, true, true, orderCode, "Giao dịch đã được ghi nhận trước đó.", PaymentCallbackStatus.AlreadyConfirmed);
         }
 
-        if (responseCode == "00")
+        var isPaid = responseCode == "00" && transactionStatus == "00";
+        var failureMessage = $"Giao dịch VNPAY không thành công: {DescribeVnpayResponseCode(responseCode)} Khóa học vẫn còn trong giỏ hàng.";
+
+        if (!updateOrder)
+        {
+            return isPaid
+                ? new PaymentCallbackResult(false, true, false, orderCode,
+                    "VNPAY đã xác nhận thanh toán. Hệ thống đang chờ IPN để kích hoạt khóa học, vui lòng tải lại trang sau ít phút.",
+                    PaymentCallbackStatus.Pending)
+                : new PaymentCallbackResult(false, true, false, orderCode, failureMessage, PaymentCallbackStatus.Failed);
+        }
+
+        if (isPaid)
         {
             await CompleteOrderPaidAsync(order, txnNo ?? "VNPAY_OK", rawPayload);
-            return new PaymentCallbackResult(true, true, false, orderCode, "Thanh toán VNPAY thành công! Khóa học đã được kích hoạt.");
+            return new PaymentCallbackResult(true, true, false, orderCode, "Thanh toán VNPAY thành công! Khóa học đã được kích hoạt.", PaymentCallbackStatus.Success);
         }
 
+        if (order.Status == OrderStatus.Cancelled)
+        {
+            return new PaymentCallbackResult(false, true, true, orderCode, failureMessage, PaymentCallbackStatus.AlreadyConfirmed);
+        }
+
+        _logger.LogInformation("[VNPAY] Đơn {OrderCode} thất bại: ResponseCode {ResponseCode}, TransactionStatus {TransactionStatus}",
+            orderCode, responseCode, transactionStatus);
         await MarkOrderCancelledAsync(order, PaymentProvider.VNPAY, txnNo, rawPayload);
-        return new PaymentCallbackResult(false, true, false, orderCode, "Giao dịch VNPAY bị hủy hoặc thất bại. Khóa học vẫn còn trong giỏ hàng.");
+        return new PaymentCallbackResult(false, true, false, orderCode, failureMessage, PaymentCallbackStatus.Failed);
     }
+
+    public static string DescribeVnpayResponseCode(string? responseCode) =>
+        responseCode != null && VnpayResponseMessages.TryGetValue(responseCode, out var message)
+            ? message
+            : $"Mã lỗi {responseCode ?? "không xác định"}.";
 
     public async Task<PaymentCallbackResult> ProcessMomoCallbackAsync(IReadOnlyDictionary<string, string> queryParams, string rawPayload)
     {

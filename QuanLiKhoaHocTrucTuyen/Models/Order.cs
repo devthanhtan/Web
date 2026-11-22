@@ -20,6 +20,10 @@ public class Order
 
     public PaymentProvider PaymentProvider { get; set; } = PaymentProvider.VNPAY;
 
+    /// <summary>vnp_TxnRef của lần thanh toán gần nhất (VNPAY không cho trùng mã trong ngày nên mỗi lần thử lại sinh mã mới).</summary>
+    [StringLength(100)]
+    public string? PaymentTxnRef { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? PaidAt { get; set; }
 

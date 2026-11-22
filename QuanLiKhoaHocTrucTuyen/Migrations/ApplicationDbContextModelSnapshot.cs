@@ -850,6 +850,10 @@ namespace QuanLiKhoaHocTrucTuyen.Migrations
                     b.Property<int>("PaymentProvider")
                         .HasColumnType("int");
 
+                    b.Property<string>("PaymentTxnRef")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -864,6 +868,8 @@ namespace QuanLiKhoaHocTrucTuyen.Migrations
 
                     b.HasIndex("OrderCode")
                         .IsUnique();
+
+                    b.HasIndex("PaymentTxnRef");
 
                     b.HasIndex("UserId");
 

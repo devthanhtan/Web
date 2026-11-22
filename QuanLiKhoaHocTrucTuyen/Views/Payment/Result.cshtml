@@ -21,6 +21,19 @@
                     <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-outline-orange">Xem lịch sử đơn hàng</a>
                 </div>
             }
+            else if (Model.Status == QuanLiKhoaHocTrucTuyen.Services.Interfaces.PaymentCallbackStatus.Pending)
+            {
+                <div class="stat-icon mx-auto mb-3 text-warning bg-warning-subtle" style="width:68px;height:68px;font-size:2rem;">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <h1 class="h4 mb-2">Đang xác nhận thanh toán</h1>
+                <p class="text-muted small mb-3">@Model.Message</p>
+                <div class="small text-muted mb-4">Mã giao dịch đơn hàng: <code>@Model.OrderCode</code></div>
+                <div class="d-grid gap-2">
+                    <a asp-controller="Payment" asp-action="Result" asp-route-orderCode="@Model.OrderCode" class="btn btn-orange">Kiểm tra lại trạng thái</a>
+                    <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-light border">Xem đơn hàng</a>
+                </div>
+            }
             else
             {
                 <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width:68px;height:68px;font-size:2rem;">

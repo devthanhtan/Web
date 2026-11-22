@@ -29,11 +29,25 @@ public class YouTubeOptions
 
 public class VnpayOptions
 {
+    public const string MockHashSecret = "VNPAY_SANDBOX_SECRET_KEY_2026_DEMO";
+
     public string TmnCode { get; set; } = "EDUSPARK";
-    public string HashSecret { get; set; } = "VNPAY_SANDBOX_SECRET_KEY_2026_DEMO";
+    public string HashSecret { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public string ReturnPath { get; set; } = "/Payment/VnpayReturn";
     public string IpnPath { get; set; } = "/Payment/VnpayIpn";
+
+    /// <summary>Gọi cổng VNPAY thật (sandbox/production) kể cả khi AppFeatures:UseMockServices = true.</summary>
+    public bool UseRealGateway { get; set; }
+
+    /// <summary>Thời gian hết hạn thanh toán (vnp_ExpireDate), tính bằng phút.</summary>
+    public int ExpireMinutes { get; set; } = 15;
+
+    /// <summary>
+    /// Cho phép ReturnUrl cập nhật đơn hàng khi IPN chưa tới (localhost không nhận được IPN).
+    /// Production nên đặt false để chỉ IPN cập nhật kết quả như tài liệu VNPAY yêu cầu.
+    /// </summary>
+    public bool UpdateOrderOnReturn { get; set; } = true;
 }
 
 public class MomoOptions

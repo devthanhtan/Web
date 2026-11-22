@@ -118,6 +118,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Order>(e =>
         {
             e.HasIndex(x => x.OrderCode).IsUnique();
+            e.HasIndex(x => x.PaymentTxnRef);
             e.Property(x => x.TotalAmount).HasColumnType("decimal(18,2)");
 
             e.HasOne(x => x.User)

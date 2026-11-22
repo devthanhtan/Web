@@ -49,6 +49,12 @@ dotnet user-secrets set "Momo:AccessKey" "<YOUR_ACCESS_KEY>"
 dotnet user-secrets set "Momo:SecretKey" "<YOUR_MOMO_SECRET>"
 ```
 
+Chỉ muốn chạy VNPAY sandbox thật (các dịch vụ khác vẫn giả lập): đặt thêm `Vnpay:UseRealGateway = true`. Chi tiết luồng, cấu hình, thẻ test và IPN xem [docs/VNPAY_INTEGRATION.md](docs/VNPAY_INTEGRATION.md).
+
+Tài liệu khác:
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Hướng dẫn triển khai (GitHub Actions/Somee, IIS, cấu hình VNPAY production).
+- [docs/PAYMENT_GUIDE.md](docs/PAYMENT_GUIDE.md) - Hướng dẫn thanh toán cho học viên và người kiểm thử.
+
 ## 5. Chạy Unit Tests (xUnit)
 ```powershell
 dotnet test QuanLiKhoaHocTrucTuyen.slnx

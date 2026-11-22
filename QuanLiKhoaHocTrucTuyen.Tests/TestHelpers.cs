@@ -49,11 +49,11 @@ internal static class TestHelpers
             => Task.FromResult<(bool, string?, string?)>((true, "MOCK_YT", null));
     }
 
-    public static PaymentGatewayService CreatePaymentService(ApplicationDbContext db, string vnpSecret = "TEST_VNP_SECRET", string momoSecret = "TEST_MOMO_SECRET")
+    public static PaymentGatewayService CreatePaymentService(ApplicationDbContext db, string vnpSecret = "TEST_VNP_SECRET", string momoSecret = "TEST_MOMO_SECRET", VnpayOptions? vnpayOptions = null)
     {
         return new PaymentGatewayService(
             db,
-            Microsoft.Extensions.Options.Options.Create(new VnpayOptions { TmnCode = "TESTTMN", HashSecret = vnpSecret }),
+            Microsoft.Extensions.Options.Options.Create(vnpayOptions ?? new VnpayOptions { TmnCode = "TESTTMN", HashSecret = vnpSecret }),
             Microsoft.Extensions.Options.Options.Create(new MomoOptions { PartnerCode = "MOMO", AccessKey = "ACC", SecretKey = momoSecret }),
             Microsoft.Extensions.Options.Options.Create(new AppFeaturesOptions { UseMockServices = true }),
             new FakeHttpClientFactory(),
