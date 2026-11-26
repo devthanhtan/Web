@@ -2,84 +2,184 @@
 @{
     ViewData["Title"] = "Chi tiết kiểm duyệt khóa học";
     ViewData["AreaTitle"] = "Quản trị Admin";
+    var thumbUrl = string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/course-default.svg" : Model.ThumbnailUrl;
+    var totalLessons = Model.Chapters.Sum(ch => ch.Lessons.Count);
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <a asp-action="Index" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left me-1"></i> Danh sách duyệt</a>
-    <div class="d-flex gap-2">
-        <form asp-action="Approve" method="post" class="m-0">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="id" value="@Model.Id" />
-            <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i> Phê duyệt công khai</button>
-        </form>
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectCourseModal">
-            <i class="bi bi-x-circle me-1"></i> Từ chối kèm lý do
-        </button>
-    </div>
-</div>
-
-<div class="row g-4">
-    <div class="col-lg-5">
-        <div class="app-card p-4">
-            <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/course-dotnet.svg" : Model.ThumbnailUrl)" class="w-100 rounded mb-3" style="aspect-ratio:16/9;object-fit:cover;" alt="@Model.Title" />
-            <h1 class="h4 mb-2">@Model.Title</h1>
-            <p class="small text-muted mb-3">@Model.ShortDescription</p>
-            <div class="small mb-2"><strong>Giảng viên:</strong> @Model.Instructor.FullName (@Model.Instructor.Email)</div>
-            <div class="small mb-2"><strong>Danh mục:</strong> @Model.Category.Name · <strong>Trình độ:</strong> @Model.Level</div>
-            <div class="small mb-3"><strong>Học phí:</strong> <span class="text-orange fw-bold">@Model.Price.ToString("N0") đ</span></div>
-            <div class="p-3 bg-light rounded small">@Model.Description</div>
+<section class="hl-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+        <div>
+            <div class="hl-eyebrow mb-1">HUIT Learning · Thẩm định Nội dung</div>
+            <h1 class="h3 fw-bold mb-1">@Model.Title</h1>
+            <p class="text-muted small mb-0">Xem trước giáo trình, video bài giảng và quyết định xuất bản khóa học</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a asp-action="Index"
+               class="btn btn-outline-huit d-inline-flex align-items-center px-3"
+               style="min-height: 44px;">
+                <i class="bi bi-arrow-left me-2"></i> Danh sách duyệt
+            </a>
+            <form asp-action="Approve" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit"
+                        class="btn btn-success d-inline-flex align-items-center px-3"
+                        style="min-height: 44px;">
+                    <i class="bi bi-check2-circle me-2"></i> Phê duyệt công khai
+                </button>
+            </form>
+            <button type="button"
+                    class="btn btn-danger d-inline-flex align-items-center px-3"
+                    style="min-height: 44px;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#rejectCourseModal">
+                <i class="bi bi-x-circle me-2"></i> Từ chối kèm lý do
+            </button>
         </div>
     </div>
-    <div class="col-lg-7">
-        <div class="app-card p-4">
-            <h2 class="h5 mb-3">Đề cương &amp; Nội dung kiểm tra</h2>
-            @foreach (var ch in Model.Chapters.OrderBy(c => c.SortOrder))
-            {
-                <div class="mb-3 border rounded overflow-hidden">
-                    <div class="p-2 px-3 bg-orange-soft fw-bold small">Chương @ch.SortOrder: @ch.Title</div>
-                    <div class="list-group list-group-flush">
-                        @foreach (var l in ch.Lessons.OrderBy(x => x.SortOrder))
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-5" data-reveal="up">
+            <div class="hl-bento-card p-3 p-md-4 h-100">
+                <div class="rounded-3 overflow-hidden border mb-3 bg-light">
+                    <img src="@thumbUrl"
+                         onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                         class="course-thumb w-100"
+                         style="aspect-ratio: 16/9; object-fit: cover;"
+                         alt="@Model.Title" />
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span class="badge badge-huit">@Model.Category.Name</span>
+                    <span class="badge badge-orange">@Model.Level</span>
+                    @switch (Model.Status)
+                    {
+                        case CourseStatus.Draft:
+                            <span class="badge bg-secondary">Nháp</span>
+                            break;
+                        case CourseStatus.PendingReview:
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Chờ duyệt</span>
+                            break;
+                        case CourseStatus.Approved:
+                            <span class="badge bg-success">Đã duyệt</span>
+                            break;
+                        case CourseStatus.Rejected:
+                            <span class="badge bg-danger">Từ chối</span>
+                            break;
+                    }
+                </div>
+
+                <h2 class="h5 fw-bold mb-2">@Model.Title</h2>
+                <p class="small text-muted mb-3">@Model.ShortDescription</p>
+
+                <div class="glass-card p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2 small">
+                        <span class="text-muted">Giảng viên phụ trách</span>
+                        <span class="fw-semibold text-dark text-end">@Model.Instructor.FullName</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2 small">
+                        <span class="text-muted">Email liên hệ</span>
+                        <span class="text-dark text-end">@Model.Instructor.Email</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center gap-2 small">
+                        <span class="text-muted">Học phí đề xuất</span>
+                        <span class="text-orange fw-bold fs-6 text-nowrap">@Model.Price.ToString("N0") đ</span>
+                    </div>
+                </div>
+
+                <div class="hl-eyebrow mb-2">Mô tả chi tiết</div>
+                <div class="p-3 bg-light rounded-3 border small">@Model.Description</div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-7" data-reveal="up" data-reveal-delay="80">
+            <div class="hl-bento-card p-3 p-md-4 h-100">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+                    <div>
+                        <div class="hl-eyebrow">Cấu trúc học liệu</div>
+                        <h2 class="h5 fw-bold mb-0">
+                            <i class="bi bi-list-nested text-orange me-1"></i>
+                            Đề cương &amp; Nội dung kiểm tra
+                        </h2>
+                    </div>
+                    <span class="badge badge-huit text-nowrap">@Model.Chapters.Count chương · @totalLessons bài học</span>
+                </div>
+
+                @if (!Model.Chapters.Any())
+                {
+                    <div class="text-center text-muted small py-5 bg-light rounded-3 border">
+                        <i class="bi bi-journal-x fs-3 d-block mb-2 opacity-50"></i>
+                        Khóa học chưa có chương bài học nào.
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var ch in Model.Chapters.OrderBy(c => c.SortOrder))
                         {
-                            <div class="list-group-item small">
-                                <div class="d-flex justify-content-between">
-                                    <strong>@l.Title</strong>
-                                    <span class="badge bg-light text-dark border">@(l.LessonType == LessonType.Video ? l.VideoStatus.ToString() : "Tài liệu")</span>
+                            <div class="border rounded-3 overflow-hidden bg-white">
+                                <div class="p-3 bg-orange-soft d-flex justify-content-between align-items-center gap-2">
+                                    <span class="fw-bold small">Chương @ch.SortOrder: @ch.Title</span>
+                                    <span class="badge badge-orange text-nowrap">@ch.Lessons.Count bài</span>
                                 </div>
-                                @if (!string.IsNullOrEmpty(l.YoutubeVideoId) && !l.YoutubeVideoId.StartsWith("MOCK_"))
-                                {
-                                    <div class="text-muted">YouTube ID: <code>@l.YoutubeVideoId</code></div>
-                                }
-                                else if (!string.IsNullOrEmpty(l.LocalVideoPath))
-                                {
-                                    <video src="@l.LocalVideoPath" controls class="w-100 rounded mt-2" style="max-height: 220px;"></video>
-                                }
+                                <div class="list-group list-group-flush">
+                                    @foreach (var l in ch.Lessons.OrderBy(x => x.SortOrder))
+                                    {
+                                        <div class="list-group-item p-3 small">
+                                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                                    <i class="bi @(l.LessonType == LessonType.Video ? "bi-play-circle-fill text-orange" : "bi-file-earmark-text-fill text-huit")"></i>
+                                                    <strong class="text-dark">@l.Title</strong>
+                                                    @if (l.IsFreePreview)
+                                                    {
+                                                        <span class="badge bg-info-subtle text-info-emphasis">Học thử</span>
+                                                    }
+                                                </div>
+                                                <span class="badge bg-light text-dark border text-nowrap">@(l.LessonType == LessonType.Video ? l.VideoStatus.ToString() : "Tài liệu")</span>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(l.YoutubeVideoId) && !l.YoutubeVideoId.StartsWith("MOCK_"))
+                                            {
+                                                <div class="text-muted mt-2">YouTube ID: <code class="px-2 py-1 bg-light rounded">@l.YoutubeVideoId</code></div>
+                                            }
+                                            else if (!string.IsNullOrEmpty(l.LocalVideoPath))
+                                            {
+                                                <div class="ratio ratio-16x9 rounded-3 overflow-hidden bg-dark mt-2" style="max-width: 460px;">
+                                                    <video src="@l.LocalVideoPath" controls playsinline class="w-100 h-100"></video>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         }
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Reject Course Modal -->
 <div class="modal fade" id="rejectCourseModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <form asp-action="Reject" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="CourseId" value="@Model.Id" />
-                <div class="modal-header">
-                    <h5 class="modal-title">Từ chối duyệt khóa học</h5>
+                <div class="modal-header bg-light border-bottom">
+                    <div>
+                        <div class="hl-eyebrow">Phản hồi kiểm duyệt</div>
+                        <h5 class="modal-title fw-bold mb-0">Từ chối duyệt khóa học</h5>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <label class="form-label fw-semibold">Lý do từ chối (bắt buộc)</label>
-                    <textarea name="RejectionReason" class="form-control" rows="4" required placeholder="Ghi rõ vấn đề nội dung, bản quyền hoặc chất lượng để giảng viên sửa..."></textarea>
+                    <textarea name="RejectionReason" class="form-control" rows="4" required placeholder="Ghi rõ vấn đề nội dung, bản quyền hoặc chất lượng để giảng viên chỉnh sửa..."></textarea>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                <div class="modal-footer bg-light border-top d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-light border px-3" style="min-height: 44px;" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger px-3" style="min-height: 44px;">Xác nhận từ chối</button>
                 </div>
             </form>
         </div>

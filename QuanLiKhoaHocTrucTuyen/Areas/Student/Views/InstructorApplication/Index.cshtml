@@ -4,32 +4,86 @@
     ViewData["AreaTitle"] = "Nâng cấp Giảng viên";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-9">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-1">Đăng ký nâng cấp lên Giảng viên</h1>
-            <p class="text-muted small mb-4">Gửi hồ sơ năng lực (CV và chứng chỉ chuyên môn) để Admin thẩm định và mở Dashboard Giảng viên.</p>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Cộng tác Giảng dạy</span>
+        <h1 class="h3 fw-bold mb-1">Đăng ký nâng cấp lên Giảng viên</h1>
+        <p class="text-muted small mb-0">Gửi hồ sơ năng lực (CV và chứng chỉ chuyên môn) để Ban quản trị HUIT Learning thẩm định và mở Kênh Giảng viên.</p>
+    </div>
+    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-arrow-left me-1"></i> Về khóa học của tôi
+    </a>
+</div>
 
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
+        <!-- Benefits Strip -->
+        <div class="row row-cols-1 row-cols-md-3 g-3 mb-4" data-stagger-group>
+            <div class="col" data-reveal="up">
+                <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon flex-shrink-0"><i class="bi bi-easel2-fill"></i></div>
+                        <div>
+                            <div class="fw-bold small">Studio biên soạn dễ dàng</div>
+                            <div class="text-muted" style="font-size: 0.78rem;">Quản lý chương, bài giảng video &amp; ngân hàng đề thi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col" data-reveal="up">
+                <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon flex-shrink-0"><i class="bi bi-cash-stack"></i></div>
+                        <div>
+                            <div class="fw-bold small">Chia sẻ doanh thu minh bạch</div>
+                            <div class="text-muted" style="font-size: 0.78rem;">Báo cáo thu nhập ròng theo thời gian thực trên HUIT Learning</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col" data-reveal="up">
+                <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon flex-shrink-0"><i class="bi bi-award-fill"></i></div>
+                        <div>
+                            <div class="fw-bold small">Lan tỏa tri thức số</div>
+                            <div class="text-muted" style="font-size: 0.78rem;">Đồng hành cùng cộng đồng sinh viên &amp; kỹ sư công nghệ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hl-bento-card p-3 p-md-4" data-reveal="up">
             @if (Model.IsAlreadyInstructor)
             {
-                <div class="alert alert-success border-0">
-                    <i class="bi bi-check-circle-fill me-2"></i> Tài khoản của bạn đã có quyền <strong>Giảng viên</strong>!
-                    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="btn btn-sm btn-orange ms-2">Mở Kênh Giảng viên</a>
+                <div class="alert alert-success border-0 d-flex flex-wrap align-items-center justify-content-between gap-2 mb-0">
+                    <div>
+                        <i class="bi bi-check-circle-fill me-2"></i> Tài khoản của bạn đã có quyền <strong>Giảng viên HUIT Learning</strong>!
+                    </div>
+                    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index"
+                       class="btn btn-orange btn-sm d-inline-flex align-items-center" style="min-height: 44px;">
+                        <i class="bi bi-speedometer2 me-1"></i> Mở Kênh Giảng viên
+                    </a>
                 </div>
             }
             else if (Model.LatestRequest != null)
             {
                 if (Model.LatestRequest.Status == InstructorRequestStatus.Pending)
                 {
-                    <div class="alert alert-warning border-0">
+                    <div class="alert alert-warning border-0 mb-0">
                         <h2 class="h6 fw-bold mb-1"><i class="bi bi-hourglass-split me-1"></i> Hồ sơ đang chờ Admin thẩm định</h2>
-                        <p class="small mb-2">Đã gửi lúc @Model.LatestRequest.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · Chuyên môn: <strong>@Model.LatestRequest.Expertise</strong></p>
-                        <a href="@Model.LatestRequest.CvFilePath" target="_blank" class="btn btn-sm btn-outline-secondary">Xem lại CV đã nộp</a>
+                        <p class="small mb-3">Đã gửi lúc @Model.LatestRequest.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · Chuyên môn: <strong>@Model.LatestRequest.Expertise</strong></p>
+                        <a href="@Model.LatestRequest.CvFilePath" target="_blank"
+                           class="btn btn-outline-huit btn-sm d-inline-flex align-items-center" style="min-height: 40px;">
+                            <i class="bi bi-file-earmark-person me-1"></i> Xem lại CV đã nộp
+                        </a>
                     </div>
                 }
                 else if (Model.LatestRequest.Status == InstructorRequestStatus.Approved)
                 {
-                    <div class="alert alert-success border-0">
+                    <div class="alert alert-success border-0 mb-0">
                         <h2 class="h6 fw-bold mb-1"><i class="bi bi-patch-check-fill me-1"></i> Hồ sơ đã được phê duyệt</h2>
                         <p class="small mb-0">Vui lòng đăng xuất và đăng nhập lại nếu bạn chưa thấy menu Kênh Giảng viên.</p>
                     </div>
@@ -46,17 +100,19 @@
 
             @if (!Model.IsAlreadyInstructor && (Model.LatestRequest == null || Model.LatestRequest.Status == InstructorRequestStatus.Rejected))
             {
+                <span class="hl-eyebrow d-inline-block mb-1">Biểu mẫu đăng ký</span>
+                <h2 class="h5 fw-bold mb-3">Hồ sơ ứng tuyển Giảng viên</h2>
                 <form asp-action="Index" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="row g-3">
-                        <div class="col-md-8">
+                        <div class="col-12 col-md-8">
                             <label asp-for="Expertise" class="form-label fw-semibold"></label>
                             <input asp-for="Expertise" class="form-control" placeholder="Ví dụ: Lập trình ASP.NET Core & SQL Server" />
                             <span asp-validation-for="Expertise" class="text-danger small"></span>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <label asp-for="ExperienceYears" class="form-label fw-semibold"></label>
                             <input asp-for="ExperienceYears" type="number" min="0" max="60" class="form-control" />
                             <span asp-validation-for="ExperienceYears" class="text-danger small"></span>
@@ -66,21 +122,21 @@
                             <textarea asp-for="Bio" rows="4" class="form-control" placeholder="Mô tả kinh nghiệm giảng dạy, dự án thực tế và khóa học dự kiến xây dựng..."></textarea>
                             <span asp-validation-for="Bio" class="text-danger small"></span>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label asp-for="CvFile" class="form-label fw-semibold"></label>
                             <input asp-for="CvFile" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt" class="form-control" />
                             <span asp-validation-for="CvFile" class="text-danger small"></span>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label asp-for="CertificateFile" class="form-label fw-semibold"></label>
                             <input asp-for="CertificateFile" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt" class="form-control" />
                             <span asp-validation-for="CertificateFile" class="text-danger small"></span>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-orange px-4">
-                            <i class="bi bi-send-check me-1"></i> Gửi hồ sơ xét duyệt
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-orange px-4 d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                            <i class="bi bi-send-check me-2"></i> Gửi hồ sơ xét duyệt
                         </button>
                     </div>
                 </form>

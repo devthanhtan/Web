@@ -47,7 +47,7 @@ public class ResendEmailConfirmationModel : PageModel
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = Url.Page("/Account/ConfirmEmail", null, new { area = "Identity", userId, code }, Request.Scheme);
 
-            await _emailSender.SendEmailAsync(Input.Email, "[EduSpark] Gửi lại liên kết xác thực email",
+            await _emailSender.SendEmailAsync(Input.Email, "[HUIT Learning] Gửi lại liên kết xác thực email",
                 $"<p>Vui lòng nhấn vào liên kết sau để xác thực tài khoản: <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>Xác thực ngay</a></p>");
         }
 

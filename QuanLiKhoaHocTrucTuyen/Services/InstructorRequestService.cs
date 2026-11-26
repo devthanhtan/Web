@@ -153,8 +153,8 @@ public class InstructorRequestService : IInstructorRequestService
         {
             await _email.SendEmailAsync(
                 request.User.Email,
-                "[EduSpark] Chúc mừng! Hồ sơ Giảng viên đã được phê duyệt",
-                $"<p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(request.User.FullName)}</strong>,</p><p>Hồ sơ nâng cấp Giảng viên của bạn đã được Admin phê duyệt. Bạn vui lòng đăng xuất và đăng nhập lại (hoặc truy cập Kênh Giảng Viên) để bắt đầu xuất bản khóa học.</p>");
+                "[HUIT Learning] Chúc mừng! Hồ sơ Giảng viên đã được phê duyệt",
+                $"<p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(request.User.FullName)}</strong>,</p><p>Hồ sơ nâng cấp Giảng viên của bạn trên <strong>HUIT Learning</strong> đã được Admin phê duyệt. Bạn vui lòng đăng xuất và đăng nhập lại (hoặc truy cập Kênh Giảng Viên) để bắt đầu xuất bản khóa học.</p>");
         }
 
         return (true, null);
@@ -188,8 +188,8 @@ public class InstructorRequestService : IInstructorRequestService
         {
             await _email.SendEmailAsync(
                 request.User.Email,
-                "[EduSpark] Thông báo kết quả thẩm định hồ sơ Giảng viên",
-                $"<p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(request.User.FullName)}</strong>,</p><p>Hồ sơ Giảng viên của bạn chưa đạt yêu cầu với lý do:</p><blockquote>{System.Net.WebUtility.HtmlEncode(request.RejectionReason)}</blockquote><p>Bạn có thể bổ sung hồ sơ và gửi xét duyệt lại trong mục Hồ sơ Học viên.</p>");
+                "[HUIT Learning] Thông báo kết quả thẩm định hồ sơ Giảng viên",
+                $"<p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(request.User.FullName)}</strong>,</p><p>Hồ sơ Giảng viên trên <strong>HUIT Learning</strong> của bạn chưa đạt yêu cầu với lý do:</p><blockquote>{System.Net.WebUtility.HtmlEncode(request.RejectionReason)}</blockquote><p>Bạn có thể bổ sung hồ sơ và gửi xét duyệt lại trong mục Hồ sơ Học viên.</p>");
         }
 
         return (true, null);

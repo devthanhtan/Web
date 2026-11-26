@@ -1,86 +1,273 @@
 @model QuanLiKhoaHocTrucTuyen.ViewModels.CourseCatalogViewModel
 @{
-    ViewData["Title"] = "Danh sách khóa học";
+    ViewData["Title"] = "Danh mục khóa học - HUIT Learning";
+    var hasActiveFilter = !string.IsNullOrWhiteSpace(Model.Keyword)
+        || Model.CategoryId.HasValue
+        || Model.MaxPrice.HasValue
+        || Model.MinRating.HasValue
+        || !string.IsNullOrWhiteSpace(Model.Sort);
+    var selectedCategory = Model.CategoryId.HasValue
+        ? Model.Categories.FirstOrDefault(c => c.Id == Model.CategoryId.Value)?.Name
+        : null;
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h1 class="h3 mb-1">Khám phá khóa học</h1>
-        <p class="text-muted small mb-0">Tìm thấy <strong>@Model.TotalCount</strong> khóa học phù hợp</p>
-    </div>
-    <button class="btn btn-outline-orange btn-sm d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel">
-        <i class="bi bi-funnel me-1"></i> Bộ lọc tìm kiếm
-    </button>
-</div>
+<style>
+    .hl-catalog-hero {
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(circle at 90% 15%, rgba(249, 115, 22, 0.1), transparent 45%),
+            linear-gradient(150deg, #ffffff 0%, #f8fafc 60%, #eff6ff 100%);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+    }
 
-<div class="row g-4">
-    <div class="col-lg-3">
-        <div class="collapse d-lg-block" id="filterPanel">
-            <div class="app-card p-3 p-md-4">
-                <h2 class="h6 fw-bold mb-3"><i class="bi bi-sliders text-orange me-1"></i> Bộ lọc</h2>
-                <form method="get" asp-action="Index">
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Từ khóa</label>
-                        <input type="text" name="keyword" value="@Model.Keyword" class="form-control form-control-sm" placeholder="Tên khóa học, giảng viên..." />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Danh mục</label>
-                        <select name="categoryId" class="form-select form-select-sm">
-                            <option value="">Tất cả danh mục</option>
-                            @foreach (var cat in Model.Categories)
-                            {
-                                <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Mức giá tối đa</label>
-                        <select name="maxPrice" class="form-select form-select-sm">
-                            <option value="">Không giới hạn</option>
-                            <option value="500000" selected="@(Model.MaxPrice == 500000)">Dưới 500.000 đ</option>
-                            <option value="700000" selected="@(Model.MaxPrice == 700000)">Dưới 700.000 đ</option>
-                            <option value="1000000" selected="@(Model.MaxPrice == 1000000)">Dưới 1.000.000 đ</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Đánh giá tối thiểu</label>
-                        <select name="minRating" class="form-select form-select-sm">
-                            <option value="">Tất cả</option>
-                            <option value="4" selected="@(Model.MinRating == 4)">Từ 4 sao trở lên</option>
-                            <option value="3" selected="@(Model.MinRating == 3)">Từ 3 sao trở lên</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Sắp xếp</label>
-                        <select name="sort" class="form-select form-select-sm">
-                            <option value="">Phổ biến nhất</option>
-                            <option value="rating" selected="@(Model.Sort == "rating")">Đánh giá cao nhất</option>
-                            <option value="price_asc" selected="@(Model.Sort == "price_asc")">Giá tăng dần</option>
-                            <option value="price_desc" selected="@(Model.Sort == "price_desc")">Giá giảm dần</option>
-                        </select>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-orange btn-sm">Áp dụng bộ lọc</button>
-                        <a asp-action="Index" class="btn btn-light border btn-sm">Xóa bộ lọc</a>
-                    </div>
-                </form>
-            </div>
+    .hl-quick-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: #ffffff;
+        color: #334155;
+        transition: all 0.18s ease;
+        flex-shrink: 0;
+    }
+
+    .hl-quick-pill:hover {
+        border-color: rgba(29, 78, 216, 0.35);
+        color: #1d4ed8;
+        background: #eff6ff;
+    }
+
+    .hl-quick-pill.active {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        color: #ffffff;
+        box-shadow: 0 8px 18px -6px rgba(29, 78, 216, 0.45);
+    }
+</style>
+
+<!-- CATALOG HERO SEARCH HEADER -->
+<section class="hl-catalog-hero p-3 p-md-4 p-lg-5 mb-4" data-reveal="up">
+    <div class="row align-items-center g-3 g-lg-4">
+        <div class="col-12 col-lg-7">
+            <span class="hl-eyebrow text-orange">
+                <i class="bi bi-mortarboard-fill me-1" aria-hidden="true"></i> Thư viện học liệu số HUIT Learning
+            </span>
+            <h1 class="h2 fw-bold mt-1 mb-2">Khám phá khóa học trực tuyến</h1>
+            <p class="text-muted small mb-0">
+                Hiện có <strong class="text-dark" style="font-family: 'JetBrains Mono', monospace;">@Model.TotalCount</strong> khóa học phù hợp với tiêu chí tìm kiếm của bạn.
+            </p>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <form method="get" asp-action="Index" class="d-flex gap-2" role="search" aria-label="Tìm kiếm trong danh mục">
+                @if (Model.CategoryId.HasValue)
+                {
+                    <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                }
+                @if (Model.MaxPrice.HasValue)
+                {
+                    <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+                }
+                @if (Model.MinRating.HasValue)
+                {
+                    <input type="hidden" name="minRating" value="@Model.MinRating" />
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Sort))
+                {
+                    <input type="hidden" name="sort" value="@Model.Sort" />
+                }
+                <div class="input-group bg-white rounded-pill border p-1 shadow-sm flex-grow-1">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </span>
+                    <input type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control border-0 shadow-none bg-transparent"
+                           placeholder="Tên khóa học, giảng viên..."
+                           aria-label="Từ khóa khóa học" />
+                    <button type="submit" class="btn btn-orange rounded-pill px-3 fw-semibold">
+                        Tìm
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class="col-lg-9">
+    <!-- Horizontal Snap-Scroll Category Quick-Filter Pills -->
+    <div class="mt-4 pt-3 border-top">
+        <div class="hl-pill-scroll d-flex align-items-center gap-2 pb-1">
+            <a asp-action="Index"
+               asp-route-keyword="@Model.Keyword"
+               asp-route-maxPrice="@Model.MaxPrice"
+               asp-route-minRating="@Model.MinRating"
+               asp-route-sort="@Model.Sort"
+               class="hl-quick-pill @(!Model.CategoryId.HasValue ? "active" : "")">
+                <i class="bi bi-grid-fill" aria-hidden="true"></i>
+                <span>Tất cả</span>
+            </a>
+            @foreach (var cat in Model.Categories)
+            {
+                <a asp-action="Index"
+                   asp-route-keyword="@Model.Keyword"
+                   asp-route-categoryId="@cat.Id"
+                   asp-route-maxPrice="@Model.MaxPrice"
+                   asp-route-minRating="@Model.MinRating"
+                   asp-route-sort="@Model.Sort"
+                   class="hl-quick-pill @(Model.CategoryId == cat.Id ? "active" : "")">
+                    <i class="bi @cat.IconClass" aria-hidden="true"></i>
+                    <span>@cat.Name</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Mobile & Tablet Filter Trigger + Active Filter Chips -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button class="btn btn-huit btn-sm rounded-pill px-3 py-2 d-xl-none"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#catalogFilterOffcanvas"
+                    aria-controls="catalogFilterOffcanvas">
+                <i class="bi bi-sliders2 me-1" aria-hidden="true"></i> Bộ lọc &amp; Sắp xếp
+            </button>
+
+            @if (hasActiveFilter)
+            {
+                @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+                {
+                    <span class="badge badge-orange rounded-pill px-3 py-2">Từ khóa: "@Model.Keyword"</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(selectedCategory))
+                {
+                    <span class="badge badge-huit rounded-pill px-3 py-2">@selectedCategory</span>
+                }
+                @if (Model.MaxPrice.HasValue)
+                {
+                    <span class="badge badge-orange rounded-pill px-3 py-2">
+                        @(Model.MaxPrice == 0 ? "Miễn phí" : $"≤ {Model.MaxPrice.Value:N0} đ")
+                    </span>
+                }
+                @if (Model.MinRating.HasValue)
+                {
+                    <span class="badge badge-orange rounded-pill px-3 py-2">≥ @Model.MinRating sao</span>
+                }
+                <a asp-action="Index" class="btn btn-light border btn-sm rounded-pill px-3">
+                    <i class="bi bi-x-circle me-1" aria-hidden="true"></i> Xóa lọc
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <!-- DESKTOP STICKY FILTER SIDEBAR (xl+) -->
+    <aside class="col-xl-3 d-none d-xl-block" aria-label="Bộ lọc khóa học">
+        <div class="hl-bento-card app-card p-4 position-sticky" style="top: 92px;" data-reveal="up">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 class="h6 fw-bold mb-0">
+                    <i class="bi bi-sliders2 text-orange me-1" aria-hidden="true"></i> Bộ lọc nâng cao
+                </h2>
+                @if (hasActiveFilter)
+                {
+                    <a asp-action="Index" class="small fw-semibold text-decoration-none">Đặt lại</a>
+                }
+            </div>
+
+            <form method="get" asp-action="Index">
+                <div class="mb-3">
+                    <label for="desktopFilterKeyword" class="form-label small fw-semibold">Từ khóa tìm kiếm</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light"><i class="bi bi-search" aria-hidden="true"></i></span>
+                        <input id="desktopFilterKeyword"
+                               type="text"
+                               name="keyword"
+                               value="@Model.Keyword"
+                               class="form-control"
+                               placeholder="Tên khóa học, giảng viên..." />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="desktopFilterCategory" class="form-label small fw-semibold">Chuyên ngành / Danh mục</label>
+                    <select id="desktopFilterCategory" name="categoryId" class="form-select form-select-sm">
+                        <option value="">Tất cả danh mục</option>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="desktopFilterMaxPrice" class="form-label small fw-semibold">Mức học phí tối đa</label>
+                    <select id="desktopFilterMaxPrice" name="maxPrice" class="form-select form-select-sm">
+                        <option value="">Tất cả mức giá</option>
+                        <option value="0" selected="@(Model.MaxPrice == 0)">Khóa học miễn phí</option>
+                        <option value="500000" selected="@(Model.MaxPrice == 500000)">Dưới 500.000 đ</option>
+                        <option value="700000" selected="@(Model.MaxPrice == 700000)">Dưới 700.000 đ</option>
+                        <option value="1000000" selected="@(Model.MaxPrice == 1000000)">Dưới 1.000.000 đ</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="desktopFilterMinRating" class="form-label small fw-semibold">Đánh giá tối thiểu</label>
+                    <select id="desktopFilterMinRating" name="minRating" class="form-select form-select-sm">
+                        <option value="">Mọi mức đánh giá</option>
+                        <option value="4" selected="@(Model.MinRating == 4)">Từ 4.0 sao trở lên</option>
+                        <option value="3" selected="@(Model.MinRating == 3)">Từ 3.0 sao trở lên</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="desktopFilterSort" class="form-label small fw-semibold">Sắp xếp theo</label>
+                    <select id="desktopFilterSort" name="sort" class="form-select form-select-sm">
+                        <option value="">Phổ biến nhất</option>
+                        <option value="rating" selected="@(Model.Sort == "rating")">Đánh giá cao nhất</option>
+                        <option value="price_asc" selected="@(Model.Sort == "price_asc")">Học phí tăng dần</option>
+                        <option value="price_desc" selected="@(Model.Sort == "price_desc")">Học phí giảm dần</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-orange rounded-pill py-2 fw-semibold">
+                        <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Áp dụng bộ lọc
+                    </button>
+                    <a asp-action="Index" class="btn btn-light border rounded-pill btn-sm py-2">
+                        <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i> Xóa bộ lọc
+                    </a>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    <!-- COURSE RESULTS GRID -->
+    <div class="col-12 col-xl-9">
         @if (!Model.Courses.Any())
         {
-            <div class="app-card p-5 text-center">
-                <div class="stat-icon mx-auto mb-3"><i class="bi bi-search"></i></div>
-                <h2 class="h5 mb-2">Không tìm thấy khóa học phù hợp</h2>
-                <p class="text-muted small mb-3">Thử thay đổi từ khóa hoặc xóa bớt điều kiện lọc.</p>
-                <a asp-action="Index" class="btn btn-outline-orange btn-sm">Xem tất cả khóa học</a>
+            <div class="hl-bento-card app-card p-5 text-center" data-reveal="up">
+                <div class="stat-icon mx-auto mb-3">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                </div>
+                <h2 class="h5 fw-bold mb-2">Không tìm thấy khóa học phù hợp</h2>
+                <p class="text-muted small mb-4 mx-auto" style="max-width: 440px;">
+                    Hiện chưa có khóa học nào khớp với điều kiện lọc bạn chọn. Hãy thử từ khóa khác hoặc xem toàn bộ thư viện khóa học HUIT Learning.
+                </p>
+                <a asp-action="Index" class="btn btn-orange rounded-pill px-4">
+                    <i class="bi bi-grid me-1" aria-hidden="true"></i> Xem tất cả khóa học
+                </a>
             </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" data-stagger-group>
                 @foreach (var item in Model.Courses)
                 {
                     <partial name="_CourseCardPartial" model="item" />
@@ -89,12 +276,27 @@
 
             @if (Model.TotalPages > 1)
             {
-                <nav class="mt-4" aria-label="Phân trang khóa học">
-                    <ul class="pagination justify-content-center">
+                <nav class="mt-4 pt-3" aria-label="Phân trang danh sách khóa học">
+                    <ul class="pagination justify-content-center flex-wrap gap-1 mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="Index"
+                               asp-route-keyword="@Model.Keyword"
+                               asp-route-categoryId="@Model.CategoryId"
+                               asp-route-maxPrice="@Model.MaxPrice"
+                               asp-route-minRating="@Model.MinRating"
+                               asp-route-sort="@Model.Sort"
+                               asp-route-page="@(Model.Page - 1)"
+                               aria-label="Trang trước">
+                                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                            </a>
+                        </li>
+
                         @for (int p = 1; p <= Model.TotalPages; p++)
                         {
                             <li class="page-item @(p == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-action="Index"
+                                <a class="page-link rounded-pill px-3"
+                                   asp-action="Index"
                                    asp-route-keyword="@Model.Keyword"
                                    asp-route-categoryId="@Model.CategoryId"
                                    asp-route-maxPrice="@Model.MaxPrice"
@@ -103,9 +305,99 @@
                                    asp-route-page="@p">@p</a>
                             </li>
                         }
+
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="Index"
+                               asp-route-keyword="@Model.Keyword"
+                               asp-route-categoryId="@Model.CategoryId"
+                               asp-route-maxPrice="@Model.MaxPrice"
+                               asp-route-minRating="@Model.MinRating"
+                               asp-route-sort="@Model.Sort"
+                               asp-route-page="@(Model.Page + 1)"
+                               aria-label="Trang tiếp">
+                                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             }
         }
+    </div>
+</div>
+
+<!-- MOBILE & TABLET OFFCANVAS FILTER DRAWER (< 1200px) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="catalogFilterOffcanvas" aria-labelledby="catalogFilterOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h2 class="offcanvas-title h6 fw-bold mb-0" id="catalogFilterOffcanvasLabel">
+            <i class="bi bi-sliders2 text-orange me-1" aria-hidden="true"></i> Bộ lọc &amp; Sắp xếp
+        </h2>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng bộ lọc"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" asp-action="Index">
+            <div class="mb-3">
+                <label for="mobileFilterKeyword" class="form-label small fw-semibold">Từ khóa tìm kiếm</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search" aria-hidden="true"></i></span>
+                    <input id="mobileFilterKeyword"
+                           type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control"
+                           placeholder="Tên khóa học, giảng viên..." />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="mobileFilterCategory" class="form-label small fw-semibold">Chuyên ngành / Danh mục</label>
+                <select id="mobileFilterCategory" name="categoryId" class="form-select">
+                    <option value="">Tất cả danh mục</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="mobileFilterMaxPrice" class="form-label small fw-semibold">Mức học phí tối đa</label>
+                <select id="mobileFilterMaxPrice" name="maxPrice" class="form-select">
+                    <option value="">Tất cả mức giá</option>
+                    <option value="0" selected="@(Model.MaxPrice == 0)">Khóa học miễn phí</option>
+                    <option value="500000" selected="@(Model.MaxPrice == 500000)">Dưới 500.000 đ</option>
+                    <option value="700000" selected="@(Model.MaxPrice == 700000)">Dưới 700.000 đ</option>
+                    <option value="1000000" selected="@(Model.MaxPrice == 1000000)">Dưới 1.000.000 đ</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="mobileFilterMinRating" class="form-label small fw-semibold">Đánh giá tối thiểu</label>
+                <select id="mobileFilterMinRating" name="minRating" class="form-select">
+                    <option value="">Mọi mức đánh giá</option>
+                    <option value="4" selected="@(Model.MinRating == 4)">Từ 4.0 sao trở lên</option>
+                    <option value="3" selected="@(Model.MinRating == 3)">Từ 3.0 sao trở lên</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="mobileFilterSort" class="form-label small fw-semibold">Sắp xếp theo</label>
+                <select id="mobileFilterSort" name="sort" class="form-select">
+                    <option value="">Phổ biến nhất</option>
+                    <option value="rating" selected="@(Model.Sort == "rating")">Đánh giá cao nhất</option>
+                    <option value="price_asc" selected="@(Model.Sort == "price_asc")">Học phí tăng dần</option>
+                    <option value="price_desc" selected="@(Model.Sort == "price_desc")">Học phí giảm dần</option>
+                </select>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-orange rounded-pill py-2 fw-semibold">
+                    <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Áp dụng bộ lọc
+                </button>
+                <a asp-action="Index" class="btn btn-light border rounded-pill py-2">
+                    <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i> Đặt lại mặc định
+                </a>
+            </div>
+        </form>
     </div>
 </div>

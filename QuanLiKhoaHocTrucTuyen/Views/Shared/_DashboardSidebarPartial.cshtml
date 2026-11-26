@@ -9,79 +9,112 @@
             : "";
 }
 
-<nav class="nav flex-column dashboard-nav">
+<nav class="nav flex-column dashboard-nav" aria-label="Menu chức năng">
     @if (string.Equals(currentArea, "Admin", StringComparison.OrdinalIgnoreCase))
     {
-        <div class="text-uppercase small fw-bold text-muted px-2 mb-2">Quản trị hệ thống</div>
+        <div class="dashboard-role-banner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="stat-icon" style="width: 38px; height: 38px; font-size: 1.05rem;">
+                    <i class="bi bi-shield-lock-fill text-huit" aria-hidden="true"></i>
+                </span>
+                <div class="min-w-0">
+                    <div class="fw-bold small text-ink lh-sm text-truncate">Quản trị HUIT</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.72rem;">Điều hành &amp; kiểm duyệt</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-uppercase fw-bold text-muted px-2 mb-2" style="font-size: 0.7rem; letter-spacing: 0.06em;">Quản trị hệ thống</div>
         <a class="nav-link @Active("Admin", "Dashboard")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-            <i class="bi bi-speedometer2"></i> Tổng quan &amp; Báo cáo
+            <i class="bi bi-speedometer2" aria-hidden="true"></i> Tổng quan &amp; Báo cáo
         </a>
         <a class="nav-link @Active("Admin", "Users")" asp-area="Admin" asp-controller="Users" asp-action="Index">
-            <i class="bi bi-people"></i> Quản lý người dùng
+            <i class="bi bi-people" aria-hidden="true"></i> Quản lý người dùng
         </a>
         <a class="nav-link @Active("Admin", "InstructorRequests")" asp-area="Admin" asp-controller="InstructorRequests" asp-action="Index">
-            <i class="bi bi-person-check"></i> Duyệt Giảng viên
+            <i class="bi bi-person-check" aria-hidden="true"></i> Duyệt Giảng viên
         </a>
         <a class="nav-link @Active("Admin", "Courses")" asp-area="Admin" asp-controller="Courses" asp-action="Index">
-            <i class="bi bi-journal-check"></i> Kiểm duyệt khóa học
+            <i class="bi bi-journal-check" aria-hidden="true"></i> Kiểm duyệt khóa học
         </a>
         <a class="nav-link @Active("Admin", "Commission")" asp-area="Admin" asp-controller="Commission" asp-action="Index">
-            <i class="bi bi-percent"></i> Cấu hình hoa hồng
+            <i class="bi bi-percent" aria-hidden="true"></i> Cấu hình hoa hồng
         </a>
         <a class="nav-link @Active("Admin", "Reviews")" asp-area="Admin" asp-controller="Reviews" asp-action="Index">
-            <i class="bi bi-star-half"></i> Kiểm soát đánh giá
+            <i class="bi bi-star-half" aria-hidden="true"></i> Kiểm soát đánh giá
         </a>
     }
     else if (string.Equals(currentArea, "Instructor", StringComparison.OrdinalIgnoreCase))
     {
-        <div class="text-uppercase small fw-bold text-muted px-2 mb-2">Kênh Giảng viên</div>
+        <div class="dashboard-role-banner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="stat-icon" style="width: 38px; height: 38px; font-size: 1.05rem;">
+                    <i class="bi bi-easel2-fill text-orange" aria-hidden="true"></i>
+                </span>
+                <div class="min-w-0">
+                    <div class="fw-bold small text-ink lh-sm text-truncate">Studio Giảng viên</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.72rem;">Biên soạn &amp; học liệu</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-uppercase fw-bold text-muted px-2 mb-2" style="font-size: 0.7rem; letter-spacing: 0.06em;">Kênh Giảng viên</div>
         <a class="nav-link @Active("Instructor", "Dashboard")" asp-area="Instructor" asp-controller="Dashboard" asp-action="Index">
-            <i class="bi bi-bar-chart-line"></i> Thống kê giảng dạy
+            <i class="bi bi-bar-chart-line" aria-hidden="true"></i> Thống kê giảng dạy
         </a>
         <a class="nav-link @Active("Instructor", "Courses")" asp-area="Instructor" asp-controller="Courses" asp-action="Index">
-            <i class="bi bi-collection-play"></i> Quản lý khóa học
+            <i class="bi bi-collection-play" aria-hidden="true"></i> Quản lý khóa học
         </a>
         <a class="nav-link @Active("Instructor", "Questions")" asp-area="Instructor" asp-controller="Questions" asp-action="Index">
-            <i class="bi bi-patch-question"></i> Ngân hàng câu hỏi
+            <i class="bi bi-patch-question" aria-hidden="true"></i> Ngân hàng câu hỏi
         </a>
         <a class="nav-link @Active("Instructor", "Quizzes")" asp-area="Instructor" asp-controller="Quizzes" asp-action="Index">
-            <i class="bi bi-ui-checks-grid"></i> Bài kiểm tra &amp; Thi
+            <i class="bi bi-ui-checks-grid" aria-hidden="true"></i> Bài kiểm tra &amp; Thi
         </a>
         <a class="nav-link @Active("Instructor", "Qna")" asp-area="Instructor" asp-controller="Qna" asp-action="Index">
-            <i class="bi bi-chat-dots"></i> Hộp thư hỏi đáp
+            <i class="bi bi-chat-dots" aria-hidden="true"></i> Hộp thư hỏi đáp
         </a>
         <a class="nav-link @Active("Student", "Profile")" asp-area="Student" asp-controller="Profile" asp-action="Index">
-            <i class="bi bi-person-badge"></i> Hồ sơ giảng viên
+            <i class="bi bi-person-badge" aria-hidden="true"></i> Hồ sơ giảng viên
         </a>
     }
     else
     {
-        <div class="text-uppercase small fw-bold text-muted px-2 mb-2">Góc Học viên</div>
+        <div class="dashboard-role-banner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="stat-icon" style="width: 38px; height: 38px; font-size: 1.05rem;">
+                    <i class="bi bi-mortarboard-fill text-huit" aria-hidden="true"></i>
+                </span>
+                <div class="min-w-0">
+                    <div class="fw-bold small text-ink lh-sm text-truncate">Cổng Học viên HUIT</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.72rem;">Lộ trình &amp; chứng chỉ số</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-uppercase fw-bold text-muted px-2 mb-2" style="font-size: 0.7rem; letter-spacing: 0.06em;">Góc Học viên</div>
         <a class="nav-link @Active("Student", "Dashboard")" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
-            <i class="bi bi-journal-bookmark-fill"></i> Khóa học của tôi
+            <i class="bi bi-journal-bookmark-fill" aria-hidden="true"></i> Khóa học của tôi
         </a>
         <a class="nav-link @Active("Student", "Cart")" asp-area="Student" asp-controller="Cart" asp-action="Index">
-            <i class="bi bi-cart3"></i> Giỏ hàng &amp; Thanh toán
+            <i class="bi bi-cart3" aria-hidden="true"></i> Giỏ hàng &amp; Thanh toán
         </a>
         <a class="nav-link @Active("Student", "Orders")" asp-area="Student" asp-controller="Orders" asp-action="Index">
-            <i class="bi bi-receipt"></i> Lịch sử đơn hàng
+            <i class="bi bi-receipt" aria-hidden="true"></i> Lịch sử đơn hàng
         </a>
         <a class="nav-link @Active("Student", "Certificates")" asp-area="Student" asp-controller="Certificates" asp-action="Index">
-            <i class="bi bi-patch-check"></i> Chứng chỉ của tôi
+            <i class="bi bi-patch-check" aria-hidden="true"></i> Chứng chỉ của tôi
         </a>
         <a class="nav-link @Active("Student", "Profile")" asp-area="Student" asp-controller="Profile" asp-action="Index">
-            <i class="bi bi-person-circle"></i> Hồ sơ cá nhân
+            <i class="bi bi-person-circle" aria-hidden="true"></i> Hồ sơ cá nhân
         </a>
         @if (!User.IsInRole(AppRoles.Instructor) && !User.IsInRole(AppRoles.Admin))
         {
             <a class="nav-link @Active("Student", "InstructorApplication")" asp-area="Student" asp-controller="InstructorApplication" asp-action="Index">
-                <i class="bi bi-award"></i> Trở thành Giảng viên
+                <i class="bi bi-award" aria-hidden="true"></i> Trở thành Giảng viên
             </a>
         }
     }
 
-    <hr class="my-3" />
+    <hr class="my-3 opacity-25" />
     <a class="nav-link" asp-area="" asp-controller="Courses" asp-action="Index">
-        <i class="bi bi-compass"></i> Khám phá khóa học
+        <i class="bi bi-compass" aria-hidden="true"></i> Khám phá khóa học
     </a>
 </nav>

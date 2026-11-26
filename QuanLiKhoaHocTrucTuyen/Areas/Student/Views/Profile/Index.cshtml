@@ -1,42 +1,77 @@
 @model QuanLiKhoaHocTrucTuyen.Areas.Student.ViewModels.ProfileViewModel
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
-    ViewData["AreaTitle"] = "Hồ sơ";
+    ViewData["AreaTitle"] = "Hồ sơ cá nhân";
 }
 
-<div class="row g-4">
-    <div class="col-lg-8">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-1">Cập nhật hồ sơ cá nhân</h1>
-            <p class="text-muted small mb-4">Quản lý thông tin hiển thị trên chứng chỉ và hồ sơ giảng dạy</p>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Tài khoản</span>
+        <h1 class="h3 fw-bold mb-1">Hồ sơ cá nhân</h1>
+        <p class="text-muted small mb-0">Quản lý thông tin hiển thị trên chứng chỉ điện tử HUIT Learning và hồ sơ giảng dạy</p>
+    </div>
+    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-arrow-left me-1"></i> Về khóa học của tôi
+    </a>
+</div>
+
+<div class="row g-4 align-items-start">
+    <!-- Avatar Summary Card (top on mobile, right column on lg+) -->
+    <div class="col-12 col-lg-4 order-first order-lg-last" data-reveal="up">
+        <div class="hl-bento-card p-4 text-center sticky-lg-top" style="top: 88px;">
+            @if (!string.IsNullOrEmpty(Model.CurrentAvatarUrl))
+            {
+                <img src="@Model.CurrentAvatarUrl"
+                     alt="@Model.FullName"
+                     class="rounded-circle object-fit-cover mb-3 border border-3 border-warning-subtle shadow-sm"
+                     style="width: 116px; height: 116px;" />
+            }
+            else
+            {
+                <div class="avatar-circle mx-auto mb-3 fs-2 shadow-sm" style="width: 116px; height: 116px;">
+                    @(string.IsNullOrWhiteSpace(Model.FullName) ? "U" : Model.FullName[0].ToString().ToUpper())
+                </div>
+            }
+            <span class="badge badge-huit mb-2">HUIT Learning ID</span>
+            <h2 class="h5 fw-bold mb-1">@Model.FullName</h2>
+            <p class="small text-orange fw-semibold mb-2">@(Model.Headline ?? "Học viên HUIT Learning")</p>
+            <p class="small text-muted mb-0">@(Model.Bio ?? "Chưa có tiểu sử giới thiệu.")</p>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-8" data-reveal="up">
+        <div class="hl-bento-card p-3 p-md-4">
+            <span class="hl-eyebrow d-inline-block mb-1">Thông tin chi tiết</span>
+            <h2 class="h5 fw-bold mb-3">Cập nhật thông tin tài khoản</h2>
 
             <form asp-action="Index" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label asp-for="FullName" class="form-label fw-semibold"></label>
                         <input asp-for="FullName" class="form-control" />
                         <span asp-validation-for="FullName" class="text-danger small"></span>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label asp-for="Email" class="form-label fw-semibold"></label>
-                        <input asp-for="Email" class="form-control" readonly />
+                        <input asp-for="Email" class="form-control bg-light" readonly />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
                         <input asp-for="PhoneNumber" class="form-control" placeholder="090xxxxxxx" />
                         <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label asp-for="Headline" class="form-label fw-semibold"></label>
-                        <input asp-for="Headline" class="form-control" placeholder="Ví dụ: Lập trình viên .NET" />
+                        <input asp-for="Headline" class="form-control" placeholder="Ví dụ: Lập trình viên .NET · Sinh viên CNTT" />
                         <span asp-validation-for="Headline" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
                         <label asp-for="Bio" class="form-label fw-semibold"></label>
-                        <textarea asp-for="Bio" rows="4" class="form-control" placeholder="Giới thiệu ngắn về bản thân..."></textarea>
+                        <textarea asp-for="Bio" rows="4" class="form-control" placeholder="Giới thiệu ngắn về mục tiêu học tập, dự án hoặc kinh nghiệm của bạn..."></textarea>
                         <span asp-validation-for="Bio" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
@@ -46,30 +81,12 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-orange px-4">
-                        <i class="bi bi-save me-1"></i> Lưu thay đổi
+                <div class="mt-4 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-orange px-4 d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                        <i class="bi bi-save me-2"></i> Lưu thay đổi
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="app-card p-4 text-center">
-            @if (!string.IsNullOrEmpty(Model.CurrentAvatarUrl))
-            {
-                <img src="@Model.CurrentAvatarUrl" alt="@Model.FullName" class="rounded-circle object-fit-cover mb-3 border border-3 border-warning-subtle" style="width: 112px; height: 112px;" />
-            }
-            else
-            {
-                <div class="avatar-circle mx-auto mb-3 fs-2" style="width: 112px; height: 112px;">
-                    @(string.IsNullOrWhiteSpace(Model.FullName) ? "U" : Model.FullName[0].ToString().ToUpper())
-                </div>
-            }
-            <h2 class="h5 mb-1">@Model.FullName</h2>
-            <p class="small text-orange fw-semibold mb-2">@(Model.Headline ?? "Thành viên EduSpark")</p>
-            <p class="small text-muted mb-0">@(Model.Bio ?? "Chưa có tiểu sử giới thiệu.")</p>
         </div>
     </div>
 </div>

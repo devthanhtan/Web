@@ -1,28 +1,32 @@
 @if (TempData["Success"] is string successMsg && !string.IsNullOrWhiteSpace(successMsg))
 {
-    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>@successMsg
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-3 d-flex align-items-center gap-2" role="alert" aria-live="polite">
+        <i class="bi bi-check-circle-fill fs-5 flex-shrink-0" aria-hidden="true"></i>
+        <div>@successMsg</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
     </div>
 }
 @if (TempData["Error"] is string errorMsg && !string.IsNullOrWhiteSpace(errorMsg))
 {
-    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMsg
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 mb-3 d-flex align-items-center gap-2" role="alert" aria-live="assertive">
+        <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0" aria-hidden="true"></i>
+        <div>@errorMsg</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
     </div>
 }
 @if (TempData["Warning"] is string warnMsg && !string.IsNullOrWhiteSpace(warnMsg))
 {
-    <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-        <i class="bi bi-exclamation-circle-fill me-2"></i>@warnMsg
+    <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm rounded-4 mb-3 d-flex align-items-center gap-2" role="alert" aria-live="polite">
+        <i class="bi bi-exclamation-circle-fill fs-5 flex-shrink-0" aria-hidden="true"></i>
+        <div>@warnMsg</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
     </div>
 }
 @if (TempData["Info"] is string infoMsg && !string.IsNullOrWhiteSpace(infoMsg))
 {
-    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-        <i class="bi bi-info-circle-fill me-2"></i>@infoMsg
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm rounded-4 mb-3 d-flex align-items-center gap-2" role="alert" aria-live="polite">
+        <i class="bi bi-info-circle-fill fs-5 flex-shrink-0" aria-hidden="true"></i>
+        <div>@infoMsg</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
     </div>
 }

@@ -1,7 +1,75 @@
 @{
-    ViewData["Title"] = "Chính sách bảo mật";
+    ViewData["Title"] = "Chính sách bảo mật & Quyền sở hữu học liệu";
 }
-<div class="app-card p-4">
-    <h1 class="h3 mb-3">Chính sách bảo mật &amp; Quyền sở hữu học liệu</h1>
-    <p class="text-muted">Mọi thông tin cá nhân, lịch sử thanh toán và chứng chỉ trên EduSpark được bảo mật và chỉ sử dụng phục vụ hoạt động học tập trực tuyến.</p>
-</div>
+
+<section class="hl-section py-2 py-md-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="hl-bento-card app-card p-4 p-md-5 mb-4" data-reveal="up">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span class="badge badge-huit rounded-pill px-3 py-2">
+                        <i class="bi bi-shield-lock-fill text-orange me-1" aria-hidden="true"></i> Cam kết an toàn thông tin
+                    </span>
+                    <span class="small text-muted">Áp dụng trên toàn hệ thống HUIT Learning</span>
+                </div>
+
+                <span class="hl-eyebrow text-orange">Quy chuẩn minh bạch</span>
+                <h1 class="h2 fw-bold mt-1 mb-3">Chính sách bảo mật &amp; Quyền sở hữu học liệu</h1>
+                <p class="text-muted mb-4">
+                    Mọi thông tin cá nhân, tiến độ học tập, lịch sử giao dịch thanh toán và dữ liệu chứng chỉ số trên nền tảng <strong>HUIT Learning</strong> đều được bảo vệ nghiêm ngặt và chỉ sử dụng nhằm phục vụ hoạt động đào tạo trực tuyến.
+                </p>
+
+                <div class="row row-cols-1 row-cols-md-2 g-4" data-stagger-group>
+                    <div class="col" data-reveal="up">
+                        <div class="hl-bento-card p-4 bg-light rounded-4 h-100 border">
+                            <div class="stat-icon mb-3"><i class="bi bi-person-lock" aria-hidden="true"></i></div>
+                            <h2 class="h6 fw-bold mb-2">1. Bảo vệ dữ liệu học viên &amp; giảng viên</h2>
+                            <p class="small text-muted mb-0">
+                                Thông tin tài khoản, email và hồ sơ năng lực được mã hóa lưu trữ an toàn theo tiêu chuẩn xác thực ASP.NET Core Identity, tuyệt đối không chia sẻ cho bên thứ ba trái phép.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col" data-reveal="up">
+                        <div class="hl-bento-card p-4 bg-light rounded-4 h-100 border">
+                            <div class="stat-icon mb-3"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i></div>
+                            <h2 class="h6 fw-bold mb-2">2. An toàn giao dịch thanh toán</h2>
+                            <p class="small text-muted mb-0">
+                                Các giao dịch đăng ký khóa học trên HUIT Learning được kiểm chứng chữ ký số HMAC và xử lý idempotent nhằm đảm bảo quyền lợi truy cập khóa học chính xác, minh bạch.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col" data-reveal="up">
+                        <div class="hl-bento-card p-4 bg-light rounded-4 h-100 border">
+                            <div class="stat-icon mb-3"><i class="bi bi-qr-code-scan" aria-hidden="true"></i></div>
+                            <h2 class="h6 fw-bold mb-2">3. Xác thực chứng chỉ điện tử công khai</h2>
+                            <p class="small text-muted mb-0">
+                                Mã chứng chỉ định danh và mã QR chỉ hiển thị thông tin xác nhận hoàn thành khóa học (họ tên học viên, tên khóa học, giảng viên và ngày cấp) khi tra cứu hợp lệ.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col" data-reveal="up">
+                        <div class="hl-bento-card p-4 bg-light rounded-4 h-100 border">
+                            <div class="stat-icon mb-3"><i class="bi bi-journal-code" aria-hidden="true"></i></div>
+                            <h2 class="h6 fw-bold mb-2">4. Bản quyền bài giảng &amp; tài liệu số</h2>
+                            <p class="small text-muted mb-0">
+                                Toàn bộ video bài giảng, tài liệu đính kèm và đề thi trên HUIT Learning thuộc quyền sở hữu trí tuệ của giảng viên và nhà trường, dành riêng cho mục đích học tập cá nhân.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4 pt-4 border-top">
+                    <span class="small text-muted">Cần hỗ trợ thêm về tài khoản hoặc chứng chỉ số?</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-huit btn-sm rounded-pill px-3">
+                            <i class="bi bi-compass me-1" aria-hidden="true"></i> Khám phá khóa học
+                        </a>
+                        <a asp-area="" asp-controller="Certificate" asp-action="Verify" class="btn btn-outline-orange btn-sm rounded-pill px-3">
+                            <i class="bi bi-patch-check me-1" aria-hidden="true"></i> Tra cứu chứng chỉ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

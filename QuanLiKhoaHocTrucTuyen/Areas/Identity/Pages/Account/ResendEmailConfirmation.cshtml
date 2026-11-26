@@ -1,23 +1,44 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.ResendEmailConfirmationModel
 @{
-    ViewData["Title"] = "Gửi lại email xác thực";
+    ViewData["Title"] = "Gửi lại email xác thực - HUIT Learning";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-md-7 col-lg-5">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-2">Gửi lại email xác thực</h1>
-            <p class="small text-muted mb-3">Nhập email đã đăng ký để nhận lại liên kết kích hoạt.</p>
-            <form method="post">
-                <div asp-validation-summary="All" class="text-danger small mb-2"></div>
-                <div class="mb-3">
-                    <label asp-for="Input.Email" class="form-label fw-semibold">Email</label>
-                    <input asp-for="Input.Email" class="form-control" />
-                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+<section class="hl-section py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 shadow-sm" data-reveal="up">
+                <div class="text-center mb-4">
+                    <div class="stat-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                        <i class="bi bi-envelope-paper-fill" aria-hidden="true"></i>
+                    </div>
+                    <span class="hl-eyebrow text-orange">Kích hoạt tài khoản</span>
+                    <h1 class="h4 fw-bold mt-1 mb-1">Gửi lại email xác thực</h1>
+                    <p class="small text-muted mb-0">Nhận lại liên kết kích hoạt tài khoản HUIT Learning</p>
                 </div>
-                <button type="submit" class="btn btn-orange w-100">Gửi lại liên kết</button>
-            </form>
+
+                <form method="post">
+                    <div asp-validation-summary="All" class="text-danger small mb-2"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label fw-semibold small">Email đã đăng ký</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                            <input asp-for="Input.Email" class="form-control" placeholder="ten@email.com" />
+                        </div>
+                        <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold mb-3">
+                        <i class="bi bi-send-check me-1" aria-hidden="true"></i> Gửi lại liên kết kích hoạt
+                    </button>
+                    <div class="text-center small">
+                        <a asp-page="./Login" class="text-muted text-decoration-none"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Quay lại đăng nhập</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

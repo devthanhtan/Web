@@ -27,9 +27,9 @@ public static class SeedData
             userManager,
             email: "admin@eduspark.vn",
             password: "Admin12345",
-            fullName: "Quản Trị Viên EduSpark",
-            headline: "Quản trị hệ thống đào tạo trực tuyến",
-            bio: "Điều hành kiểm duyệt nội dung, chất lượng giảng viên và tài chính nền tảng.",
+            fullName: "Quản Trị Viên HUIT Learning",
+            headline: "Quản trị hệ thống đào tạo trực tuyến HUIT Learning",
+            bio: "Điều hành kiểm duyệt nội dung, chất lượng giảng viên và tài chính nền tảng HUIT Learning.",
             roles: [AppRoles.Admin]);
 
         // Seed Instructor
@@ -173,7 +173,7 @@ public static class SeedData
                 Slug = "kien-truc-microservices-net-8-nhap",
                 ShortDescription = "Khóa học đang biên soạn về kiến trúc phân tán và bảo mật nâng cao.",
                 Description = "Nội dung đang được giảng viên hoàn thiện trước khi gửi duyệt.",
-                ThumbnailUrl = "/images/course-dotnet.svg",
+                ThumbnailUrl = "/images/course-microservices.svg",
                 Level = "Nâng cao",
                 Price = 899000m,
                 CategoryId = catWeb.Id,
@@ -493,6 +493,218 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddHours(-6)
             });
 
+            await context.SaveChangesAsync();
+        }
+
+        // Idempotent refresh for both newly initialized and pre-existing LocalDB databases
+        await EnsureSupplementalHuitDataAsync(context, userManager, admin, instructor, student);
+    }
+
+    private static async Task EnsureSupplementalHuitDataAsync(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        ApplicationUser admin,
+        ApplicationUser instructor,
+        ApplicationUser student)
+    {
+        if (admin.FullName == "Quản Trị Viên EduSpark" || (admin.FullName != null && admin.FullName.Contains("EduSpark", StringComparison.OrdinalIgnoreCase)))
+        {
+            admin.FullName = "Quản Trị Viên HUIT Learning";
+            admin.Headline = "Quản trị hệ thống đào tạo trực tuyến HUIT Learning";
+            await userManager.UpdateAsync(admin);
+        }
+
+        var catWeb = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "lap-trinh-web");
+        if (catWeb == null)
+        {
+            catWeb = new Category
+            {
+                Name = "Lập trình Web",
+                Slug = "lap-trinh-web",
+                Description = "ASP.NET Core, HTML/CSS, JavaScript và kiến trúc Web hiện đại",
+                IconClass = "bi-code-slash"
+            };
+            context.Categories.Add(catWeb);
+            await context.SaveChangesAsync();
+        }
+
+        var catDevOps = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "devops-cloud");
+        if (catDevOps == null)
+        {
+            catDevOps = new Category
+            {
+                Name = "DevOps & Cloud",
+                Slug = "devops-cloud",
+                Description = "Triển khai ứng dụng, CI/CD và bảo mật hệ thống",
+                IconClass = "bi-cloud-check"
+            };
+            context.Categories.Add(catDevOps);
+            await context.SaveChangesAsync();
+        }
+
+        const string devOpsSlug = "docker-github-actions-cicd-cloud";
+        if (!await context.Courses.AnyAsync(c => c.Slug == devOpsSlug))
+        {
+            var courseDevOps = new Course
+            {
+                Title = "Docker, GitHub Actions CI/CD & Triển Khai Cloud Thực Chiến",
+                Slug = devOpsSlug,
+                ShortDescription = "Đóng gói ứng dụng đa tầng với Docker Compose, tự động hóa kiểm thử và triển khai liên tục lên máy chủ Linux Cloud.",
+                Description = "Khóa học thực chiến tại HUIT Learning giúp bạn làm chủ Docker, tối ưu multi-stage Dockerfile cho .NET 8, thiết lập workflow CI/CD tự động với GitHub Actions, cấu hình Reverse Proxy Nginx SSL và giám sát hệ thống sản phẩm thật.",
+                ThumbnailUrl = "/images/course-devops-cloud.svg",
+                IntroYoutubeId = "3c-iBn73dDE",
+                Level = "Trung cấp",
+                Price = 699000m,
+                CategoryId = catDevOps.Id,
+                InstructorId = instructor.Id,
+                Status = CourseStatus.Approved,
+                ReviewedByAdminId = admin.Id,
+                ReviewedAt = DateTime.UtcNow.AddDays(-3),
+                CreatedAt = DateTime.UtcNow.AddDays(-6),
+                UpdatedAt = DateTime.UtcNow.AddDays(-3)
+            };
+            context.Courses.Add(courseDevOps);
+            await context.SaveChangesAsync();
+
+            var chDevOps = new Chapter
+            {
+                CourseId = courseDevOps.Id,
+                Title = "Chương 1: Container hóa với Docker & Tự động hóa CI/CD",
+                SortOrder = 1
+            };
+            context.Chapters.Add(chDevOps);
+            await context.SaveChangesAsync();
+
+            context.Lessons.AddRange(
+                new Lesson
+                {
+                    ChapterId = chDevOps.Id,
+                    Title = "Bài 1: Tối ưu Multi-Stage Dockerfile & Docker Compose cho ASP.NET Core 8",
+                    Description = "Đóng gói ứng dụng web cùng SQL Server thành cụm container gọn nhẹ, bảo mật và dễ triển khai.",
+                    LessonType = LessonType.Video,
+                    SortOrder = 1,
+                    DurationSeconds = 210,
+                    IsFreePreview = true,
+                    YoutubeVideoId = "3c-iBn73dDE",
+                    VideoStatus = VideoUploadStatus.Ready
+                },
+                new Lesson
+                {
+                    ChapterId = chDevOps.Id,
+                    Title = "Bài 2: Thiết lập GitHub Actions Build, Test xUnit & Deploy tự động",
+                    Description = "Cấu hình pipeline kiểm thử tự động mỗi khi tạo Pull Request và phát hành không gián đoạn.",
+                    LessonType = LessonType.Document,
+                    SortOrder = 2,
+                    DurationSeconds = 180,
+                    IsFreePreview = false,
+                    VideoStatus = VideoUploadStatus.None,
+                    ContentHtml = "<h4>Chu trình CI/CD chuẩn tại HUIT Learning</h4><ol><li>Tự động chạy <code>dotnet build</code> và <code>dotnet test</code> trên mỗi commit.</li><li>Đóng gói image và đẩy lên GitHub Container Registry (GHCR).</li><li>Kích hoạt triển khai qua SSH với cơ chế healthcheck an toàn.</li></ol>"
+                });
+
+            context.Reviews.Add(new Review
+            {
+                UserId = student.Id,
+                CourseId = courseDevOps.Id,
+                Rating = 5,
+                Comment = "Phần Docker Compose và GitHub Actions hướng dẫn rất trực quan, áp dụng được ngay cho đồ án thực tế.",
+                IsHidden = false,
+                CreatedAt = DateTime.UtcNow.AddDays(-2)
+            });
+
+            await context.SaveChangesAsync();
+        }
+
+        const string frontend3dSlug = "threejs-3d-webgl-view-transitions-modern-web";
+        if (!await context.Courses.AnyAsync(c => c.Slug == frontend3dSlug))
+        {
+            var courseFrontend = new Course
+            {
+                Title = "Lập Trình Web 3D Tương Tác Với Three.js & View Transitions API",
+                Slug = frontend3dSlug,
+                ShortDescription = "Kiến tạo giao diện Web 3D 60fps bằng Three.js WebGL, hiệu ứng chuyển trang mượt View Transitions và chuẩn truy cập hiện đại.",
+                Description = "Khám phá kỹ nghệ Frontend thế hệ mới: dựng cảnh 3D tương tác chuột với Three.js, quản lý hiệu năng render thông minh với IntersectionObserver & ResizeObserver, kết hợp View Transitions API giúp ứng dụng đa trang mượt như Native App.",
+                ThumbnailUrl = "/images/course-react-frontend.svg",
+                IntroYoutubeId = "PkZNo7MFNFg",
+                Level = "Trung cấp",
+                Price = 599000m,
+                CategoryId = catWeb.Id,
+                InstructorId = instructor.Id,
+                Status = CourseStatus.Approved,
+                ReviewedByAdminId = admin.Id,
+                ReviewedAt = DateTime.UtcNow.AddDays(-2),
+                CreatedAt = DateTime.UtcNow.AddDays(-4),
+                UpdatedAt = DateTime.UtcNow.AddDays(-2)
+            };
+            context.Courses.Add(courseFrontend);
+            await context.SaveChangesAsync();
+
+            var chFrontend = new Chapter
+            {
+                CourseId = courseFrontend.Id,
+                Title = "Chương 1: Không gian 3D WebGL & Chuyển động giao diện hiện đại",
+                SortOrder = 1
+            };
+            context.Chapters.Add(chFrontend);
+            await context.SaveChangesAsync();
+
+            context.Lessons.AddRange(
+                new Lesson
+                {
+                    ChapterId = chFrontend.Id,
+                    Title = "Bài 1: Khởi tạo Scene, Camera, Ánh sáng & Vật thể 3D với Three.js",
+                    Description = "Xây dựng khối đa diện tương tác con trỏ chuột mượt 60fps và tự động co giãn theo khung nhìn.",
+                    LessonType = LessonType.Video,
+                    SortOrder = 1,
+                    DurationSeconds = 240,
+                    IsFreePreview = true,
+                    YoutubeVideoId = "PkZNo7MFNFg",
+                    VideoStatus = VideoUploadStatus.Ready
+                },
+                new Lesson
+                {
+                    ChapterId = chFrontend.Id,
+                    Title = "Bài 2: Tích hợp View Transitions API & Tôn trọng prefers-reduced-motion",
+                    Description = "Kỹ thuật morph hình ảnh giữa trang danh mục và chi tiết khóa học không gây giật khung hình.",
+                    LessonType = LessonType.Document,
+                    SortOrder = 2,
+                    DurationSeconds = 150,
+                    IsFreePreview = false,
+                    VideoStatus = VideoUploadStatus.None,
+                    ContentHtml = "<h4>Nguyên tắc Web Motion hiện đại</h4><ul><li>Sử dụng <code>@view-transition { navigation: auto; }</code> và định danh <code>view-transition-name</code> duy nhất cho từng phần tử.</li><li>Tạm dừng vòng lặp <code>requestAnimationFrame</code> khi tab ẩn hoặc khuất tầm nhìn.</li><li>Luôn hỗ trợ chế độ giảm chuyển động <code>prefers-reduced-motion: reduce</code>.</li></ul>"
+                });
+
+            context.Reviews.Add(new Review
+            {
+                UserId = student.Id,
+                CourseId = courseFrontend.Id,
+                Rating = 5,
+                Comment = "Hiệu ứng Three.js và chuyển trang View Transitions cực mượt, tối ưu tốt cả trên điện thoại.",
+                IsHidden = false,
+                CreatedAt = DateTime.UtcNow.AddDays(-1)
+            });
+
+            await context.SaveChangesAsync();
+        }
+
+        bool hasCourseUpdates = false;
+        var draftCourse = await context.Courses.FirstOrDefaultAsync(c => c.Slug == "kien-truc-microservices-net-8-nhap");
+        if (draftCourse != null && (string.IsNullOrWhiteSpace(draftCourse.ThumbnailUrl) || draftCourse.ThumbnailUrl == "/images/course-dotnet.svg"))
+        {
+            draftCourse.ThumbnailUrl = "/images/course-microservices.svg";
+            hasCourseUpdates = true;
+        }
+
+        var missingThumbCourses = await context.Courses
+            .Where(c => c.ThumbnailUrl == null || c.ThumbnailUrl == "")
+            .ToListAsync();
+        foreach (var course in missingThumbCourses)
+        {
+            course.ThumbnailUrl = "/images/course-default.svg";
+            hasCourseUpdates = true;
+        }
+
+        if (hasCourseUpdates)
+        {
             await context.SaveChangesAsync();
         }
     }

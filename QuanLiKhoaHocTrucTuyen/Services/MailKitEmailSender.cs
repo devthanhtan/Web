@@ -29,20 +29,22 @@ public class MailKitEmailSender : IAppEmailService
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        var senderName = string.IsNullOrWhiteSpace(_smtp.FromName) ? "HUIT Learning" : _smtp.FromName;
+
         if (_features.UseMockServices || string.IsNullOrWhiteSpace(_smtp.Host))
         {
             var mockDir = Path.Combine(_env.ContentRootPath, "App_Data", "MockEmails");
             Directory.CreateDirectory(mockDir);
             var safeEmail = Regex.Replace(email, @"[^a-zA-Z0-9._-]", "_");
             var filePath = Path.Combine(mockDir, $"{DateTime.UtcNow:yyyyMMddHHmmssfff}_{safeEmail}.html");
-            var content = $"<!-- To: {email} | Subject: {subject} -->\n{htmlMessage}";
+            var content = $"<!-- From: {senderName} | To: {email} | Subject: {subject} -->\n{htmlMessage}";
             await File.WriteAllTextAsync(filePath, content);
-            _logger.LogInformation("[MockEmail] Đã lưu email tới {Email} với tiêu đề '{Subject}' tại {FilePath}", email, subject, filePath);
+            _logger.LogInformation("[MockEmail - HUIT Learning] Đã lưu email tới {Email} với tiêu đề '{Subject}' tại {FilePath}", email, subject, filePath);
             return;
         }
 
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_smtp.FromName, _smtp.FromEmail));
+        message.From.Add(new MailboxAddress(senderName, _smtp.FromEmail));
         message.To.Add(MailboxAddress.Parse(email));
         message.Subject = subject;
         message.Body = new BodyBuilder { HtmlBody = htmlMessage }.ToMessageBody();

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <defs>
+    <linearGradient id="ms-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#071126"/>
+      <stop offset="50%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#0054A6"/>
+    </linearGradient>
+    <radialGradient id="ms-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(940 360) scale(400)">
+      <stop offset="0%" stop-color="#818CF8" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="ms-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.3" fill="#FFFFFF" fill-opacity="0.1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#ms-bg)"/>
+  <rect width="1280" height="720" fill="url(#ms-grid)"/>
+  <rect width="1280" height="720" fill="url(#ms-glow)"/>
+
+  <!-- Left Column -->
+  <rect x="76" y="76" width="350" height="44" rx="22" fill="#FFFFFF" fill-opacity="0.12" stroke="#818CF8" stroke-opacity="0.45"/>
+  <circle cx="102" cy="98" r="7" fill="#FF6B00"/>
+  <text x="120" y="104" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" letter-spacing="0.8">HUIT LEARNING · ARCHITECTURE</text>
+
+  <text x="76" y="216" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="56" font-weight="800">Microservices</text>
+  <text x="76" y="286" fill="#A5B4FC" font-family="Segoe UI, Inter, sans-serif" font-size="50" font-weight="800">&amp; Bảo Mật API .NET 8</text>
+
+  <text x="76" y="352" fill="#E2E8F0" font-family="Segoe UI, Inter, sans-serif" font-size="24" font-weight="500">YARP Gateway · OAuth2 / JWT · Event-Driven</text>
+  <text x="76" y="390" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="400">Kiến trúc phân tán chịu tải cao, gRPC &amp; Zero-Trust Security</text>
+
+  <g transform="translate(76, 438)">
+    <rect x="0" y="0" width="136" height="42" rx="12" fill="#4F46E5" fill-opacity="0.45" stroke="#A5B4FC" stroke-opacity="0.6"/>
+    <text x="68" y="27" text-anchor="middle" fill="#EEF2FF" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">API Gateway</text>
+
+    <rect x="150" y="0" width="124" height="42" rx="12" fill="#0284C7" fill-opacity="0.4" stroke="#38BDF8" stroke-opacity="0.55"/>
+    <text x="212" y="27" text-anchor="middle" fill="#E0F2FE" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">RabbitMQ</text>
+
+    <rect x="288" y="0" width="132" height="42" rx="12" fill="#EA580C" fill-opacity="0.4" stroke="#FB923C" stroke-opacity="0.6"/>
+    <text x="354" y="27" text-anchor="middle" fill="#FFF7ED" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">JWT OAuth2</text>
+  </g>
+
+  <rect x="76" y="536" width="280" height="58" rx="16" fill="#FF6B00"/>
+  <text x="216" y="572" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="800">Kiến Trúc Phân Tán</text>
+
+  <!-- Right Column: Microservice Mesh Diagram -->
+  <!-- Mesh Connection Lines -->
+  <g stroke-width="2.5" stroke-dasharray="6 6">
+    <line x1="936" y1="330" x2="760" y2="185" stroke="#38BDF8"/>
+    <line x1="936" y1="330" x2="1112" y2="185" stroke="#38BDF8"/>
+    <line x1="936" y1="330" x2="760" y2="485" stroke="#FB923C"/>
+    <line x1="936" y1="330" x2="1112" y2="485" stroke="#4ADE80"/>
+    <line x1="760" y1="185" x2="1112" y2="185" stroke="#818CF8" stroke-opacity="0.5"/>
+    <line x1="760" y1="485" x2="1112" y2="485" stroke="#818CF8" stroke-opacity="0.5"/>
+  </g>
+
+  <!-- Central API Gateway Hub -->
+  <g transform="translate(836, 266)">
+    <rect width="200" height="128" rx="24" fill="#0F172A" stroke="#FF6B00" stroke-width="3"/>
+    <rect x="44" y="16" width="112" height="26" rx="13" fill="#FF6B00" fill-opacity="0.22"/>
+    <text x="100" y="34" text-anchor="middle" fill="#FDBA74" font-family="Segoe UI, sans-serif" font-size="12" font-weight="800">ZERO TRUST</text>
+    <text x="100" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="20" font-weight="800">API Gateway</text>
+    <text x="100" y="98" text-anchor="middle" fill="#38BDF8" font-family="Consolas, monospace" font-size="13">YARP · RateLimit</text>
+  </g>
+
+  <!-- Node 1: Identity Service -->
+  <g transform="translate(668, 126)">
+    <rect width="184" height="106" rx="18" fill="#0F172A" fill-opacity="0.94" stroke="#38BDF8" stroke-width="2"/>
+    <circle cx="34" cy="36" r="14" fill="#0284C7" fill-opacity="0.35"/>
+    <text x="34" y="41" text-anchor="middle" fill="#38BDF8" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800">ID</text>
+    <text x="58" y="41" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">Identity API</text>
+    <text x="22" y="74" fill="#94A3B8" font-family="Consolas, monospace" font-size="13">JWT · RefreshToken</text>
+    <text x="22" y="92" fill="#4ADE80" font-family="Consolas, monospace" font-size="12">● Healthy (gRPC)</text>
+  </g>
+
+  <!-- Node 2: Catalog Service -->
+  <g transform="translate(1020, 126)">
+    <rect width="184" height="106" rx="18" fill="#0F172A" fill-opacity="0.94" stroke="#818CF8" stroke-width="2"/>
+    <circle cx="34" cy="36" r="14" fill="#4F46E5" fill-opacity="0.35"/>
+    <text x="34" y="41" text-anchor="middle" fill="#A5B4FC" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800">CT</text>
+    <text x="58" y="41" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">Catalog API</text>
+    <text x="22" y="74" fill="#94A3B8" font-family="Consolas, monospace" font-size="13">Redis Cache · CQRS</text>
+    <text x="22" y="92" fill="#4ADE80" font-family="Consolas, monospace" font-size="12">● Healthy (REST)</text>
+  </g>
+
+  <!-- Node 3: Ordering Service -->
+  <g transform="translate(668, 444)">
+    <rect width="184" height="106" rx="18" fill="#0F172A" fill-opacity="0.94" stroke="#FB923C" stroke-width="2"/>
+    <circle cx="34" cy="36" r="14" fill="#EA580C" fill-opacity="0.35"/>
+    <text x="34" y="41" text-anchor="middle" fill="#FDBA74" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800">OR</text>
+    <text x="58" y="41" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">Order Saga</text>
+    <text x="22" y="74" fill="#94A3B8" font-family="Consolas, monospace" font-size="13">Outbox Pattern</text>
+    <text x="22" y="92" fill="#FBBF24" font-family="Consolas, monospace" font-size="12">⇄ Event Bus</text>
+  </g>
+
+  <!-- Node 4: Payment & Telemetry -->
+  <g transform="translate(1020, 444)">
+    <rect width="184" height="106" rx="18" fill="#0F172A" fill-opacity="0.94" stroke="#34D399" stroke-width="2"/>
+    <circle cx="34" cy="36" r="14" fill="#059669" fill-opacity="0.35"/>
+    <text x="34" y="41" text-anchor="middle" fill="#6EE7B7" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800">OT</text>
+    <text x="58" y="41" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">OpenTelemetry</text>
+    <text x="22" y="74" fill="#94A3B8" font-family="Consolas, monospace" font-size="13">Tracing · Metrics</text>
+    <text x="22" y="92" fill="#4ADE80" font-family="Consolas, monospace" font-size="12">● 99.98% Uptime</text>
+  </g>
+</svg>

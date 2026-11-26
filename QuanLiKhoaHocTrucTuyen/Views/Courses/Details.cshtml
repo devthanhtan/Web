@@ -1,127 +1,349 @@
 @model QuanLiKhoaHocTrucTuyen.ViewModels.CourseDetailViewModel
 @{
-    ViewData["Title"] = Model.Course.Title;
+    ViewData["Title"] = $"{Model.Course.Title} - HUIT Learning";
     var course = Model.Course;
+    var orderedChapters = course.Chapters.OrderBy(c => c.SortOrder).ToList();
+    var freePreviewCount = orderedChapters.SelectMany(c => c.Lessons).Count(l => l.IsFreePreview);
+    var instructorInitial = !string.IsNullOrWhiteSpace(course.Instructor.FullName)
+        ? course.Instructor.FullName.Trim()[0].ToString().ToUpper()
+        : "G";
 }
 
-<div class="row g-4">
-    <div class="col-lg-8">
-        <div class="app-card p-4 mb-4">
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <span class="badge badge-orange">@course.Category.Name</span>
-                <span class="badge bg-light text-dark border">@course.Level</span>
-                @if (Model.ReviewCount > 0)
-                {
-                    <span class="small fw-semibold text-warning">
-                        <i class="bi bi-star-fill"></i> @Model.AverageRating.ToString("0.0")
-                        <span class="text-muted">(@Model.ReviewCount đánh giá)</span>
-                    </span>
-                }
-            </div>
-            <h1 class="h2 mb-2">@course.Title</h1>
-            <p class="text-muted mb-3">@course.ShortDescription</p>
-            <div class="d-flex flex-wrap gap-3 small text-muted">
-                <span><i class="bi bi-person-circle text-orange me-1"></i> Giảng viên: <strong class="text-dark">@course.Instructor.FullName</strong></span>
-                <span><i class="bi bi-play-btn text-orange me-1"></i> @Model.TotalLessons bài học</span>
-                <span><i class="bi bi-clock text-orange me-1"></i> ~@Model.TotalDurationMinutes phút</span>
-                <span><i class="bi bi-people text-orange me-1"></i> @course.Enrollments.Count học viên</span>
+<style>
+    .hl-course-hero {
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(circle at 86% 20%, rgba(249, 115, 22, 0.24), transparent 44%),
+            radial-gradient(circle at 12% 85%, rgba(56, 189, 248, 0.16), transparent 46%),
+            linear-gradient(145deg, #0b162c 0%, #102a5c 58%, #0f172a 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .hl-course-hero .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .hl-course-hero a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .hl-course-hero a:hover {
+        color: #ffffff;
+    }
+
+    .hl-price-mono {
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: -0.02em;
+    }
+
+    /* Offset cleanly above _Layout's .hl-mobile-bottom-nav (~64px) on < 992px */
+    .hl-mobile-enroll-bar {
+        position: fixed;
+        bottom: 68px;
+        left: 12px;
+        right: 12px;
+        z-index: 1025;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.22);
+        padding: 0.65rem 0.9rem;
+    }
+
+    .hl-detail-page-pad {
+        padding-bottom: 5.5rem;
+    }
+
+    @@media (min-width: 992px) {
+        .hl-detail-page-pad {
+            padding-bottom: 0;
+        }
+    }
+</style>
+
+<!-- EDITORIAL DARK-NAVY COURSE HEADER BANNER -->
+<section class="hl-course-hero p-4 p-md-5 mb-4 shadow-sm" data-reveal="up">
+    <nav aria-label="Điều hướng phân cấp" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item">
+                <a asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="" asp-controller="Courses" asp-action="Index">Khóa học</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="" asp-controller="Courses" asp-action="Index" asp-route-categoryId="@course.CategoryId">@course.Category.Name</a>
+            </li>
+            <li class="breadcrumb-item active text-white-50 text-truncate" style="max-width: 240px;" aria-current="page">@course.Title</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <span class="badge bg-orange text-white rounded-pill px-3 py-2">@course.Category.Name</span>
+        <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-3 py-2">
+            <i class="bi bi-bar-chart-steps text-orange me-1" aria-hidden="true"></i>@course.Level
+        </span>
+        <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-3 py-2">
+            <i class="bi bi-qr-code-scan text-info me-1" aria-hidden="true"></i>Chứng chỉ số QR
+        </span>
+        @if (Model.ReviewCount > 0)
+        {
+            <span class="small fw-semibold text-warning ms-sm-auto">
+                <i class="bi bi-star-fill" aria-hidden="true"></i> @Model.AverageRating.ToString("0.0")
+                <span class="text-white-50 fw-normal">(@Model.ReviewCount đánh giá)</span>
+            </span>
+        }
+    </div>
+
+    <h1 class="h2 fw-bold text-white mb-2 lh-sm">@course.Title</h1>
+    <p class="text-white-50 mb-4" style="max-width: 760px;">@course.ShortDescription</p>
+
+    <div class="row row-cols-2 row-cols-sm-4 g-3 pt-3 border-top border-white border-opacity-10 small">
+        <div class="col">
+            <div class="text-white-50">Giảng viên</div>
+            <div class="fw-semibold text-white text-truncate" title="@course.Instructor.FullName">
+                <i class="bi bi-person-badge text-orange me-1" aria-hidden="true"></i>@course.Instructor.FullName
             </div>
         </div>
+        <div class="col">
+            <div class="text-white-50">Thời lượng</div>
+            <div class="fw-semibold text-white">
+                <i class="bi bi-play-btn text-orange me-1" aria-hidden="true"></i>@Model.TotalLessons bài (~@Model.TotalDurationMinutes phút)
+            </div>
+        </div>
+        <div class="col">
+            <div class="text-white-50">Học viên</div>
+            <div class="fw-semibold text-white">
+                <i class="bi bi-people text-orange me-1" aria-hidden="true"></i>@course.Enrollments.Count đã đăng ký
+            </div>
+        </div>
+        <div class="col">
+            <div class="text-white-50">Cập nhật</div>
+            <div class="fw-semibold text-white">
+                <i class="bi bi-calendar-check text-orange me-1" aria-hidden="true"></i>@course.UpdatedAt.ToLocalTime().ToString("MM/yyyy")
+            </div>
+        </div>
+    </div>
+</section>
 
+<div class="row g-4 hl-detail-page-pad">
+    <!-- MAIN CONTENT COLUMN (Desktop: Left 8 cols, Mobile: Below Enrollment Card) -->
+    <div class="col-12 col-lg-8 order-2 order-lg-1">
+        <!-- Intro Video -->
         @if (!string.IsNullOrWhiteSpace(course.IntroYoutubeId))
         {
-            <div class="app-card p-4 mb-4">
-                <h2 class="h5 mb-3"><i class="bi bi-play-circle text-orange me-1"></i> Video giới thiệu khóa học</h2>
-                <div class="video-frame-wrapper">
-                    <iframe src="https://www.youtube.com/embed/@course.IntroYoutubeId" title="Giới thiệu khóa học" allowfullscreen></iframe>
+            <div class="hl-bento-card app-card p-3 p-md-4 mb-4" data-reveal="up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0">
+                        <i class="bi bi-play-circle-fill text-orange me-1" aria-hidden="true"></i> Video giới thiệu khóa học
+                    </h2>
+                    <span class="badge badge-huit rounded-pill px-3">HD Preview</span>
+                </div>
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden bg-dark shadow-sm">
+                    <iframe src="https://www.youtube.com/embed/@course.IntroYoutubeId"
+                            title="Giới thiệu khóa học @course.Title"
+                            loading="lazy"
+                            allowfullscreen></iframe>
                 </div>
             </div>
         }
 
-        <div class="app-card p-4 mb-4">
-            <h2 class="h5 mb-3">Mô tả chi tiết</h2>
-            <p class="mb-0" style="white-space: pre-line;">@course.Description</p>
+        <!-- What You'll Learn & Detailed Description -->
+        <div class="hl-bento-card app-card p-4 mb-4" data-reveal="up">
+            <span class="hl-eyebrow text-orange">Tổng quan chương trình</span>
+            <h2 class="h5 fw-bold mt-1 mb-3">
+                <i class="bi bi-journal-richtext text-huit me-1" aria-hidden="true"></i> Bạn sẽ học được gì?
+            </h2>
+            <div class="text-body lh-lg" style="white-space: pre-line;">@course.Description</div>
         </div>
 
-        <div class="app-card p-4 mb-4">
-            <h2 class="h5 mb-3">Nội dung khóa học (Đề cương)</h2>
-            <div class="accordion" id="syllabusAccordion">
-                @foreach (var ch in course.Chapters.OrderBy(c => c.SortOrder))
-                {
-                    var collapseId = $"ch_{ch.Id}";
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button @(ch.SortOrder > 1 ? "collapsed" : "") fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
-                                Chương @ch.SortOrder: @ch.Title (@ch.Lessons.Count bài)
-                            </button>
-                        </h3>
-                        <div id="@collapseId" class="accordion-collapse collapse @(ch.SortOrder == 1 ? "show" : "")">
-                            <div class="accordion-body p-0">
-                                <ul class="list-group list-group-flush">
-                                    @foreach (var lesson in ch.Lessons.OrderBy(l => l.SortOrder))
-                                    {
-                                        <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
-                                            <div>
-                                                <i class="bi @(lesson.LessonType == LessonType.Video ? "bi-play-circle text-orange" : "bi-file-earmark-text text-primary") me-2"></i>
-                                                <span>@lesson.Title</span>
-                                                <span class="small text-muted ms-2">@TimeSpan.FromSeconds(lesson.DurationSeconds).ToString(@"mm\:ss")</span>
-                                            </div>
-                                            @if (lesson.IsFreePreview)
-                                            {
-                                                <button type="button" class="btn btn-sm btn-outline-orange preview-lesson-btn"
-                                                        data-bs-toggle="modal" data-bs-target="#previewLessonModal"
-                                                        data-title="@lesson.Title"
-                                                        data-type="@((int)lesson.LessonType)"
-                                                        data-yt="@lesson.YoutubeVideoId"
-                                                        data-local="@lesson.LocalVideoPath"
-                                                        data-html="@lesson.ContentHtml">
-                                                    <i class="bi bi-eye me-1"></i> Học thử
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <span class="small text-muted"><i class="bi bi-lock"></i></span>
-                                            }
-                                        </li>
-                                    }
-                                </ul>
+        <!-- Curriculum Syllabus Accordion -->
+        <div class="hl-bento-card app-card p-4 mb-4" data-reveal="up">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <span class="hl-eyebrow text-orange">Đề cương chi tiết</span>
+                    <h2 class="h5 fw-bold mt-1 mb-1">
+                        <i class="bi bi-list-nested text-huit me-1" aria-hidden="true"></i> Nội dung khóa học
+                    </h2>
+                    <p class="small text-muted mb-0">
+                        @orderedChapters.Count chương · @Model.TotalLessons bài giảng · ~@Model.TotalDurationMinutes phút học tập
+                        @if (freePreviewCount > 0)
+                        {
+                            <span class="badge badge-orange rounded-pill ms-1">@freePreviewCount bài học thử miễn phí</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            @if (!orderedChapters.Any())
+            {
+                <p class="text-muted small mb-0">Đề cương khóa học đang được giảng viên cập nhật.</p>
+            }
+            else
+            {
+                <div class="accordion" id="syllabusAccordion">
+                    @foreach (var ch in orderedChapters)
+                    {
+                        var collapseId = $"ch_{ch.Id}";
+                        var chapterMinutes = (int)Math.Ceiling(ch.Lessons.Sum(l => l.DurationSeconds) / 60.0);
+                        <div class="accordion-item border rounded-4 mb-2 overflow-hidden">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button @(ch.SortOrder > 1 ? "collapsed" : "") fw-semibold bg-light"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="@(ch.SortOrder == 1 ? "true" : "false")"
+                                        aria-controls="@collapseId">
+                                    <span class="me-auto pe-2 d-flex flex-wrap align-items-center gap-2">
+                                        <span>Chương @ch.SortOrder: @ch.Title</span>
+                                        <span class="badge bg-white text-muted border rounded-pill fw-normal">@ch.Lessons.Count bài · ~@chapterMinutes phút</span>
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="@collapseId" class="accordion-collapse collapse @(ch.SortOrder == 1 ? "show" : "")">
+                                <div class="accordion-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var lesson in ch.Lessons.OrderBy(l => l.SortOrder))
+                                        {
+                                            <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 py-3 px-3 px-md-4">
+                                                <div class="d-flex align-items-center gap-3 min-w-0">
+                                                    <i class="bi @(lesson.LessonType == LessonType.Video ? "bi-play-circle-fill text-orange" : "bi-file-earmark-text-fill text-huit") fs-5 flex-shrink-0" aria-hidden="true"></i>
+                                                    <div class="min-w-0">
+                                                        <div class="fw-semibold text-dark">@lesson.Title</div>
+                                                        <div class="small text-muted">
+                                                            @(lesson.LessonType == LessonType.Video ? "Video bài giảng" : "Tài liệu đọc")
+                                                            · <span style="font-family: 'JetBrains Mono', monospace;">@TimeSpan.FromSeconds(lesson.DurationSeconds).ToString(@"mm\:ss")</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @if (lesson.IsFreePreview)
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-orange rounded-pill px-3 preview-lesson-btn flex-shrink-0"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#previewLessonModal"
+                                                            data-title="@lesson.Title"
+                                                            data-type="@((int)lesson.LessonType)"
+                                                            data-yt="@lesson.YoutubeVideoId"
+                                                            data-local="@lesson.LocalVideoPath"
+                                                            data-html="@lesson.ContentHtml">
+                                                        <i class="bi bi-eye me-1" aria-hidden="true"></i> Học thử
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-light text-muted border rounded-pill px-3 py-2 flex-shrink-0" title="Đăng ký khóa học để mở khóa">
+                                                        <i class="bi bi-lock-fill me-1" aria-hidden="true"></i> Học viên
+                                                    </span>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
                         </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Instructor Bio & Q&A Support -->
+        <div class="hl-bento-card app-card p-4 mb-4" data-reveal="up">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 mb-3 border-bottom">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar-circle flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.15rem;" aria-hidden="true">@instructorInitial</span>
+                    <div>
+                        <span class="hl-eyebrow text-orange">Giảng viên hướng dẫn</span>
+                        <h2 class="h5 fw-bold mb-0">@course.Instructor.FullName</h2>
                     </div>
+                </div>
+                @if (Model.IsOwned)
+                {
+                    <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@course.Id" class="btn btn-sm btn-outline-huit rounded-pill px-3">
+                        Mở thảo luận Q&amp;A <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+                    </a>
                 }
+            </div>
+
+            <div class="accordion accordion-flush" id="courseFaqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed px-0 fw-semibold small" type="button" data-bs-toggle="collapse" data-bs-target="#faqQna">
+                            Làm thế nào để đặt câu hỏi trực tiếp cho giảng viên @course.Instructor.FullName?
+                        </button>
+                    </h3>
+                    <div id="faqQna" class="accordion-collapse collapse" data-bs-parent="#courseFaqAccordion">
+                        <div class="accordion-body px-0 pt-0 small text-muted">
+                            Ngay sau khi sở hữu khóa học trên <strong>HUIT Learning</strong>, mỗi bài giảng trong Phòng học đều tích hợp khu vực Hỏi &amp; Đáp (Q&amp;A) để bạn gửi câu hỏi và nhận giải đáp trực tiếp từ giảng viên.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed px-0 fw-semibold small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCert">
+                            Điều kiện để nhận chứng chỉ điện tử PDF + QR là gì?
+                        </button>
+                    </h3>
+                    <div id="faqCert" class="accordion-collapse collapse" data-bs-parent="#courseFaqAccordion">
+                        <div class="accordion-body px-0 pt-0 small text-muted">
+                            Bạn cần hoàn thành đầy đủ tiến độ bài giảng và vượt qua bài kiểm tra đánh giá năng lực của khóa học. Hệ thống sẽ tự động cấp chứng chỉ số định danh có mã QR tra cứu toàn cầu.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Reviews (BR-F4) -->
-        <div class="app-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">Đánh giá từ học viên</h2>
+        <!-- Student Reviews -->
+        <div class="hl-bento-card app-card p-4" data-reveal="up">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <span class="hl-eyebrow text-orange">Phản hồi thực tế</span>
+                    <h2 class="h5 fw-bold mt-1 mb-0">
+                        <i class="bi bi-stars text-orange me-1" aria-hidden="true"></i> Đánh giá từ học viên
+                    </h2>
+                </div>
                 @if (Model.ReviewCount > 0)
                 {
-                    <span class="badge badge-orange fs-6"><i class="bi bi-star-fill text-warning me-1"></i>@Model.AverageRating.ToString("0.0") / 5 (@Model.ReviewCount)</span>
+                    <span class="badge badge-orange rounded-pill px-3 py-2 fs-6">
+                        <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>@Model.AverageRating.ToString("0.0") / 5 (@Model.ReviewCount)
+                    </span>
                 }
             </div>
+
             @if (!Model.VisibleReviews.Any())
             {
-                <p class="text-muted small mb-0">Chưa có đánh giá nào cho khóa học này.</p>
+                <div class="p-4 bg-light rounded-4 text-center">
+                    <p class="text-muted small mb-0">Chưa có đánh giá nào cho khóa học này. Hãy trở thành học viên đầu tiên chia sẻ cảm nhận!</p>
+                </div>
             }
             else
             {
                 <div class="vstack gap-3">
                     @foreach (var r in Model.VisibleReviews)
                     {
-                        <div class="p-3 bg-light rounded">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong class="small">@r.User.FullName</strong>
-                                <span class="text-warning small">
+                        var initial = !string.IsNullOrWhiteSpace(r.User.FullName) ? r.User.FullName.Trim()[0].ToString().ToUpper() : "H";
+                        <div class="p-3 bg-light rounded-4 border">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="avatar-circle flex-shrink-0" aria-hidden="true">@initial</span>
+                                    <div>
+                                        <div class="fw-bold small text-dark">@r.User.FullName</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">@r.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                </div>
+                                <span class="text-warning small flex-shrink-0" aria-label="Đánh giá @r.Rating trên 5 sao">
                                     @for (int s = 1; s <= 5; s++)
                                     {
-                                        <i class="bi @(s <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                        <i class="bi @(s <= r.Rating ? "bi-star-fill" : "bi-star")" aria-hidden="true"></i>
                                     }
                                 </span>
                             </div>
-                            <p class="small mb-1">@r.Comment</p>
-                            <div class="text-muted" style="font-size:0.75rem;">@r.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                            <p class="small mb-0 text-body">@r.Comment</p>
                         </div>
                     }
                 </div>
@@ -129,27 +351,38 @@
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="app-card p-4 sticky-top" style="top: 84px;">
-            <img src="@(string.IsNullOrEmpty(course.ThumbnailUrl) ? "/images/course-dotnet.svg" : course.ThumbnailUrl)" class="w-100 rounded mb-3" style="aspect-ratio:16/9;object-fit:cover;" alt="@course.Title" />
-            <div class="fs-2 fw-bold text-orange mb-3">
-                @(course.Price == 0 ? "Miễn phí" : $"{course.Price:N0} đ")
+    <!-- STICKY ENROLLMENT CARD (Desktop: Right 4 cols sticky, Mobile/Tablet: Full-width right under banner) -->
+    <div class="col-12 col-lg-4 order-1 order-lg-2">
+        <div class="hl-bento-card app-card p-3 p-md-4 position-sticky" style="top: 96px;" data-reveal="up">
+            <div class="position-relative mb-3 rounded-4 overflow-hidden bg-light shadow-sm">
+                <img src="@(string.IsNullOrEmpty(course.ThumbnailUrl) ? "/images/course-default.svg" : course.ThumbnailUrl)"
+                     onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                     style="view-transition-name: course-thumb-@Model.Course.Id; aspect-ratio: 16/9; object-fit: cover;"
+                     class="w-100 d-block course-thumb"
+                     alt="@course.Title" />
+            </div>
+
+            <div class="d-flex align-items-baseline justify-content-between mb-3">
+                <div class="hl-price-mono fs-2 fw-bold text-orange">
+                    @(course.Price == 0 ? "Miễn phí" : $"{course.Price:N0} đ")
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Truy cập trọn đời</span>
             </div>
 
             @if (Model.IsOwned)
             {
-                <div class="alert alert-success small py-2 mb-3">
-                    <i class="bi bi-check-circle-fill me-1"></i> Bạn đã sở hữu khóa học này.
+                <div class="alert alert-success small rounded-3 py-2 mb-3">
+                    <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i> Bạn đã sở hữu khóa học này.
                 </div>
-                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@course.Id" class="btn btn-orange w-100 py-2 mb-2">
-                    <i class="bi bi-play-fill me-1"></i> Vào học ngay
+                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@course.Id" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold mb-2">
+                    <i class="bi bi-play-fill me-1" aria-hidden="true"></i> Vào học ngay
                 </a>
-                <button type="button" class="btn btn-light border w-100" disabled>Không thể thêm lại vào giỏ</button>
+                <button type="button" class="btn btn-light border rounded-pill w-100 small" disabled>Đã kích hoạt trong tài khoản</button>
             }
             else if (Model.IsInCart)
             {
-                <a asp-area="Student" asp-controller="Cart" asp-action="Index" class="btn btn-orange w-100 py-2 mb-2">
-                    <i class="bi bi-cart-check me-1"></i> Xem giỏ hàng &amp; Thanh toán
+                <a asp-area="Student" asp-controller="Cart" asp-action="Index" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold mb-2">
+                    <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Xem giỏ hàng &amp; Thanh toán
                 </a>
             }
             else
@@ -158,31 +391,71 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="courseId" value="@course.Id" />
                     <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                    <button type="submit" class="btn btn-orange w-100 py-2 mb-2">
-                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ hàng
+                    <button type="submit" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold mb-2">
+                        <i class="bi bi-cart-plus me-1" aria-hidden="true"></i> Thêm vào giỏ hàng
                     </button>
                 </form>
             }
 
-            <hr />
+            <hr class="my-3" />
+
+            <div class="small fw-bold text-dark mb-2">Quyền lợi học viên HUIT Learning:</div>
             <ul class="list-unstyled small text-muted mb-0 vstack gap-2">
-                <li><i class="bi bi-infinity text-orange me-2"></i>Truy cập trọn đời mọi bài giảng</li>
-                <li><i class="bi bi-file-earmark-arrow-down text-orange me-2"></i>Tài liệu đính kèm đầy đủ</li>
-                <li><i class="bi bi-patch-check text-orange me-2"></i>Cấp chứng chỉ PDF + QR khi đạt bài thi</li>
+                <li><i class="bi bi-collection-play text-huit me-2" aria-hidden="true"></i>@Model.TotalLessons bài giảng chuẩn HD (~@Model.TotalDurationMinutes phút)</li>
+                <li><i class="bi bi-infinity text-huit me-2" aria-hidden="true"></i>Truy cập trọn đời trên máy tính &amp; di động</li>
+                <li><i class="bi bi-file-earmark-arrow-down text-huit me-2" aria-hidden="true"></i>Tài liệu thực hành &amp; mã nguồn đính kèm</li>
+                <li><i class="bi bi-patch-check text-orange me-2" aria-hidden="true"></i>Chứng chỉ số HUIT Learning (PDF + QR)</li>
             </ul>
         </div>
     </div>
 </div>
 
-<!-- Preview Modal -->
-<div class="modal fade" id="previewLessonModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="previewModalTitle">Học thử</h5>
+<!-- MOBILE & TABLET FLOATING CTA BAR (Positioned cleanly above .hl-mobile-bottom-nav at bottom: 68px) -->
+<div class="hl-mobile-enroll-bar glass-card d-lg-none">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+        <div class="min-w-0">
+            <div class="text-muted" style="font-size: 0.72rem;">Học phí trọn gói</div>
+            <div class="hl-price-mono fs-5 fw-bold text-orange text-truncate">
+                @(course.Price == 0 ? "Miễn phí" : $"{course.Price:N0} đ")
+            </div>
+        </div>
+        <div class="flex-shrink-0">
+            @if (Model.IsOwned)
+            {
+                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@course.Id" class="btn btn-orange rounded-pill px-4 py-2 fw-semibold">
+                    <i class="bi bi-play-fill me-1" aria-hidden="true"></i> Vào học
+                </a>
+            }
+            else if (Model.IsInCart)
+            {
+                <a asp-area="Student" asp-controller="Cart" asp-action="Index" class="btn btn-orange rounded-pill px-4 py-2 fw-semibold">
+                    <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Thanh toán
+                </a>
+            }
+            else
+            {
+                <form asp-area="Student" asp-controller="Cart" asp-action="Add" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="courseId" value="@course.Id" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="btn btn-orange rounded-pill px-4 py-2 fw-semibold">
+                        <i class="bi bi-cart-plus me-1" aria-hidden="true"></i> Thêm giỏ
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- PREVIEW LESSON MODAL -->
+<div class="modal fade" id="previewLessonModal" tabindex="-1" aria-labelledby="previewModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="previewModalTitle">Học thử bài giảng</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <div class="modal-body" id="previewModalBody"></div>
+            <div class="modal-body p-3 p-md-4" id="previewModalBody"></div>
         </div>
     </div>
 </div>
@@ -191,7 +464,7 @@
     <script>
         document.querySelectorAll('.preview-lesson-btn').forEach(btn => {
             btn.addEventListener('click', function () {
-                const title = this.dataset.title;
+                const title = this.dataset.title || '';
                 const type = this.dataset.type;
                 const yt = this.dataset.yt;
                 const local = this.dataset.local;
@@ -201,14 +474,14 @@
 
                 if (type === '0') {
                     if (local && yt && yt.startsWith('MOCK_')) {
-                        body.innerHTML = `<video src="${local}" controls class="w-100 rounded"></video>`;
+                        body.innerHTML = `<div class="ratio ratio-16x9 rounded-4 overflow-hidden bg-dark"><video src="${local}" controls autoplay class="w-100 h-100"></video></div>`;
                     } else if (yt) {
-                        body.innerHTML = `<div class="video-frame-wrapper"><iframe src="https://www.youtube.com/embed/${yt}" allowfullscreen></iframe></div>`;
+                        body.innerHTML = `<div class="ratio ratio-16x9 rounded-4 overflow-hidden bg-dark"><iframe src="https://www.youtube.com/embed/${yt}" title="Học thử" allowfullscreen></iframe></div>`;
                     } else {
-                        body.innerHTML = '<div class="text-muted">Video xem thử đang được cập nhật.</div>';
+                        body.innerHTML = '<div class="p-4 text-center text-muted">Video xem thử đang được cập nhật.</div>';
                     }
                 } else {
-                    body.innerHTML = `<div class="p-3 bg-light rounded">${html || 'Tài liệu xem thử.'}</div>`;
+                    body.innerHTML = `<div class="p-3 p-md-4 bg-light rounded-4 border">${html || 'Tài liệu xem thử.'}</div>`;
                 }
             });
         });

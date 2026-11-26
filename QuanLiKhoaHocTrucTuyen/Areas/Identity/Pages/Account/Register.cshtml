@@ -1,71 +1,135 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Đăng ký tài khoản";
+    ViewData["Title"] = "Đăng ký tài khoản - HUIT Learning";
 }
 
-<div class="row justify-content-center py-3">
-    <div class="col-12 col-md-8 col-lg-5">
-        <div class="app-card p-4 p-md-5">
-            <div class="text-center mb-4">
-                <div class="brand-icon mx-auto mb-3 d-inline-flex align-items-center justify-content-center" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#ff6b00,#ea580c);color:#fff;">
-                    <i class="bi bi-person-plus-fill fs-4"></i>
+<style>
+    .hl-auth-shell {
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 24px 48px -20px rgba(15, 23, 42, 0.14);
+        background: #ffffff;
+    }
+
+    .hl-auth-brand-panel {
+        background:
+            radial-gradient(circle at 82% 18%, rgba(249, 115, 22, 0.25), transparent 46%),
+            radial-gradient(circle at 12% 88%, rgba(56, 189, 248, 0.2), transparent 48%),
+            linear-gradient(150deg, #0b162c 0%, #102a5c 58%, #0f172a 100%);
+        color: #ffffff;
+    }
+</style>
+
+<section class="hl-section py-3 py-md-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="hl-auth-shell" data-reveal="up">
+                <div class="row g-0">
+                    <!-- LEFT BRAND PANEL -->
+                    <div class="col-12 col-lg-5 hl-auth-brand-panel p-4 p-md-5 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-inline-flex align-items-center gap-2 mb-4">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-3 shadow-sm"
+                                      style="width: 44px; height: 44px; background: linear-gradient(135deg, #1d4ed8, #f97316); color: #fff;">
+                                    <i class="bi bi-person-plus-fill fs-5" aria-hidden="true"></i>
+                                </span>
+                                <span class="fw-bold fs-5 tracking-tight">HUIT Learning</span>
+                            </div>
+
+                            <span class="hl-eyebrow text-warning d-block mb-2">Khởi tạo lộ trình học tập</span>
+                            <h2 class="h3 fw-bold text-white mb-3 lh-sm">
+                                Mở tài khoản miễn phí &amp; học thử hàng loạt khóa học công nghệ
+                            </h2>
+                            <p class="small text-white-50 mb-4">
+                                Một tài khoản duy nhất để học trực tuyến, thi trắc nghiệm, quản lý chứng chỉ số và đăng ký trở thành giảng viên trên HUIT Learning.
+                            </p>
+                        </div>
+
+                        <ul class="list-unstyled small text-white-50 vstack gap-2 mb-0 pt-3 border-top border-white border-opacity-10">
+                            <li><i class="bi bi-check-circle-fill text-orange me-2" aria-hidden="true"></i>Miễn phí đăng ký &amp; xem trước bài giảng học thử</li>
+                            <li><i class="bi bi-check-circle-fill text-orange me-2" aria-hidden="true"></i>Hỏi đáp trực tiếp cùng đội ngũ giảng viên</li>
+                            <li><i class="bi bi-check-circle-fill text-orange me-2" aria-hidden="true"></i>Nhận chứng chỉ điện tử định danh mã QR</li>
+                        </ul>
+                    </div>
+
+                    <!-- RIGHT REGISTER FORM PANEL -->
+                    <div class="col-12 col-lg-7 p-4 p-md-5">
+                        <div class="mb-4">
+                            <span class="hl-eyebrow text-orange">Đăng ký thành viên</span>
+                            <h1 class="h3 fw-bold mt-1 mb-1">Tạo tài khoản HUIT Learning</h1>
+                            <p class="text-muted small mb-0">Điền thông tin bên dưới để bắt đầu hành trình học tập số</p>
+                        </div>
+
+                        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 py-2" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.FullName" class="form-label fw-semibold small"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-person" aria-hidden="true"></i></span>
+                                    <input asp-for="Input.FullName" class="form-control" placeholder="Nguyễn Văn A" />
+                                </div>
+                                <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Email" class="form-label fw-semibold small"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                                    <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="ten@email.com" />
+                                </div>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Password" class="form-label fw-semibold small"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+                                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự gồm chữ và số" />
+                                </div>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.ConfirmPassword" class="form-label fw-semibold small"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-check2-square" aria-hidden="true"></i></span>
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Nhập lại mật khẩu xác nhận" />
+                                </div>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                            </div>
+
+                            <button id="registerSubmit" type="submit" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold">
+                                <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Đăng ký tài khoản miễn phí
+                            </button>
+                        </form>
+
+                        @if (Model.ExternalLogins.Count > 0)
+                        {
+                            <div class="text-center my-3 text-muted small">hoặc đăng ký nhanh bằng</div>
+                            <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                                <div class="vstack gap-2">
+                                    @foreach (var provider in Model.ExternalLogins)
+                                    {
+                                        <button type="submit" class="btn btn-outline-secondary rounded-pill w-100 py-2" name="provider" value="@provider.Name">
+                                            <i class="bi bi-google text-danger me-2" aria-hidden="true"></i> Tiếp tục với @provider.DisplayName
+                                        </button>
+                                    }
+                                </div>
+                            </form>
+                        }
+
+                        <div class="text-center mt-4 pt-3 border-top small">
+                            Đã có tài khoản trên HUIT Learning? <a asp-page="./Login" class="fw-semibold text-decoration-none">Đăng nhập ngay</a>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="h3 mb-1">Tạo tài khoản EduSpark</h1>
-                <p class="text-muted small mb-0">Bắt đầu học tập hàng trăm khóa học chất lượng cao</p>
-            </div>
-
-            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2" role="alert"></div>
-
-                <div class="mb-3">
-                    <label asp-for="Input.FullName" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.FullName" class="form-control" placeholder="Nguyễn Văn A" />
-                    <span asp-validation-for="Input.FullName" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Input.Email" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="ten@email.com" />
-                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Input.Password" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Ít nhất 8 ký tự gồm chữ và số" />
-                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-4">
-                    <label asp-for="Input.ConfirmPassword" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Nhập lại mật khẩu" />
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
-                </div>
-
-                <button id="registerSubmit" type="submit" class="btn btn-orange w-100 py-2">
-                    <i class="bi bi-check2-circle me-1"></i> Đăng ký ngay
-                </button>
-            </form>
-
-            @if (Model.ExternalLogins.Count > 0)
-            {
-                <div class="text-center my-3 text-muted small">hoặc đăng ký nhanh bằng</div>
-                <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                    @foreach (var provider in Model.ExternalLogins)
-                    {
-                        <button type="submit" class="btn btn-outline-secondary w-100" name="provider" value="@provider.Name">
-                            <i class="bi bi-google text-danger me-2"></i> Tiếp tục với @provider.DisplayName
-                        </button>
-                    }
-                </form>
-            }
-
-            <div class="text-center mt-4 small">
-                Đã có tài khoản? <a asp-page="./Login" class="fw-semibold">Đăng nhập</a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

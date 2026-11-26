@@ -2,35 +2,51 @@
 @{
     ViewData["Title"] = "Kết quả bài làm";
     ViewData["AreaTitle"] = "Kết quả kiểm tra";
+    var courseThumb = string.IsNullOrEmpty(Model.Quiz.Course?.ThumbnailUrl) ? "/images/course-default.svg" : Model.Quiz.Course.ThumbnailUrl;
 }
 
-<div class="app-card p-4 mb-4">
-    <div class="row align-items-center g-3">
-        <div class="col-md-8">
-            <span class="badge @(Model.Attempt.IsPassed ? "bg-success" : "bg-danger") mb-2">
-                @(Model.Attempt.IsPassed ? "ĐẠT YÊU CẦU" : "CHƯA ĐẠT")
-            </span>
-            <h1 class="h3 mb-1">@Model.Quiz.Title (Lần @Model.Attempt.AttemptNumber)</h1>
-            <p class="text-muted small mb-0">
-                Điểm của bạn: <strong class="text-orange fs-5">@Model.Attempt.ScorePercent.ToString("0.#")%</strong>
-                (@Model.Attempt.CorrectCount / @Model.Attempt.TotalQuestions câu đúng · Điểm chuẩn: @Model.Quiz.PassingScorePercent%)
-            </p>
+<div class="hl-bento-card p-3 p-md-4 mb-4" data-reveal="up">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-3">
+            <img src="@courseThumb"
+                 onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                 alt="@Model.Quiz.Title"
+                 class="rounded-3 border flex-shrink-0 d-none d-sm-block"
+                 style="width: 112px; aspect-ratio: 16/9; object-fit: cover;" />
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="hl-eyebrow">Kết quả bài làm</span>
+                    <span class="badge @(Model.Attempt.IsPassed ? "bg-success" : "bg-danger")">
+                        <i class="bi @(Model.Attempt.IsPassed ? "bi-check-circle-fill" : "bi-exclamation-circle-fill") me-1"></i>
+                        @(Model.Attempt.IsPassed ? "ĐẠT YÊU CẦU" : "CHƯA ĐẠT")
+                    </span>
+                </div>
+                <h1 class="h4 fw-bold mb-1">@Model.Quiz.Title (Lần #@Model.Attempt.AttemptNumber)</h1>
+                <p class="text-muted small mb-0">
+                    Điểm đạt được: <strong class="text-orange fs-5">@Model.Attempt.ScorePercent.ToString("0.#")%</strong>
+                    · Trả lời đúng <strong>@Model.Attempt.CorrectCount / @Model.Attempt.TotalQuestions</strong> câu
+                    · Điểm chuẩn: <strong>@Model.Quiz.PassingScorePercent%</strong>
+                </p>
+            </div>
         </div>
-        <div class="col-md-4 text-md-end d-flex flex-wrap gap-2 justify-content-md-end">
+        <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
             @if (Model.Certificate != null)
             {
-                <a asp-area="Student" asp-controller="Certificates" asp-action="DownloadPdf" asp-route-id="@Model.Certificate.Id" class="btn btn-success">
+                <a asp-area="Student" asp-controller="Certificates" asp-action="DownloadPdf" asp-route-id="@Model.Certificate.Id"
+                   class="btn btn-success btn-sm d-inline-flex align-items-center" style="min-height: 44px;">
                     <i class="bi bi-file-earmark-pdf-fill me-1"></i> Tải chứng chỉ PDF
                 </a>
             }
             @if (Model.CanRetake)
             {
-                <a asp-action="Info" asp-route-id="@Model.Quiz.Id" class="btn btn-orange">
+                <a asp-action="Info" asp-route-id="@Model.Quiz.Id"
+                   class="btn btn-orange btn-sm d-inline-flex align-items-center" style="min-height: 44px;">
                     <i class="bi bi-arrow-repeat me-1"></i> Thi lại
                 </a>
             }
-            <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@Model.Quiz.CourseId" class="btn btn-outline-orange">
-                Về bài học
+            <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@Model.Quiz.CourseId"
+               class="btn btn-outline-huit btn-sm d-inline-flex align-items-center" style="min-height: 44px;">
+                <i class="bi bi-arrow-left me-1"></i> Về bài học
             </a>
         </div>
     </div>
@@ -38,16 +54,23 @@
 
 @if (Model.Certificate != null && Model.Quiz.IsFinalExam && Model.Attempt.IsPassed)
 {
-    <div class="alert alert-success border-0 shadow-sm mb-4">
-        <h2 class="h6 fw-bold mb-1"><i class="bi bi-patch-check-fill me-1"></i> Đã cấp chứng chỉ điện tử!</h2>
-        <p class="small mb-2">Mã chứng chỉ: <strong>@Model.Certificate.Code</strong></p>
-        <a asp-area="" asp-controller="Certificate" asp-action="Verify" asp-route-code="@Model.Certificate.Code" class="btn btn-sm btn-light border">
+    <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-3 p-md-4" data-reveal="up">
+        <div>
+            <h2 class="h6 fw-bold mb-1"><i class="bi bi-patch-check-fill me-1"></i> Chúc mừng! Bạn đã được cấp chứng chỉ điện tử HUIT Learning!</h2>
+            <p class="small mb-0">Mã chứng chỉ xác thực: <strong>@Model.Certificate.Code</strong></p>
+        </div>
+        <a asp-area="" asp-controller="Certificate" asp-action="Verify" asp-route-code="@Model.Certificate.Code"
+           class="btn btn-light border btn-sm d-inline-flex align-items-center justify-content-center flex-shrink-0" style="min-height: 44px;">
             <i class="bi bi-qr-code me-1"></i> Xem trang xác thực công khai
         </a>
     </div>
 }
 
-<h2 class="h5 mb-3">Xem lại chi tiết từng câu hỏi</h2>
+<div class="mb-3" data-reveal="up">
+    <span class="hl-eyebrow d-inline-block mb-1">Chi tiết đáp án</span>
+    <h2 class="h5 fw-bold mb-0">Xem lại từng câu hỏi (@Model.Questions.Count câu)</h2>
+</div>
+
 <div class="vstack gap-3">
     @for (int i = 0; i < Model.Questions.Count; i++)
     {
@@ -55,24 +78,35 @@
         Model.SelectedAnswers.TryGetValue(q.Id, out var chosen);
         bool isCorrect = string.Equals(chosen, q.CorrectOption, StringComparison.OrdinalIgnoreCase);
 
-        <div class="app-card p-4 border-start border-4 @(isCorrect ? "border-success" : "border-danger")">
-            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+        <div class="hl-bento-card p-3 p-md-4 border-start border-4 @(isCorrect ? "border-success" : "border-danger")" data-reveal="up">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                 <div class="fw-bold">Câu @(i + 1): @q.Content</div>
-                <span class="badge @(isCorrect ? "bg-success" : "bg-danger")">@(isCorrect ? "Đúng" : "Sai")</span>
+                <span class="badge @(isCorrect ? "bg-success" : "bg-danger") flex-shrink-0">@(isCorrect ? "Đúng" : "Sai")</span>
             </div>
-            <div class="small mb-2">
-                <div>A. @q.OptionA</div>
-                <div>B. @q.OptionB</div>
-                <div>C. @q.OptionC</div>
-                <div>D. @q.OptionD</div>
+            <div class="row row-cols-1 row-cols-md-2 g-2 small mb-3">
+                @foreach (var opt in new[] { ("A", q.OptionA), ("B", q.OptionB), ("C", q.OptionC), ("D", q.OptionD) })
+                {
+                    bool isRightOpt = string.Equals(opt.Item1, q.CorrectOption, StringComparison.OrdinalIgnoreCase);
+                    bool isChosenOpt = string.Equals(opt.Item1, chosen, StringComparison.OrdinalIgnoreCase);
+                    var optClass = isRightOpt
+                        ? "bg-success-subtle border-success text-success-emphasis fw-semibold"
+                        : (isChosenOpt ? "bg-danger-subtle border-danger text-danger-emphasis" : "bg-light border");
+                    <div class="col">
+                        <div class="p-2 px-3 rounded-3 border @optClass">
+                            <strong>@opt.Item1.</strong> @opt.Item2
+                        </div>
+                    </div>
+                }
             </div>
-            <div class="small">
-                Bạn chọn: <strong>@(string.IsNullOrEmpty(chosen) ? "Không trả lời" : chosen)</strong> ·
-                Đáp án đúng: <strong class="text-success">@q.CorrectOption</strong>
+            <div class="small d-flex flex-wrap gap-3">
+                <span>Bạn chọn: <strong>@(string.IsNullOrEmpty(chosen) ? "Không trả lời" : chosen)</strong></span>
+                <span>Đáp án đúng: <strong class="text-success">@q.CorrectOption</strong></span>
             </div>
             @if (!string.IsNullOrEmpty(q.Explanation))
             {
-                <div class="small text-muted mt-1"><em>Giải thích: @q.Explanation</em></div>
+                <div class="small text-muted mt-2 pt-2 border-top">
+                    <i class="bi bi-lightbulb text-orange me-1"></i><em>Giải thích: @q.Explanation</em>
+                </div>
             }
         </div>
     }

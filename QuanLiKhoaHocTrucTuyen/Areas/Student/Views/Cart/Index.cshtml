@@ -5,41 +5,67 @@
     var total = Model.Sum(c => c.Course.Price);
 }
 
-<h1 class="h3 mb-4">Giỏ hàng của tôi (@Model.Count khóa học)</h1>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Thanh toán</span>
+        <h1 class="h3 fw-bold mb-1">Giỏ hàng của tôi</h1>
+        <p class="text-muted small mb-0">Bạn đang có <strong>@Model.Count</strong> khóa học trong giỏ hàng HUIT Learning</p>
+    </div>
+    <a asp-area="" asp-controller="Courses" asp-action="Index"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-plus-lg me-1"></i> Chọn thêm khóa học
+    </a>
+</div>
 
 @if (!Model.Any())
 {
-    <div class="app-card p-5 text-center">
+    <div class="hl-bento-card p-5 text-center" data-reveal="scale">
         <div class="stat-icon mx-auto mb-3"><i class="bi bi-cart-x"></i></div>
-        <h2 class="h5 mb-2">Giỏ hàng đang trống</h2>
-        <p class="text-muted small mb-3">Hãy chọn khóa học yêu thích để bắt đầu thanh toán.</p>
-        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">Tìm khóa học</a>
+        <h2 class="h5 fw-bold mb-2">Giỏ hàng đang trống</h2>
+        <p class="text-muted small mb-4">Hãy chọn khóa học yêu thích từ danh mục HUIT Learning để bắt đầu thanh toán và mở khóa trọn đời.</p>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange px-4" style="min-height: 44px;">
+            <i class="bi bi-compass me-1"></i> Tìm khóa học ngay
+        </a>
     </div>
 }
 else
 {
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="app-card p-3 vstack gap-3">
+    <div class="row g-4 align-items-start">
+        <!-- Cart Items List -->
+        <div class="col-12 col-lg-8">
+            <div class="hl-bento-card p-3 p-md-4 vstack gap-3" data-reveal="up">
                 @foreach (var item in Model)
                 {
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 border-bottom">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="@(string.IsNullOrEmpty(item.Course.ThumbnailUrl) ? "/images/course-dotnet.svg" : item.Course.ThumbnailUrl)"
-                                 alt="@item.Course.Title" class="rounded" style="width:96px;height:56px;object-fit:cover;" />
-                            <div>
-                                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@item.CourseId" class="fw-bold text-dark">
+                    var thumbUrl = string.IsNullOrEmpty(item.Course.ThumbnailUrl) ? "/images/course-default.svg" : item.Course.ThumbnailUrl;
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-start align-items-sm-center gap-3 min-w-0 w-100">
+                            <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@item.CourseId" class="flex-shrink-0">
+                                <img src="@thumbUrl"
+                                     onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                                     alt="@item.Course.Title"
+                                     class="rounded-3 border"
+                                     style="width: 120px; aspect-ratio: 16/9; object-fit: cover;" />
+                            </a>
+                            <div class="min-w-0">
+                                <span class="badge badge-huit mb-1">@item.Course.Category.Name</span>
+                                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@item.CourseId"
+                                   class="d-block fw-bold text-dark text-decoration-none">
                                     @item.Course.Title
                                 </a>
-                                <div class="small text-muted">GV: @item.Course.Instructor.FullName · @item.Course.Category.Name</div>
+                                <div class="small text-muted mt-1">
+                                    <i class="bi bi-person-video3 me-1"></i>GV: @item.Course.Instructor.FullName · @item.Course.Level
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold text-orange">@item.Course.Price.ToString("N0") đ</span>
+                        <div class="d-flex align-items-center justify-content-between justify-content-sm-end gap-3 w-100 w-sm-auto flex-shrink-0 pt-2 pt-sm-0">
+                            <span class="fw-bold fs-6 text-orange text-nowrap">@item.Course.Price.ToString("N0") đ</span>
                             <form asp-action="Remove" method="post" class="m-0">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="courseId" value="@item.CourseId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center justify-content-center"
+                                        style="min-width: 44px; min-height: 44px;" title="Xóa khỏi giỏ hàng">
+                                    <i class="bi bi-trash"></i> <span class="d-sm-none ms-1">Xóa</span>
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -47,12 +73,18 @@ else
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="app-card p-4">
-                <h2 class="h5 mb-3">Thanh toán</h2>
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="text-muted">Tổng thanh toán:</span>
-                    <span class="fs-4 fw-bold text-orange">@total.ToString("N0") đ</span>
+        <!-- Sticky Order Summary Card on lg+ (desktop & tablet landscape) -->
+        <div class="col-12 col-lg-4">
+            <div class="hl-bento-card p-4 sticky-lg-top" style="top: 88px;" data-reveal="up">
+                <span class="hl-eyebrow d-inline-block mb-1">Thanh toán an toàn</span>
+                <h2 class="h5 fw-bold mb-3">Tóm tắt đơn hàng</h2>
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span>Số lượng khóa học</span>
+                    <span class="fw-semibold text-dark">@Model.Count khóa</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-baseline border-top pt-3 mb-3">
+                    <span class="fw-semibold">Tổng thanh toán:</span>
+                    <span class="fs-4 fw-bold text-orange text-nowrap">@total.ToString("N0") đ</span>
                 </div>
 
                 <form asp-action="Checkout" method="post" data-loading-form="true">
@@ -60,20 +92,32 @@ else
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Chọn cổng thanh toán (Sandbox)</label>
                         <div class="vstack gap-2">
-                            <label class="border rounded p-2 d-flex align-items-center gap-2 cursor-pointer">
+                            <label class="border rounded-3 p-3 d-flex align-items-center gap-2 cursor-pointer bg-light-subtle">
                                 <input type="radio" name="provider" value="VNPAY" checked class="form-check-input mt-0" />
-                                <span class="fw-semibold">VNPAY Sandbox</span>
+                                <div>
+                                    <div class="fw-semibold small">VNPAY Sandbox</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">ATM nội địa, QR Ngân hàng, Thẻ quốc tế</div>
+                                </div>
                             </label>
-                            <label class="border rounded p-2 d-flex align-items-center gap-2 cursor-pointer">
+                            <label class="border rounded-3 p-3 d-flex align-items-center gap-2 cursor-pointer bg-light-subtle">
                                 <input type="radio" name="provider" value="MoMo" class="form-check-input mt-0" />
-                                <span class="fw-semibold">MoMo E-Wallet Sandbox</span>
+                                <div>
+                                    <div class="fw-semibold small">MoMo E-Wallet Sandbox</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Thanh toán nhanh qua ví điện tử MoMo</div>
+                                </div>
                             </label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-orange w-100 py-2">
-                        <i class="bi bi-credit-card me-1"></i> Tiến hành thanh toán
+                    <button type="submit" class="btn btn-orange w-100 fw-semibold d-inline-flex align-items-center justify-content-center" style="min-height: 46px;">
+                        <i class="bi bi-shield-check me-2"></i> Tiến hành thanh toán
                     </button>
                 </form>
+
+                <div class="mt-3 pt-3 border-top vstack gap-2 small text-muted">
+                    <div><i class="bi bi-lightning-charge-fill text-orange me-1"></i> Kích hoạt khóa học tự động ngay sau thanh toán</div>
+                    <div><i class="bi bi-infinity text-huit me-1"></i> Truy cập học trọn đời trên mọi thiết bị</div>
+                    <div><i class="bi bi-patch-check-fill text-success me-1"></i> Cấp chứng chỉ số QR từ HUIT Learning</div>
+                </div>
             </div>
         </div>
     </div>

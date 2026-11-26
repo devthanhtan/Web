@@ -1,17 +1,137 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
   <defs>
-    <linearGradient id="g1" x1="0" y1="0" x2="800" y2="450" gradientUnits="userSpaceOnUse">
+    <linearGradient id="dn-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06162E"/>
+      <stop offset="52%" stop-color="#003E7E"/>
+      <stop offset="100%" stop-color="#0B2246"/>
+    </linearGradient>
+    <radialGradient id="dn-glow-orange" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1040 160) rotate(135) scale(460)">
+      <stop offset="0%" stop-color="#FF6B00" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dn-glow-cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 640) rotate(-35) scale(480)">
+      <stop offset="0%" stop-color="#0EA5E9" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dn-accent" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FF6B00"/>
       <stop offset="100%" stop-color="#FB923C"/>
     </linearGradient>
+    <linearGradient id="dn-card" x1="680" y1="110" x2="1180" y2="590" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" stop-opacity="0.94"/>
+      <stop offset="100%" stop-color="#1E293B" stop-opacity="0.90"/>
+    </linearGradient>
+    <pattern id="dn-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
   </defs>
-  <rect width="800" height="450" rx="24" fill="url(#g1)"/>
-  <circle cx="670" cy="95" r="110" fill="#FFFFFF" fill-opacity="0.14"/>
-  <circle cx="140" cy="370" r="140" fill="#FFFFFF" fill-opacity="0.10"/>
-  <rect x="64" y="72" width="132" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.22"/>
-  <text x="130" y="96" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">.NET 8 MVC</text>
-  <text x="64" y="190" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="40" font-weight="800">ASP.NET Core 8</text>
-  <text x="64" y="242" fill="#FFF7ED" font-family="Segoe UI, sans-serif" font-size="24" font-weight="600">Identity · EF Core · Areas · Thanh toán</text>
-  <rect x="64" y="295" width="220" height="52" rx="14" fill="#FFFFFF"/>
-  <text x="174" y="327" text-anchor="middle" fill="#EA580C" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700">Thực chiến Fullstack</text>
+
+  <rect width="1280" height="720" fill="url(#dn-bg)"/>
+  <rect width="1280" height="720" fill="url(#dn-grid)"/>
+  <rect width="1280" height="720" fill="url(#dn-glow-orange)"/>
+  <rect width="1280" height="720" fill="url(#dn-glow-cyan)"/>
+
+  <!-- Decorative geometric rings -->
+  <circle cx="1090" cy="130" r="190" stroke="#38BDF8" stroke-opacity="0.14" stroke-width="2" stroke-dasharray="8 8"/>
+  <circle cx="1090" cy="130" r="135" stroke="#FF6B00" stroke-opacity="0.22" stroke-width="1.5"/>
+
+  <!-- Left Content Column -->
+  <rect x="76" y="76" width="318" height="44" rx="22" fill="#FFFFFF" fill-opacity="0.12" stroke="#38BDF8" stroke-opacity="0.35"/>
+  <circle cx="102" cy="98" r="7" fill="#FF6B00"/>
+  <text x="120" y="104" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" letter-spacing="0.8">HUIT LEARNING · FULLSTACK</text>
+
+  <text x="76" y="218" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="60" font-weight="800">ASP.NET Core 8</text>
+  <text x="76" y="288" fill="#FB923C" font-family="Segoe UI, Inter, sans-serif" font-size="52" font-weight="800">MVC Thực Chiến</text>
+
+  <text x="76" y="352" fill="#E2E8F0" font-family="Segoe UI, Inter, sans-serif" font-size="24" font-weight="500">Identity · EF Core 8 · Areas · VNPAY &amp; MoMo</text>
+  <text x="76" y="390" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="500">Xây dựng hệ thống E-Commerce &amp; LMS chuẩn doanh nghiệp</text>
+
+  <!-- Tech Pills -->
+  <g transform="translate(76, 438)">
+    <rect x="0" y="0" width="112" height="42" rx="12" fill="#6D28D9" fill-opacity="0.45" stroke="#A78BFA" stroke-opacity="0.6"/>
+    <text x="56" y="27" text-anchor="middle" fill="#F5F3FF" font-family="Segoe UI, Inter, sans-serif" font-size="17" font-weight="700">.NET 8 LTS</text>
+
+    <rect x="126" y="0" width="106" height="42" rx="12" fill="#0284C7" fill-opacity="0.38" stroke="#38BDF8" stroke-opacity="0.55"/>
+    <text x="179" y="27" text-anchor="middle" fill="#E0F2FE" font-family="Segoe UI, Inter, sans-serif" font-size="17" font-weight="700">C# 12</text>
+
+    <rect x="246" y="0" width="144" height="42" rx="12" fill="#FFFFFF" fill-opacity="0.10" stroke="#FFFFFF" stroke-opacity="0.28"/>
+    <text x="318" y="27" text-anchor="middle" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="17" font-weight="600">Clean MVC</text>
+  </g>
+
+  <!-- Bottom CTA / Level Badge -->
+  <rect x="76" y="536" width="268" height="58" rx="16" fill="url(#dn-accent)"/>
+  <text x="210" y="572" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="800">Dự Án Thực Chiến A-Z</text>
+
+  <!-- Right Column: Layered 3D IDE & Architecture Illustration -->
+  <!-- Back Shadow Card -->
+  <rect x="716" y="146" width="492" height="390" rx="24" fill="#0054A6" fill-opacity="0.35" stroke="#38BDF8" stroke-opacity="0.25"/>
+
+  <!-- Main IDE Window -->
+  <g transform="translate(684, 118)">
+    <rect width="496" height="392" rx="22" fill="url(#dn-card)" stroke="#475569" stroke-width="1.5"/>
+    <!-- Window Header -->
+    <rect width="496" height="48" rx="22" fill="#0B1120"/>
+    <rect y="26" width="496" height="22" fill="#0B1120"/>
+    <circle cx="26" cy="24" r="6.5" fill="#EF4444"/>
+    <circle cx="48" cy="24" r="6.5" fill="#F59E0B"/>
+    <circle cx="70" cy="24" r="6.5" fill="#10B981"/>
+    <rect x="104" y="11" width="210" height="26" rx="8" fill="#1E293B"/>
+    <text x="209" y="29" text-anchor="middle" fill="#E2E8F0" font-family="Consolas, monospace" font-size="13" font-weight="600">PaymentController.cs</text>
+
+    <!-- Code Lines -->
+    <g font-family="Consolas, Courier New, monospace" font-size="15" font-weight="600">
+      <text x="26" y="84" fill="#64748B">01</text>
+      <text x="58" y="84" fill="#38BDF8">[Authorize(Roles = AppRoles.Student)]</text>
+
+      <text x="26" y="114" fill="#64748B">02</text>
+      <text x="58" y="114" fill="#C084FC">public class</text>
+      <text x="172" y="114" fill="#FDE047">OrderController</text>
+      <text x="316" y="114" fill="#E2E8F0">: Controller</text>
+
+      <text x="26" y="144" fill="#64748B">03</text>
+      <text x="58" y="144" fill="#94A3B8">{</text>
+
+      <text x="26" y="174" fill="#64748B">04</text>
+      <text x="78" y="174" fill="#FB923C">[HttpPost, ValidateAntiForgeryToken]</text>
+
+      <text x="26" y="204" fill="#64748B">05</text>
+      <text x="78" y="204" fill="#C084FC">public async</text>
+      <text x="190" y="204" fill="#38BDF8">Task&lt;IActionResult&gt;</text>
+      <text x="368" y="204" fill="#4ADE80">Checkout()</text>
+
+      <text x="26" y="234" fill="#64748B">06</text>
+      <text x="98" y="234" fill="#E2E8F0">=&gt;</text>
+      <text x="126" y="234" fill="#C084FC">await</text>
+      <text x="180" y="234" fill="#E2E8F0">_gateway.CreateUrlAsync();</text>
+
+      <text x="26" y="264" fill="#64748B">07</text>
+      <text x="58" y="264" fill="#94A3B8">}</text>
+    </g>
+
+    <!-- Bottom Architecture Pipeline inside IDE -->
+    <rect x="24" y="294" width="448" height="74" rx="14" fill="#0F172A" stroke="#334155"/>
+    <rect x="40" y="313" width="108" height="36" rx="9" fill="#1D4ED8"/>
+    <text x="94" y="336" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Razor Views</text>
+
+    <path d="M156 331 H184" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="184,326 194,331 184,336" fill="#38BDF8"/>
+
+    <rect x="200" y="313" width="112" height="36" rx="9" fill="#7C3AED"/>
+    <text x="256" y="336" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">EF Core 8</text>
+
+    <path d="M320 331 H348" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="348,326 358,331 348,336" fill="#FB923C"/>
+
+    <rect x="364" y="313" width="92" height="36" rx="9" fill="#EA580C"/>
+    <text x="410" y="336" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">VNPAY</text>
+  </g>
+
+  <!-- Floating Status Card Bottom-Right -->
+  <g transform="translate(830, 534)">
+    <rect width="368" height="82" rx="18" fill="#0F172A" fill-opacity="0.92" stroke="#10B981" stroke-opacity="0.65" stroke-width="1.5"/>
+    <circle cx="42" cy="41" r="20" fill="#10B981" fill-opacity="0.2"/>
+    <path d="M33 41 L39 47 L52 34" stroke="#34D399" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="76" y="36" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="17" font-weight="700">HMAC-SHA512 Verified · 200 OK</text>
+    <text x="76" y="59" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="14" font-weight="500">Identity RBAC · Background Worker Ready</text>
+  </g>
 </svg>

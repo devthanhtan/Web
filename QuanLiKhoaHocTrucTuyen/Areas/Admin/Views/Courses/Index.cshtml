@@ -2,74 +2,176 @@
 @{
     ViewData["Title"] = "Kiểm duyệt khóa học";
     ViewData["AreaTitle"] = "Quản trị Admin";
+    var totalCount = Model.Courses.Count;
+    var pendingCount = Model.Courses.Count(c => c.Status == CourseStatus.PendingReview);
+    var approvedCount = Model.Courses.Count(c => c.Status == CourseStatus.Approved);
+    var rejectedOrDraftCount = Model.Courses.Count(c => c.Status == CourseStatus.Rejected || c.Status == CourseStatus.Draft);
 }
 
-<div class="app-card p-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+<section class="hl-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
         <div>
-            <h1 class="h4 mb-1">Kiểm duyệt khóa học</h1>
-            <p class="text-muted small mb-0">Kiểm tra nội dung, bản quyền, chất lượng video trước khi xuất bản công khai</p>
+            <div class="hl-eyebrow mb-1">HUIT Learning · Hội đồng Kiểm duyệt</div>
+            <h1 class="h3 fw-bold mb-1">Kiểm duyệt khóa học</h1>
+            <p class="text-muted small mb-0">Kiểm tra nội dung học thuật, bản quyền và chất lượng video trước khi xuất bản công khai</p>
         </div>
-        <div class="btn-group btn-group-sm">
-            <a asp-action="Index" class="btn @(Model.StatusFilter == null ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
-            <a asp-action="Index" asp-route-status="@CourseStatus.PendingReview" class="btn @(Model.StatusFilter == CourseStatus.PendingReview ? "btn-orange" : "btn-outline-secondary")">Chờ duyệt</a>
-            <a asp-action="Index" asp-route-status="@CourseStatus.Approved" class="btn @(Model.StatusFilter == CourseStatus.Approved ? "btn-orange" : "btn-outline-secondary")">Đã duyệt</a>
-            <a asp-action="Index" asp-route-status="@CourseStatus.Rejected" class="btn @(Model.StatusFilter == CourseStatus.Rejected ? "btn-orange" : "btn-outline-secondary")">Từ chối</a>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-huit d-inline-flex align-items-center px-3 py-2">
+                <i class="bi bi-collection me-2"></i> Đang hiển thị: @totalCount khóa học
+            </span>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Khóa học</th>
-                    <th>Giảng viên</th>
-                    <th>Học phí</th>
-                    <th>Bài học</th>
-                    <th>Trạng thái</th>
-                    <th class="text-end">Kiểm duyệt</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Courses.Any())
-                {
-                    <tr><td colspan="6" class="text-center text-muted py-4">Không có khóa học nào.</td></tr>
-                }
-                else
-                {
-                    @foreach (var c in Model.Courses)
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4" data-stagger-group>
+        <div class="col" data-reveal="up">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Khóa học theo bộ lọc</div>
+                        <div class="fs-3 fw-bold text-dark mt-1" data-count-to="@totalCount">@totalCount</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-journal-richtext"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="80">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Đang chờ duyệt</div>
+                        <div class="fs-3 fw-bold text-orange mt-1" data-count-to="@pendingCount">@pendingCount</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-hourglass-split"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="160">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Đã phê duyệt</div>
+                        <div class="fs-3 fw-bold text-success mt-1" data-count-to="@approvedCount">@approvedCount</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-patch-check-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="240">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Từ chối / Bản nháp</div>
+                        <div class="fs-3 fw-bold text-huit mt-1" data-count-to="@rejectedOrDraftCount">@rejectedOrDraftCount</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-file-earmark-x"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hl-bento-card p-3 p-md-4" data-reveal="up">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+            <div>
+                <div class="hl-eyebrow">Bộ lọc trạng thái</div>
+                <h2 class="h6 fw-bold mb-0">Danh sách khóa học gửi thẩm định</h2>
+            </div>
+            <div class="hl-pill-scroll d-flex flex-nowrap gap-2 pb-1">
+                <a asp-action="Index"
+                   class="btn @(Model.StatusFilter == null ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Tất cả</a>
+                <a asp-action="Index" asp-route-status="@CourseStatus.PendingReview"
+                   class="btn @(Model.StatusFilter == CourseStatus.PendingReview ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Chờ duyệt</a>
+                <a asp-action="Index" asp-route-status="@CourseStatus.Approved"
+                   class="btn @(Model.StatusFilter == CourseStatus.Approved ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Đã duyệt</a>
+                <a asp-action="Index" asp-route-status="@CourseStatus.Rejected"
+                   class="btn @(Model.StatusFilter == CourseStatus.Rejected ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Từ chối</a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Giảng viên</th>
+                        <th class="text-nowrap">Học phí</th>
+                        <th class="text-nowrap">Bài học</th>
+                        <th class="text-nowrap">Trạng thái</th>
+                        <th class="text-end text-nowrap">Kiểm duyệt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Courses.Any())
                     {
                         <tr>
-                            <td>
-                                <div class="fw-bold">@c.Title</div>
-                                <div class="small text-muted">@c.Category.Name · @c.Level</div>
-                            </td>
-                            <td class="small">@c.Instructor.FullName<br /><span class="text-muted">@c.Instructor.Email</span></td>
-                            <td class="fw-semibold text-orange">@c.Price.ToString("N0") đ</td>
-                            <td class="small">@c.Chapters.Count chương · @c.Chapters.Sum(ch => ch.Lessons.Count) bài</td>
-                            <td>
-                                @switch (c.Status)
-                                {
-                                    case CourseStatus.PendingReview:
-                                        <span class="badge bg-warning-subtle text-warning-emphasis">Chờ duyệt</span>
-                                        break;
-                                    case CourseStatus.Approved:
-                                        <span class="badge bg-success">Đã duyệt</span>
-                                        break;
-                                    case CourseStatus.Rejected:
-                                        <span class="badge bg-danger">Từ chối</span>
-                                        break;
-                                }
-                            </td>
-                            <td class="text-end">
-                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-orange">
-                                    <i class="bi bi-eye me-1"></i> Xem &amp; Duyệt
-                                </a>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
+                                Không có khóa học nào trong danh mục lọc.
                             </td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                    else
+                    {
+                        @foreach (var c in Model.Courses)
+                        {
+                            var thumbUrl = string.IsNullOrEmpty(c.ThumbnailUrl) ? "/images/course-default.svg" : c.ThumbnailUrl;
+                            <tr>
+                                <td style="min-width: 280px;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="@thumbUrl"
+                                             onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                                             alt="@c.Title"
+                                             class="rounded-3 border flex-shrink-0"
+                                             style="width: 96px; aspect-ratio: 16/9; object-fit: cover;" />
+                                        <div class="min-w-0">
+                                            <div class="fw-bold text-dark">@c.Title</div>
+                                            <div class="small text-muted mt-1">
+                                                <span class="badge badge-huit me-1">@c.Category.Name</span>
+                                                <span class="badge badge-orange">@c.Level</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="small text-nowrap">
+                                    <div class="fw-semibold text-dark">@c.Instructor.FullName</div>
+                                    <div class="text-muted">@c.Instructor.Email</div>
+                                </td>
+                                <td class="fw-bold text-orange text-nowrap">@c.Price.ToString("N0") đ</td>
+                                <td class="small text-nowrap">@c.Chapters.Count chương · @c.Chapters.Sum(ch => ch.Lessons.Count) bài</td>
+                                <td class="text-nowrap">
+                                    @switch (c.Status)
+                                    {
+                                        case CourseStatus.Draft:
+                                            <span class="badge bg-secondary">Nháp</span>
+                                            break;
+                                        case CourseStatus.PendingReview:
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Chờ duyệt</span>
+                                            break;
+                                        case CourseStatus.Approved:
+                                            <span class="badge bg-success">Đã duyệt</span>
+                                            break;
+                                        case CourseStatus.Rejected:
+                                            <span class="badge bg-danger">Từ chối</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        <a asp-action="Details" asp-route-id="@c.Id"
+                                           class="btn btn-orange d-inline-flex align-items-center px-3"
+                                           style="min-height: 44px;">
+                                            <i class="bi bi-eye me-2"></i> Xem &amp; Duyệt
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>

@@ -3,66 +3,161 @@
     ViewData["Title"] = "Cấu hình hoa hồng";
     ViewData["AreaTitle"] = "Quản trị Admin";
     var latest = ViewBag.Latest as QuanLiKhoaHocTrucTuyen.Models.CommissionConfig;
+    var platformPct = latest?.PlatformRatePercent ?? 20m;
+    var instructorPct = 100m - platformPct;
+    var lastUpdatedLabel = latest != null ? latest.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy") : "Mặc định";
 }
 
-<div class="row g-4">
-    <div class="col-lg-5">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-1">Cấu hình tỷ lệ chiết khấu / hoa hồng</h1>
-            <p class="small text-muted mb-4">Mỗi đơn hàng thanh toán thành công sẽ ghi nhận tỷ lệ hoa hồng tại thời điểm thanh toán.</p>
-
-            <div class="p-3 bg-orange-soft rounded mb-4">
-                <div class="small text-muted">Tỷ lệ hiện hành:</div>
-                <div class="fs-3 fw-bold text-orange">
-                    Nền tảng @(latest?.PlatformRatePercent.ToString("0.#") ?? "20")% · Giảng viên @((100 - (latest?.PlatformRatePercent ?? 20)).ToString("0.#"))%
-                </div>
-            </div>
-
-            <form asp-action="Update" method="post">
-                @Html.AntiForgeryToken()
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Chiết khấu nền tảng mới (%)</label>
-                    <input type="number" name="platformRatePercent" step="0.5" min="0" max="90"
-                           value="@(latest?.PlatformRatePercent ?? 20)" class="form-control" required />
-                    <div class="form-text">Phần còn lại (100% - chiết khấu) thuộc về Giảng viên.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Ghi chú thay đổi</label>
-                    <input type="text" name="note" class="form-control" placeholder="Ví dụ: Điều chỉnh ưu đãi tháng 11..." />
-                </div>
-                <button type="submit" class="btn btn-orange w-100">Lưu cấu hình hoa hồng</button>
-            </form>
+<section class="hl-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+        <div>
+            <div class="hl-eyebrow mb-1">HUIT Learning · Chính sách Tài chính</div>
+            <h1 class="h3 fw-bold mb-1">Cấu hình tỷ lệ chiết khấu &amp; hoa hồng</h1>
+            <p class="text-muted small mb-0">Mỗi đơn hàng thanh toán thành công trên HUIT Learning sẽ ghi nhận tỷ lệ hoa hồng tại đúng thời điểm giao dịch</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-orange d-inline-flex align-items-center px-3 py-2">
+                <i class="bi bi-percent me-2"></i> Sàn @platformPct.ToString("0.#")% · Giảng viên @instructorPct.ToString("0.#")%
+            </span>
         </div>
     </div>
 
-    <div class="col-lg-7">
-        <div class="app-card p-4">
-            <h2 class="h5 mb-3">Lịch sử thay đổi cấu hình</h2>
-            <div class="table-responsive">
-                <table class="table align-middle small">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Thời điểm</th>
-                            <th>Chiết khấu sàn</th>
-                            <th>Giảng viên nhận</th>
-                            <th>Người cập nhật</th>
-                            <th>Ghi chú</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4" data-stagger-group>
+        <div class="col" data-reveal="up">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Chiết khấu HUIT Learning</div>
+                        <div class="fs-3 fw-bold text-huit mt-1">@platformPct.ToString("0.#")%</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-building-check"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="80">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Tỷ lệ Giảng viên nhận</div>
+                        <div class="fs-3 fw-bold text-orange mt-1">@instructorPct.ToString("0.#")%</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-person-workspace"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="160">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Số lần điều chỉnh</div>
+                        <div class="fs-3 fw-bold text-dark mt-1" data-count-to="@Model.Count">@Model.Count</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-clock-history"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="240">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Cập nhật gần nhất</div>
+                        <div class="fs-5 fw-bold text-dark mt-2 text-nowrap">@lastUpdatedLabel</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-calendar-check"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-5" data-reveal="up">
+            <div class="hl-bento-card p-3 p-md-4 h-100">
+                <div class="hl-eyebrow mb-1">Điều chỉnh chính sách</div>
+                <h2 class="h5 fw-bold mb-3">Thiết lập tỷ lệ mới</h2>
+
+                <div class="glass-card p-3 mb-4">
+                    <div class="small text-muted mb-1">Tỷ lệ phân chia hiện hành:</div>
+                    <div class="fs-5 fw-bold text-dark mb-2">
+                        <span class="text-huit">HUIT Learning @platformPct.ToString("0.#")%</span>
+                        <span class="text-muted mx-1">·</span>
+                        <span class="text-orange">Giảng viên @instructorPct.ToString("0.#")%</span>
+                    </div>
+                    <div class="progress" style="height: 10px; border-radius: 999px;">
+                        <div class="progress-bar"
+                             style="width: @platformPct.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%; background-color: #1D4ED8;"
+                             title="HUIT Learning"></div>
+                        <div class="progress-bar"
+                             style="width: @instructorPct.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%; background-color: #F97316;"
+                             title="Giảng viên"></div>
+                    </div>
+                </div>
+
+                <form asp-action="Update" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Chiết khấu nền tảng mới (%)</label>
+                        <input type="number" name="platformRatePercent" step="0.5" min="0" max="90"
+                               value="@platformPct" class="form-control" style="min-height: 44px;" required />
+                        <div class="form-text">Phần còn lại (100% - chiết khấu) thuộc về Giảng viên.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Ghi chú thay đổi</label>
+                        <input type="text" name="note" class="form-control" style="min-height: 44px;"
+                               placeholder="Ví dụ: Điều chỉnh ưu đãi học kỳ mới..." />
+                    </div>
+                    <button type="submit" class="btn btn-orange w-100 d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                        <i class="bi bi-save me-2"></i> Lưu cấu hình hoa hồng
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-7" data-reveal="up" data-reveal-delay="80">
+            <div class="hl-bento-card p-3 p-md-4 h-100">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <div class="hl-eyebrow">Nhật ký kiểm toán</div>
+                        <h2 class="h5 fw-bold mb-0">Lịch sử thay đổi cấu hình (@Model.Count)</h2>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover small mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <td>@item.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                                <td class="fw-bold text-orange">@item.PlatformRatePercent.ToString("0.#")%</td>
-                                <td>@((100m - item.PlatformRatePercent).ToString("0.#"))%</td>
-                                <td>@(item.UpdatedByAdmin?.FullName ?? "Hệ thống")</td>
-                                <td>@item.Note</td>
+                                <th class="text-nowrap">Thời điểm</th>
+                                <th class="text-nowrap">Chiết khấu sàn</th>
+                                <th class="text-nowrap">Giảng viên nhận</th>
+                                <th class="text-nowrap">Người cập nhật</th>
+                                <th>Ghi chú</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-journal-text fs-3 d-block mb-2 opacity-50"></i>
+                                        Chưa có lịch sử điều chỉnh hoa hồng.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="fw-bold text-huit text-nowrap">@item.PlatformRatePercent.ToString("0.#")%</td>
+                                        <td class="fw-semibold text-orange text-nowrap">@((100m - item.PlatformRatePercent).ToString("0.#"))%</td>
+                                        <td class="text-nowrap">@(item.UpdatedByAdmin?.FullName ?? "Hệ thống")</td>
+                                        <td>@(string.IsNullOrWhiteSpace(item.Note) ? "-" : item.Note)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>

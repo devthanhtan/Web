@@ -2,39 +2,147 @@
 @{
     ViewData["Title"] = "Khóa học của tôi";
     ViewData["AreaTitle"] = "Góc Học viên";
+    var totalEnrolled = Model.Count;
+    var completedCount = Model.Count(e => e.ProgressPercent >= 100m);
+    var inProgressCount = Model.Count(e => e.ProgressPercent > 0m && e.ProgressPercent < 100m);
+    var avgProgress = totalEnrolled > 0 ? (int)Math.Round(Model.Average(e => e.ProgressPercent)) : 0;
+    var resumeCourse = Model.OrderByDescending(e => e.ProgressPercent < 100m ? 1 : 0).ThenByDescending(e => e.ProgressPercent).FirstOrDefault();
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h1 class="h3 mb-1">Khóa học của tôi</h1>
-        <p class="text-muted small mb-0">Theo dõi tiến độ học tập và tiếp tục từ vị trí gần nhất</p>
+<!-- Editorial Bento Greeting Banner -->
+<section class="hl-bento-card p-4 p-md-5 mb-4 position-relative overflow-hidden" data-reveal="up"
+         style="background: linear-gradient(135deg, rgba(29, 78, 216, 0.06) 0%, rgba(249, 115, 22, 0.07) 100%);">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+            <span class="hl-eyebrow d-inline-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-mortarboard-fill"></i> HUIT Learning · Góc Học viên
+            </span>
+            <h1 class="h3 fw-bold mb-1 text-dark">
+                Xin chào, <span class="text-gradient-huit">tiếp tục hành trình học tập</span>
+            </h1>
+            <p class="text-muted small mb-0">Theo dõi tiến độ học tập, hoàn thành lộ trình và mở khóa chứng chỉ số HUIT Learning.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            @if (resumeCourse != null)
+            {
+                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@resumeCourse.CourseId"
+                   class="btn btn-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                    <i class="bi bi-play-circle-fill me-2"></i> Tiếp tục học ngay
+                </a>
+            }
+            <a asp-area="" asp-controller="Courses" asp-action="Index"
+               class="btn btn-orange d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                <i class="bi bi-compass me-2"></i> Khám phá thêm khóa học
+            </a>
+        </div>
     </div>
-    <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">
-        <i class="bi bi-plus-circle me-1"></i> Tìm thêm khóa học
+</section>
+
+<!-- Responsive KPI Bento Cards (1-col mobile, 2-col tablet, 4-col desktop) -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4" data-stagger-group>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Đã ghi danh</div>
+                    <div class="fs-3 fw-bold text-huit mt-1" data-count-to="@totalEnrolled">@totalEnrolled</div>
+                    <div class="small text-muted">khóa học sở hữu</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-journal-bookmark-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Đang theo học</div>
+                    <div class="fs-3 fw-bold text-orange mt-1" data-count-to="@inProgressCount">@inProgressCount</div>
+                    <div class="small text-muted">khóa đang mở</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-play-btn-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Hoàn thành 100%</div>
+                    <div class="fs-3 fw-bold text-success mt-1" data-count-to="@completedCount">@completedCount</div>
+                    <div class="small text-muted">đủ điều kiện thi</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-patch-check-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Tiến độ trung bình</div>
+                    <div class="fs-3 fw-bold text-dark mt-1"><span data-count-to="@avgProgress">@avgProgress</span>%</div>
+                    <div class="small text-muted">toàn bộ lộ trình</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-graph-up-arrow"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Continue Learning Grid -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow">Tiếp tục học</span>
+        <h2 class="h5 fw-bold mb-0 mt-1">Danh sách khóa học đã đăng ký (@totalEnrolled)</h2>
+    </div>
+    <a asp-area="Student" asp-controller="Certificates" asp-action="Index" class="btn btn-outline-huit btn-sm d-inline-flex align-items-center" style="min-height: 40px;">
+        <i class="bi bi-award me-1"></i> Xem chứng chỉ của tôi
     </a>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="app-card p-5 text-center">
+    <div class="hl-bento-card p-5 text-center" data-reveal="scale">
         <div class="stat-icon mx-auto mb-3"><i class="bi bi-journal-x"></i></div>
-        <h2 class="h5 mb-2">Bạn chưa đăng ký khóa học nào</h2>
-        <p class="text-muted small mb-3">Hãy khám phá danh mục khóa học và bắt đầu hành trình học tập ngay.</p>
-        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange">Khám phá khóa học</a>
+        <h2 class="h5 fw-bold mb-2">Bạn chưa đăng ký khóa học nào</h2>
+        <p class="text-muted small mb-4">Hãy khám phá kho khóa học chất lượng cao tại HUIT Learning và bắt đầu hành trình nâng tầm kỹ năng ngay hôm nay.</p>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange px-4" style="min-height: 44px;">
+            <i class="bi bi-search me-1"></i> Khám phá danh mục khóa học
+        </a>
     </div>
 }
 else
 {
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" data-stagger-group>
         @foreach (var en in Model)
         {
-            <div class="col">
-                <div class="card app-card h-100 border-0">
-                    <img src="@(string.IsNullOrEmpty(en.Course.ThumbnailUrl) ? "/images/course-dotnet.svg" : en.Course.ThumbnailUrl)" class="course-thumb" alt="@en.Course.Title" />
-                    <div class="card-body d-flex flex-column p-3">
-                        <span class="badge badge-orange align-self-start mb-2">@en.Course.Category.Name</span>
-                        <h3 class="h6 fw-bold mb-1">@en.Course.Title</h3>
-                        <p class="small text-muted mb-3">GV: @en.Course.Instructor.FullName</p>
+            var thumbUrl = string.IsNullOrEmpty(en.Course.ThumbnailUrl) ? "/images/course-default.svg" : en.Course.ThumbnailUrl;
+            var isDone = en.ProgressPercent >= 100m;
+            <div class="col" data-reveal="up">
+                <div class="card hl-bento-card app-card-hover h-100 border-0 overflow-hidden" data-tilt-3d>
+                    <div class="position-relative overflow-hidden">
+                        <img src="@thumbUrl"
+                             onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                             class="course-thumb w-100 d-block"
+                             style="aspect-ratio: 16/9; object-fit: cover; view-transition-name: course-thumb-@en.CourseId;"
+                             alt="@en.Course.Title"
+                             loading="lazy" />
+                        <span class="badge @(isDone ? "bg-success" : "badge-orange") position-absolute top-0 end-0 m-3 shadow-sm">
+                            @(isDone ? "Hoàn thành" : en.ProgressPercent > 0 ? "Đang học" : "Mới ghi danh")
+                        </span>
+                    </div>
+                    <div class="card-body d-flex flex-column p-3 p-md-4">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            <span class="badge badge-huit">@en.Course.Category.Name</span>
+                            <span class="small text-muted">@en.Course.Level</span>
+                        </div>
+                        <h3 class="h6 fw-bold mb-1">
+                            <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@en.CourseId" class="text-dark text-decoration-none stretched-link-title">
+                                @en.Course.Title
+                            </a>
+                        </h3>
+                        <p class="small text-muted mb-3"><i class="bi bi-person-badge me-1"></i>GV: @en.Course.Instructor.FullName</p>
 
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between small fw-semibold mb-1">
@@ -44,9 +152,15 @@ else
                             <div class="progress progress-orange mb-3" style="height: 8px;">
                                 <div class="progress-bar" style="width: @en.ProgressPercent.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
                             </div>
-                            <div class="d-grid gap-2">
-                                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@en.CourseId" class="btn btn-orange btn-sm">
-                                    <i class="bi bi-play-circle-fill me-1"></i> Vào học ngay
+                            <div class="d-flex flex-wrap gap-2">
+                                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@en.CourseId"
+                                   class="btn btn-orange btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                                    <i class="bi @(isDone ? "bi-arrow-repeat" : "bi-play-circle-fill") me-1"></i>
+                                    @(isDone ? "Ôn tập / Thi cuối khóa" : "Vào học ngay")
+                                </a>
+                                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@en.CourseId"
+                                   class="btn btn-outline-huit btn-sm d-inline-flex align-items-center justify-content-center px-3" style="min-height: 44px;" title="Xem chi tiết khóa học">
+                                    <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                             </div>
                         </div>

@@ -1,38 +1,54 @@
 @model QuanLiKhoaHocTrucTuyen.Services.Interfaces.PaymentCallbackResult
 @{
-    ViewData["Title"] = "Kết quả thanh toán";
+    ViewData["Title"] = "Kết quả thanh toán - HUIT Learning";
 }
 
-<div class="row justify-content-center py-5">
-    <div class="col-md-7 col-lg-5">
-        <div class="app-card p-4 p-md-5 text-center">
-            @if (Model.IsSuccess)
-            {
-                <div class="stat-icon mx-auto mb-3 text-success bg-success-subtle" style="width:68px;height:68px;font-size:2rem;">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <h1 class="h4 mb-2">Thanh toán thành công!</h1>
-                <p class="text-muted small mb-3">@Model.Message</p>
-                <div class="small text-muted mb-4">Mã giao dịch đơn hàng: <code>@Model.OrderCode</code></div>
-                <div class="d-grid gap-2">
-                    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index" class="btn btn-orange">
-                        <i class="bi bi-play-circle me-1"></i> Vào khóa học của tôi
-                    </a>
-                    <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-outline-orange">Xem lịch sử đơn hàng</a>
-                </div>
-            }
-            else
-            {
-                <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width:68px;height:68px;font-size:2rem;">
-                    <i class="bi bi-x-circle-fill"></i>
-                </div>
-                <h1 class="h4 text-danger mb-2">Thanh toán chưa thành công</h1>
-                <p class="text-muted small mb-4">@Model.Message</p>
-                <div class="d-grid gap-2">
-                    <a asp-area="Student" asp-controller="Cart" asp-action="Index" class="btn btn-orange">Quay lại giỏ hàng để thử lại</a>
-                    <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-light border">Xem đơn hàng</a>
-                </div>
-            }
+<section class="hl-section py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="scale">
+                @if (Model.IsSuccess)
+                {
+                    <div class="stat-icon mx-auto mb-3 text-success bg-success-subtle" style="width: 72px; height: 72px; font-size: 2.1rem;">
+                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    </div>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-2">Giao dịch hoàn tất</span>
+                    <h1 class="h4 fw-bold mb-2">Thanh toán thành công!</h1>
+                    <p class="text-muted small mb-3">@Model.Message</p>
+
+                    <div class="p-3 bg-light rounded-4 border small mb-4">
+                        <span class="text-muted">Mã đơn hàng HUIT Learning:</span>
+                        <code class="fw-bold text-dark ms-1" style="font-family: 'JetBrains Mono', monospace;">@Model.OrderCode</code>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-area="Student" asp-controller="Dashboard" asp-action="Index" class="btn btn-orange rounded-pill py-2 fw-semibold">
+                            <i class="bi bi-play-circle-fill me-1" aria-hidden="true"></i> Vào khóa học của tôi ngay
+                        </a>
+                        <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-outline-huit rounded-pill py-2">
+                            <i class="bi bi-receipt me-1" aria-hidden="true"></i> Xem lịch sử đơn hàng
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width: 72px; height: 72px; font-size: 2.1rem;">
+                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 mb-2">Giao dịch gián đoạn</span>
+                    <h1 class="h4 fw-bold text-danger mb-2">Thanh toán chưa thành công</h1>
+                    <p class="text-muted small mb-4">@Model.Message</p>
+
+                    <div class="d-grid gap-2">
+                        <a asp-area="Student" asp-controller="Cart" asp-action="Index" class="btn btn-orange rounded-pill py-2 fw-semibold">
+                            <i class="bi bi-cart3 me-1" aria-hidden="true"></i> Quay lại giỏ hàng để thử lại
+                        </a>
+                        <a asp-area="Student" asp-controller="Orders" asp-action="Index" class="btn btn-light border rounded-pill py-2">
+                            <i class="bi bi-clock-history me-1" aria-hidden="true"></i> Kiểm tra trạng thái đơn hàng
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
     </div>
-</div>
+</section>

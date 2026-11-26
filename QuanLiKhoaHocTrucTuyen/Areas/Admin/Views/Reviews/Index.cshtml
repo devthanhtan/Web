@@ -3,84 +3,184 @@
     ViewData["Title"] = "Kiểm soát đánh giá";
     ViewData["AreaTitle"] = "Quản trị Admin";
     bool? hiddenOnly = ViewBag.HiddenOnly as bool?;
+    var totalReviews = Model.Count;
+    var visibleReviews = Model.Count(r => !r.IsHidden);
+    var hiddenReviews = Model.Count(r => r.IsHidden);
+    var fiveStarReviews = Model.Count(r => r.Rating == 5);
 }
 
-<div class="app-card p-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+<section class="hl-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
         <div>
-            <h1 class="h4 mb-1">Kiểm soát đánh giá khóa học</h1>
-            <p class="text-muted small mb-0">Ẩn hoặc xóa các đánh giá có nội dung vi phạm tiêu chuẩn cộng đồng</p>
+            <div class="hl-eyebrow mb-1">HUIT Learning · Chất lượng Cộng đồng</div>
+            <h1 class="h3 fw-bold mb-1">Kiểm soát đánh giá khóa học</h1>
+            <p class="text-muted small mb-0">Ẩn hoặc xóa các đánh giá có nội dung vi phạm tiêu chuẩn cộng đồng HUIT Learning</p>
         </div>
-        <div class="btn-group btn-group-sm">
-            <a asp-action="Index" class="btn @(hiddenOnly == null ? "btn-orange" : "btn-outline-secondary")">Tất cả</a>
-            <a asp-action="Index" asp-route-hiddenOnly="false" class="btn @(hiddenOnly == false ? "btn-orange" : "btn-outline-secondary")">Đang hiển thị</a>
-            <a asp-action="Index" asp-route-hiddenOnly="true" class="btn @(hiddenOnly == true ? "btn-orange" : "btn-outline-secondary")">Đã ẩn</a>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-huit d-inline-flex align-items-center px-3 py-2">
+                <i class="bi bi-chat-square-quote me-2"></i> Đang hiển thị: @totalReviews đánh giá
+            </span>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Khóa học</th>
-                    <th>Học viên</th>
-                    <th>Sao &amp; Nhận xét</th>
-                    <th>Trạng thái</th>
-                    <th class="text-end">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr><td colspan="5" class="text-center text-muted py-4">Chưa có đánh giá nào.</td></tr>
-                }
-                else
-                {
-                    @foreach (var r in Model)
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4" data-stagger-group>
+        <div class="col" data-reveal="up">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Tổng đánh giá</div>
+                        <div class="fs-3 fw-bold text-dark mt-1" data-count-to="@totalReviews">@totalReviews</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-chat-left-text-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="80">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Đang hiển thị</div>
+                        <div class="fs-3 fw-bold text-success mt-1" data-count-to="@visibleReviews">@visibleReviews</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-eye-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="160">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Đã ẩn</div>
+                        <div class="fs-3 fw-bold text-huit mt-1" data-count-to="@hiddenReviews">@hiddenReviews</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-eye-slash-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col" data-reveal="up" data-reveal-delay="240">
+            <div class="hl-bento-card stat-card h-100 p-3 p-md-4" data-tilt-3d>
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="small text-muted fw-semibold">Đánh giá 5 sao</div>
+                        <div class="fs-3 fw-bold text-orange mt-1" data-count-to="@fiveStarReviews">@fiveStarReviews</div>
+                    </div>
+                    <div class="stat-icon flex-shrink-0"><i class="bi bi-star-fill"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hl-bento-card p-3 p-md-4" data-reveal="up">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+            <div>
+                <div class="hl-eyebrow">Bộ lọc hiển thị</div>
+                <h2 class="h6 fw-bold mb-0">Danh sách nhận xét của học viên</h2>
+            </div>
+            <div class="hl-pill-scroll d-flex flex-nowrap gap-2 pb-1">
+                <a asp-action="Index"
+                   class="btn @(hiddenOnly == null ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Tất cả</a>
+                <a asp-action="Index" asp-route-hiddenOnly="false"
+                   class="btn @(hiddenOnly == false ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Đang hiển thị</a>
+                <a asp-action="Index" asp-route-hiddenOnly="true"
+                   class="btn @(hiddenOnly == true ? "btn-orange" : "btn-outline-secondary") rounded-pill d-inline-flex align-items-center px-3 text-nowrap"
+                   style="min-height: 44px;">Đã ẩn</a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Học viên</th>
+                        <th>Sao &amp; Nhận xét</th>
+                        <th class="text-nowrap">Trạng thái</th>
+                        <th class="text-end text-nowrap">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
                     {
                         <tr>
-                            <td class="fw-semibold small">@r.Course.Title</td>
-                            <td class="small">@r.User.FullName<br /><span class="text-muted">@r.User.Email</span></td>
-                            <td>
-                                <div class="text-warning small mb-1">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <i class="bi @(i <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
-                                    }
-                                </div>
-                                <div class="small">@r.Comment</div>
-                            </td>
-                            <td>
-                                @if (r.IsHidden)
-                                {
-                                    <span class="badge bg-secondary">Đã ẩn</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success">Hiển thị</span>
-                                }
-                            </td>
-                            <td class="text-end text-nowrap">
-                                <form asp-action="ToggleHide" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@r.Id" />
-                                    <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
-                                    <button type="submit" class="btn btn-sm btn-outline-orange">
-                                        <i class="bi @(r.IsHidden ? "bi-eye" : "bi-eye-slash") me-1"></i>
-                                        @(r.IsHidden ? "Hiện lại" : "Ẩn")
-                                    </button>
-                                </form>
-                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Xóa vĩnh viễn đánh giá này?');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@r.Id" />
-                                    <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                </form>
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="bi bi-chat-square-dots fs-3 d-block mb-2 opacity-50"></i>
+                                Chưa có đánh giá nào.
                             </td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                    else
+                    {
+                        @foreach (var r in Model)
+                        {
+                            var thumbUrl = string.IsNullOrEmpty(r.Course?.ThumbnailUrl) ? "/images/course-default.svg" : r.Course.ThumbnailUrl;
+                            <tr>
+                                <td style="min-width: 240px;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="@thumbUrl"
+                                             onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                                             alt="@r.Course?.Title"
+                                             class="rounded-3 border flex-shrink-0"
+                                             style="width: 80px; aspect-ratio: 16/9; object-fit: cover;" />
+                                        <span class="fw-semibold small text-dark">@r.Course?.Title</span>
+                                    </div>
+                                </td>
+                                <td class="small text-nowrap">
+                                    <div class="fw-semibold text-dark">@r.User.FullName</div>
+                                    <div class="text-muted">@r.User.Email</div>
+                                </td>
+                                <td style="min-width: 240px;">
+                                    <div class="text-warning small mb-1 text-nowrap">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                        <span class="text-muted ms-1 fw-semibold">@r.Rating/5</span>
+                                    </div>
+                                    <div class="small text-body">@r.Comment</div>
+                                </td>
+                                <td class="text-nowrap">
+                                    @if (r.IsHidden)
+                                    {
+                                        <span class="badge bg-secondary">Đã ẩn</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Hiển thị</span>
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        <form asp-action="ToggleHide" method="post" class="d-inline m-0">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
+                                            <button type="submit"
+                                                    class="btn btn-outline-orange d-inline-flex align-items-center px-3"
+                                                    style="min-height: 44px;">
+                                                <i class="bi @(r.IsHidden ? "bi-eye" : "bi-eye-slash") me-2"></i>
+                                                @(r.IsHidden ? "Hiện lại" : "Ẩn")
+                                            </button>
+                                        </form>
+                                        <form asp-action="Delete" method="post" class="d-inline m-0" onsubmit="return confirm('Xóa vĩnh viễn đánh giá này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <input type="hidden" name="hiddenOnly" value="@hiddenOnly" />
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger d-inline-flex align-items-center justify-content-center px-3"
+                                                    style="min-height: 44px;"
+                                                    aria-label="Xóa đánh giá">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>

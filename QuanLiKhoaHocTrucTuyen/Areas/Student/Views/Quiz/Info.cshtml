@@ -2,81 +2,110 @@
 @{
     ViewData["Title"] = Model.Quiz.Title;
     ViewData["AreaTitle"] = "Kiểm tra & Thi";
+    var courseThumb = string.IsNullOrEmpty(Model.Quiz.Course?.ThumbnailUrl) ? "/images/course-default.svg" : Model.Quiz.Course.ThumbnailUrl;
 }
 
-<div class="row g-4">
-    <div class="col-lg-7">
-        <div class="app-card p-4">
-            <span class="badge @(Model.Quiz.IsFinalExam ? "bg-danger-subtle text-danger" : "badge-orange") mb-2">
-                @(Model.Quiz.IsFinalExam ? "Bài thi cuối khóa" : "Kiểm tra chương")
-            </span>
-            <h1 class="h3 mb-2">@Model.Quiz.Title</h1>
-            <p class="text-muted small mb-4">@Model.Quiz.Description</p>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Đánh giá năng lực</span>
+        <h1 class="h3 fw-bold mb-1">@Model.Quiz.Title</h1>
+        <p class="text-muted small mb-0">@Model.Quiz.Course?.Title</p>
+    </div>
+    <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@Model.Quiz.CourseId"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại giao diện học
+    </a>
+</div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-4">
-                    <div class="p-3 bg-orange-soft rounded text-center">
-                        <div class="fw-bold fs-5 text-orange">@Model.Quiz.DurationMinutes phút</div>
+<div class="row g-4 align-items-start">
+    <div class="col-12 col-lg-7" data-reveal="up">
+        <div class="hl-bento-card p-3 p-md-4 h-100">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                <img src="@courseThumb"
+                     onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                     alt="@(Model.Quiz.Course?.Title ?? Model.Quiz.Title)"
+                     class="rounded-3 border flex-shrink-0"
+                     style="width: 104px; aspect-ratio: 16/9; object-fit: cover;" />
+                <div class="min-w-0">
+                    <span class="badge @(Model.Quiz.IsFinalExam ? "bg-danger-subtle text-danger" : "badge-orange") mb-1">
+                        <i class="bi @(Model.Quiz.IsFinalExam ? "bi-award-fill" : "bi-ui-checks-grid") me-1"></i>
+                        @(Model.Quiz.IsFinalExam ? "Bài thi cuối khóa (Cấp chứng chỉ)" : $"Kiểm tra chương: {Model.Quiz.Chapter?.Title ?? ""}")
+                    </span>
+                    <div class="small text-muted text-truncate">@Model.Quiz.Course?.Title</div>
+                </div>
+            </div>
+
+            <p class="text-muted small mb-4">@(string.IsNullOrWhiteSpace(Model.Quiz.Description) ? "Hãy đọc kỹ câu hỏi và hoàn thành bài kiểm tra trong thời gian quy định." : Model.Quiz.Description)</p>
+
+            <div class="row row-cols-2 row-cols-sm-4 g-3 mb-4" data-stagger-group>
+                <div class="col" data-reveal="up">
+                    <div class="p-3 bg-orange-soft rounded-3 text-center h-100">
+                        <div class="fw-bold fs-5 text-orange"><span data-count-to="@Model.Quiz.DurationMinutes">@Model.Quiz.DurationMinutes</span>p</div>
                         <div class="small text-muted">Thời gian</div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="p-3 bg-orange-soft rounded text-center">
-                        <div class="fw-bold fs-5 text-orange">@Model.Quiz.PassingScorePercent%</div>
-                        <div class="small text-muted">Điểm chuẩn đạt</div>
+                <div class="col" data-reveal="up">
+                    <div class="p-3 bg-orange-soft rounded-3 text-center h-100">
+                        <div class="fw-bold fs-5 text-orange"><span data-count-to="@Model.Quiz.PassingScorePercent">@Model.Quiz.PassingScorePercent</span>%</div>
+                        <div class="small text-muted">Điểm đạt</div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="p-3 bg-orange-soft rounded text-center">
-                        <div class="fw-bold fs-5 text-orange">@Model.Quiz.QuizQuestions.Count</div>
+                <div class="col" data-reveal="up">
+                    <div class="p-3 bg-orange-soft rounded-3 text-center h-100">
+                        <div class="fw-bold fs-5 text-huit" data-count-to="@Model.Quiz.QuizQuestions.Count">@Model.Quiz.QuizQuestions.Count</div>
                         <div class="small text-muted">Số câu hỏi</div>
+                    </div>
+                </div>
+                <div class="col" data-reveal="up">
+                    <div class="p-3 bg-orange-soft rounded-3 text-center h-100">
+                        <div class="fw-bold fs-5 text-huit">@(Model.Quiz.MaxAttempts == 0 ? "∞" : Model.Quiz.MaxAttempts.ToString())</div>
+                        <div class="small text-muted">Lượt tối đa</div>
                     </div>
                 </div>
             </div>
 
             @if (!Model.Eligibility.CanStart)
             {
-                <div class="alert alert-warning border-0 mb-3">
+                <div class="alert alert-warning border-0 mb-0">
                     <i class="bi bi-lock-fill me-1"></i> @Model.Eligibility.Reason
                 </div>
             }
             else
             {
-                <form asp-action="Start" method="post">
+                <form asp-action="Start" method="post" class="d-inline-block">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Quiz.Id" />
-                    <button type="submit" class="btn btn-orange px-4 py-2">
-                        <i class="bi bi-play-fill me-1"></i> Bắt đầu làm bài ngay
+                    <button type="submit" class="btn btn-orange px-4 fw-semibold d-inline-flex align-items-center justify-content-center" style="min-height: 46px;">
+                        <i class="bi bi-play-fill me-2"></i> Bắt đầu làm bài ngay
                     </button>
                 </form>
             }
-
-            <div class="mt-3">
-                <a asp-area="Student" asp-controller="Learn" asp-action="Index" asp-route-courseId="@Model.Quiz.CourseId" class="btn btn-sm btn-light border">
-                    <i class="bi bi-arrow-left me-1"></i> Quay lại giao diện học
-                </a>
-            </div>
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="app-card p-4">
-            <h2 class="h6 fw-bold mb-3">Lịch sử các lần làm bài (@Model.PastAttempts.Count)</h2>
+    <div class="col-12 col-lg-5" data-reveal="up">
+        <div class="hl-bento-card p-3 p-md-4 h-100">
+            <span class="hl-eyebrow d-inline-block mb-1">Thống kê cá nhân</span>
+            <h2 class="h6 fw-bold mb-3">
+                <i class="bi bi-clock-history text-orange me-1"></i> Lịch sử các lần làm bài (@Model.PastAttempts.Count)
+            </h2>
             @if (!Model.PastAttempts.Any())
             {
-                <p class="small text-muted mb-0">Bạn chưa thực hiện bài kiểm tra này.</p>
+                <div class="p-4 bg-light rounded-3 text-center small text-muted">
+                    Bạn chưa thực hiện bài kiểm tra này lần nào.
+                </div>
             }
             else
             {
                 <div class="list-group list-group-flush">
                     @foreach (var att in Model.PastAttempts)
                     {
-                        <a asp-action="Result" asp-route-attemptId="@att.Id" class="list-group-item list-group-item-action px-0 d-flex justify-content-between align-items-center">
+                        <a asp-action="Result" asp-route-attemptId="@att.Id" class="list-group-item list-group-item-action px-2 py-3 rounded d-flex justify-content-between align-items-center gap-2">
                             <div>
-                                <div class="fw-semibold small">Lần @att.AttemptNumber · @att.ScorePercent.ToString("0.#")% (@att.CorrectCount/@att.TotalQuestions)</div>
-                                <div class="text-muted" style="font-size:0.75rem;">@att.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                                <div class="fw-semibold small">Lần #@att.AttemptNumber · @att.ScorePercent.ToString("0.#")% (@att.CorrectCount/@att.TotalQuestions câu)</div>
+                                <div class="text-muted text-nowrap" style="font-size: 0.75rem;">@att.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
                             </div>
-                            <span class="badge @(att.IsPassed ? "bg-success" : "bg-danger")">@(att.IsPassed ? "Đạt" : "Chưa đạt")</span>
+                            <span class="badge @(att.IsPassed ? "bg-success" : "bg-danger") text-nowrap">@(att.IsPassed ? "Đạt" : "Chưa đạt")</span>
                         </a>
                     }
                 </div>
@@ -85,8 +114,9 @@
             @if (Model.Certificate != null)
             {
                 <hr />
-                <a asp-area="Student" asp-controller="Certificates" asp-action="DownloadPdf" asp-route-id="@Model.Certificate.Id" class="btn btn-success w-100 btn-sm">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> Tải chứng chỉ PDF (@Model.Certificate.Code)
+                <a asp-area="Student" asp-controller="Certificates" asp-action="DownloadPdf" asp-route-id="@Model.Certificate.Id"
+                   class="btn btn-success w-100 d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                    <i class="bi bi-file-earmark-pdf-fill me-2"></i> Tải chứng chỉ PDF (@Model.Certificate.Code)
                 </a>
             }
         </div>

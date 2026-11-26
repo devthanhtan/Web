@@ -1,30 +1,37 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.ConfirmEmailModel
 @{
-    ViewData["Title"] = "Kết quả xác thực email";
+    ViewData["Title"] = "Kết quả xác thực email - HUIT Learning";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-md-7 col-lg-5">
-        <div class="app-card p-4 p-md-5 text-center">
-            @if (Model.IsSuccess)
-            {
-                <div class="stat-icon mx-auto mb-3 text-success bg-success-subtle" style="width:64px;height:64px;font-size:1.8rem;">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <h1 class="h4 mb-2">Kích hoạt thành công!</h1>
-                <p class="text-muted mb-4">@Model.StatusMessage</p>
-                <a asp-page="./Login" class="btn btn-orange px-4">Đăng nhập ngay</a>
-            }
-            else
-            {
-                <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width:64px;height:64px;font-size:1.8rem;">
-                    <i class="bi bi-x-circle-fill"></i>
-                </div>
-                <h1 class="h4 mb-2">Xác thực thất bại</h1>
-                <p class="text-muted mb-4">@Model.StatusMessage</p>
-                <a asp-page="./ResendEmailConfirmation" class="btn btn-outline-orange">Gửi lại email xác thực</a>
-            }
+<section class="hl-section py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="scale">
+                @if (Model.IsSuccess)
+                {
+                    <div class="stat-icon mx-auto mb-3 text-success bg-success-subtle" style="width: 68px; height: 68px; font-size: 2rem;">
+                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    </div>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-2">Xác thực hoàn tất</span>
+                    <h1 class="h4 fw-bold mb-2">Kích hoạt tài khoản thành công!</h1>
+                    <p class="text-muted small mb-4">@Model.StatusMessage</p>
+                    <a asp-page="./Login" class="btn btn-orange rounded-pill px-4 py-2 fw-semibold">
+                        <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Đăng nhập vào HUIT Learning
+                    </a>
+                }
+                else
+                {
+                    <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width: 68px; height: 68px; font-size: 2rem;">
+                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                    </div>
+                    <h1 class="h4 fw-bold text-danger mb-2">Xác thực chưa thành công</h1>
+                    <p class="text-muted small mb-4">@Model.StatusMessage</p>
+                    <a asp-page="./ResendEmailConfirmation" class="btn btn-outline-orange rounded-pill px-4 py-2">
+                        <i class="bi bi-envelope-arrow-up me-1" aria-hidden="true"></i> Gửi lại email xác thực
+                    </a>
+                }
+            </div>
         </div>
     </div>
-</div>
+</section>

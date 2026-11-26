@@ -1,28 +1,43 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.ExternalLoginModel
 @{
-    ViewData["Title"] = "Hoàn tất đăng nhập";
+    ViewData["Title"] = "Hoàn tất liên kết tài khoản - HUIT Learning";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-md-7 col-lg-5">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-2">Liên kết tài khoản @Model.ProviderDisplayName</h1>
-            <p class="small text-muted mb-3">Xác nhận thông tin để hoàn tất tạo tài khoản Học viên.</p>
-            <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
-                <div class="mb-3">
-                    <label asp-for="Input.FullName" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.FullName" class="form-control" />
-                    <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+<section class="hl-section py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 shadow-sm" data-reveal="up">
+                <div class="text-center mb-4">
+                    <div class="stat-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                        <i class="bi bi-person-check-fill" aria-hidden="true"></i>
+                    </div>
+                    <span class="hl-eyebrow text-orange">Liên kết nhanh</span>
+                    <h1 class="h4 fw-bold mt-1 mb-1">Liên kết tài khoản @Model.ProviderDisplayName</h1>
+                    <p class="small text-muted mb-0">Xác nhận thông tin hồ sơ học viên trên HUIT Learning</p>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="Input.Email" class="form-label fw-semibold"></label>
-                    <input asp-for="Input.Email" class="form-control" readonly />
-                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
-                </div>
-                <button type="submit" class="btn btn-orange w-100">Hoàn tất đăng nhập</button>
-            </form>
+
+                <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.FullName" class="form-label fw-semibold small"></label>
+                        <input asp-for="Input.FullName" class="form-control" placeholder="Họ và tên của bạn" />
+                        <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.Email" class="form-label fw-semibold small"></label>
+                        <input asp-for="Input.Email" class="form-control bg-light" readonly />
+                        <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-orange rounded-pill w-100 py-2 fw-semibold">
+                        <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Hoàn tất đăng nhập
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,6 +1,6 @@
-# EduSpark - Hệ thống Bán và Học Khóa Học Trực Tuyến (ASP.NET Core 8 MVC)
+# HUIT Learning - Hệ thống Bán và Học Khóa Học Trực Tuyến (ASP.NET Core 8 MVC)
 
-Website bán và học khóa học trực tuyến xây dựng trên **ASP.NET Core 8.0 MVC**, **Entity Framework Core 8**, **SQL Server LocalDB** và **ASP.NET Core Identity (Individual Accounts)**.
+Nền tảng bán và học khóa học trực tuyến **HUIT Learning** được xây dựng trên **ASP.NET Core 8.0 MVC**, **Entity Framework Core 8**, **SQL Server LocalDB** và **ASP.NET Core Identity (Individual Accounts)**, tích hợp trải nghiệm **Three.js 3D Interactive Hero**, **View Transitions API** và giao diện Responsive đa thiết bị.
 
 ## 1. Yêu cầu môi trường
 - Visual Studio 2022 (17.13+ hoặc VS 2026) hoặc .NET 8 SDK

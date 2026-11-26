@@ -2,50 +2,126 @@
 @{
     ViewData["Title"] = "Lịch sử đơn hàng";
     ViewData["AreaTitle"] = "Góc Học viên";
+    var totalOrders = Model.Count;
+    var paidOrders = Model.Count(o => o.Status == OrderStatus.Paid);
+    var pendingOrders = Model.Count(o => o.Status == OrderStatus.PendingPayment);
+    var totalSpent = Model.Where(o => o.Status == OrderStatus.Paid).Sum(o => o.TotalAmount);
 }
 
-<h1 class="h3 mb-4">Lịch sử đơn hàng &amp; giao dịch</h1>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Giao dịch</span>
+        <h1 class="h3 fw-bold mb-1">Lịch sử đơn hàng &amp; giao dịch</h1>
+        <p class="text-muted small mb-0">Quản lý hóa đơn thanh toán khóa học trên nền tảng HUIT Learning</p>
+    </div>
+    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-play-btn me-1"></i> Về khóa học của tôi
+    </a>
+</div>
+
+<!-- Responsive KPI Bento Cards -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4" data-stagger-group>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Tổng đơn hàng</div>
+                    <div class="fs-4 fw-bold text-huit mt-1" data-count-to="@totalOrders">@totalOrders</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-receipt"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Đã thanh toán</div>
+                    <div class="fs-4 fw-bold text-success mt-1" data-count-to="@paidOrders">@paidOrders</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-check2-circle"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Chờ thanh toán</div>
+                    <div class="fs-4 fw-bold text-warning-emphasis mt-1" data-count-to="@pendingOrders">@pendingOrders</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col" data-reveal="up">
+        <div class="hl-bento-card stat-card h-100 p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div>
+                    <div class="small text-muted fw-medium">Tổng chi tiêu</div>
+                    <div class="fs-5 fw-bold text-orange mt-1 text-nowrap">@totalSpent.ToString("N0") đ</div>
+                </div>
+                <div class="stat-icon flex-shrink-0"><i class="bi bi-wallet2"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @if (!Model.Any())
 {
-    <div class="app-card p-5 text-center text-muted">Bạn chưa có đơn hàng nào.</div>
+    <div class="hl-bento-card p-5 text-center text-muted" data-reveal="scale">
+        <i class="bi bi-receipt-cutoff fs-1 text-orange d-block mb-2"></i>
+        <p class="mb-3">Bạn chưa có đơn hàng nào.</p>
+        <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-orange px-4" style="min-height: 44px;">Khám phá khóa học</a>
+    </div>
 }
 else
 {
-    <div class="app-card p-3 p-md-4">
+    <div class="hl-bento-card p-3 p-md-4" data-reveal="up">
         <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table align-middle table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Mã đơn</th>
+                        <th class="text-nowrap">Mã đơn</th>
                         <th>Khóa học</th>
-                        <th>Tổng tiền</th>
-                        <th>Cổng TT</th>
-                        <th>Trạng thái</th>
-                        <th class="text-end">Thao tác</th>
+                        <th class="text-nowrap">Tổng tiền</th>
+                        <th class="text-nowrap">Cổng TT</th>
+                        <th class="text-nowrap">Trạng thái</th>
+                        <th class="text-end text-nowrap">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var o in Model)
                     {
                         <tr>
-                            <td>
-                                <strong>@o.OrderCode</strong>
+                            <td class="text-nowrap">
+                                <strong class="text-dark">@o.OrderCode</strong>
                                 <div class="small text-muted">@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
                             </td>
-                            <td class="small">
-                                @foreach (var item in o.Items)
-                                {
-                                    <div>• @item.Course.Title</div>
-                                }
+                            <td style="min-width: 240px;">
+                                <div class="vstack gap-2">
+                                    @foreach (var item in o.Items)
+                                    {
+                                        var thumb = string.IsNullOrEmpty(item.Course.ThumbnailUrl) ? "/images/course-default.svg" : item.Course.ThumbnailUrl;
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="@thumb"
+                                                 onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                                                 alt="@item.Course.Title"
+                                                 class="rounded border flex-shrink-0"
+                                                 style="width: 56px; aspect-ratio: 16/9; object-fit: cover;" />
+                                            <span class="small fw-semibold">@item.Course.Title</span>
+                                        </div>
+                                    }
+                                </div>
                             </td>
-                            <td class="fw-bold text-orange">@o.TotalAmount.ToString("N0") đ</td>
-                            <td><span class="badge bg-light text-dark border">@o.PaymentProvider</span></td>
-                            <td>
+                            <td class="fw-bold text-orange text-nowrap">@o.TotalAmount.ToString("N0") đ</td>
+                            <td class="text-nowrap"><span class="badge bg-light text-dark border">@o.PaymentProvider</span></td>
+                            <td class="text-nowrap">
                                 @switch (o.Status)
                                 {
                                     case OrderStatus.Paid:
-                                        <span class="badge bg-success">Đã thanh toán</span>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Đã thanh toán</span>
                                         break;
                                     case OrderStatus.PendingPayment:
                                         <span class="badge bg-warning-subtle text-warning-emphasis">Chờ thanh toán</span>
@@ -58,15 +134,21 @@ else
                             <td class="text-end">
                                 @if (o.Status != OrderStatus.Paid)
                                 {
-                                    <form asp-action="Retry" method="post" class="d-inline-flex gap-1">
+                                    <form asp-action="Retry" method="post" class="d-flex flex-wrap justify-content-end gap-2">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="orderId" value="@o.Id" />
-                                        <select name="provider" class="form-select form-select-sm" style="width:auto;">
+                                        <select name="provider" class="form-select form-select-sm" style="width: auto; min-height: 40px;">
                                             <option value="VNPAY">VNPAY</option>
                                             <option value="MoMo">MoMo</option>
                                         </select>
-                                        <button type="submit" class="btn btn-sm btn-orange">Thanh toán lại</button>
+                                        <button type="submit" class="btn btn-sm btn-orange text-nowrap" style="min-height: 40px;">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Thanh toán lại
+                                        </button>
                                     </form>
+                                }
+                                else
+                                {
+                                    <span class="small text-success fw-semibold text-nowrap"><i class="bi bi-unlock-fill me-1"></i>Đã kích hoạt</span>
                                 }
                             </td>
                         </tr>

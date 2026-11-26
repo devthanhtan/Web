@@ -545,8 +545,8 @@ public class PaymentGatewayService : IPaymentGatewayService
         {
             await _email.SendEmailAsync(
                 order.User.Email,
-                $"[EduSpark] Xác nhận thanh toán đơn hàng {order.OrderCode}",
-                $"<p>Cảm ơn bạn đã mua khóa học tại EduSpark. Mã đơn: <strong>{order.OrderCode}</strong>, Tổng tiền: <strong>{order.TotalAmount:N0} đ</strong>. Quyền truy cập khóa học đã được mở ngay lập tức.</p>");
+                $"[HUIT Learning] Xác nhận thanh toán đơn hàng {order.OrderCode}",
+                $"<p>Cảm ơn bạn đã đăng ký khóa học tại <strong>HUIT Learning</strong>. Mã đơn: <strong>{order.OrderCode}</strong>, Tổng tiền: <strong>{order.TotalAmount:N0} đ</strong>. Quyền truy cập khóa học đã được mở ngay lập tức.</p>");
         }
     }
 

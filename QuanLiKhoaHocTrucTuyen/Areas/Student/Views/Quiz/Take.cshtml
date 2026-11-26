@@ -4,17 +4,44 @@
     ViewData["AreaTitle"] = "Làm bài kiểm tra";
 }
 
-<div class="app-card p-3 mb-4 sticky-top" style="top: 72px; z-index: 1010;">
+<!-- Crisp Sticky Responsive Quiz Timer & Collapsible Mobile Question Grid -->
+<div class="hl-bento-card glass-card p-2 p-sm-3 mb-4 sticky-top shadow-sm" style="top: 64px; z-index: 1010;">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div>
-            <div class="small text-muted">Lần làm thứ #@Model.Attempt.AttemptNumber · Điểm đạt: @Model.Quiz.PassingScorePercent%</div>
-            <h1 class="h5 mb-0">@Model.Quiz.Title</h1>
+        <div class="min-w-0">
+            <div class="small text-muted d-none d-sm-block">Lần làm thứ #@Model.Attempt.AttemptNumber · Điểm đạt: @Model.Quiz.PassingScorePercent%</div>
+            <h1 class="h6 fw-bold mb-0 text-truncate">@Model.Quiz.Title</h1>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <div class="px-3 py-2 rounded bg-orange-soft border border-warning-subtle">
-                <i class="bi bi-alarm text-orange me-1"></i>
-                Thời gian còn lại: <strong id="countdownDisplay" class="fs-5 text-orange">--:--</strong>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <span class="badge bg-white text-dark border d-inline-flex align-items-center gap-1 py-2 px-2 text-nowrap">
+                <i class="bi bi-check2-square text-orange"></i>
+                <span><strong id="answeredCountSpan">0</strong>/@Model.Questions.Count</span>
+            </span>
+            <div class="px-2 px-sm-3 py-1 rounded-3 bg-orange-soft border border-warning-subtle d-inline-flex align-items-center gap-1 text-nowrap">
+                <i class="bi bi-alarm text-orange"></i>
+                <strong id="countdownDisplay" class="fs-6 text-orange font-monospace">--:--</strong>
             </div>
+            <button class="btn btn-sm btn-outline-huit d-lg-none d-inline-flex align-items-center justify-content-center" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#mobileQuizPills"
+                    aria-expanded="false" aria-controls="mobileQuizPills" title="Danh sách câu hỏi"
+                    style="min-width: 44px; min-height: 44px;">
+                <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Collapsible Question Navigation Grid on Mobile/Tablet -->
+    <div class="collapse d-lg-none mt-2 pt-2 border-top" id="mobileQuizPills">
+        <div class="d-flex flex-wrap gap-2">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var q = Model.Questions[i];
+                <a href="#questionCard_@(i + 1)"
+                   data-q-pill="@q.Id"
+                   class="btn btn-sm btn-light border fw-semibold d-inline-flex align-items-center justify-content-center"
+                   style="min-width: 42px; min-height: 42px;">
+                    @(i + 1)
+                </a>
+            }
         </div>
     </div>
 </div>
@@ -23,29 +50,62 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="attemptId" value="@Model.Attempt.Id" />
 
-    <div class="vstack gap-3 mb-4">
-        @for (int i = 0; i < Model.Questions.Count; i++)
-        {
-            var q = Model.Questions[i];
-            <div class="app-card p-4">
-                <div class="fw-bold mb-3">Câu @(i + 1): @q.Content</div>
-                <div class="vstack gap-2">
-                    @foreach (var opt in new[] { ("A", q.OptionA), ("B", q.OptionB), ("C", q.OptionC), ("D", q.OptionD) })
+    <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-8">
+            <div class="vstack gap-3 mb-4">
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    var q = Model.Questions[i];
+                    <div class="hl-bento-card p-3 p-md-4" id="questionCard_@(i + 1)" style="scroll-margin-top: 148px;">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                            <div class="fw-bold">
+                                <span class="badge badge-huit me-2">Câu @(i + 1)</span>
+                                @q.Content
+                            </div>
+                        </div>
+                        <div class="vstack gap-2">
+                            @foreach (var opt in new[] { ("A", q.OptionA), ("B", q.OptionB), ("C", q.OptionC), ("D", q.OptionD) })
+                            {
+                                <label class="border rounded-3 p-3 d-flex align-items-start gap-2 cursor-pointer quiz-option-label" data-question-id="@q.Id">
+                                    <input class="form-check-input mt-1 flex-shrink-0 quiz-radio-input" type="radio" name="answers[@q.Id]" value="@opt.Item1" data-question-id="@q.Id" />
+                                    <span><strong>@opt.Item1.</strong> @opt.Item2</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="d-grid d-sm-flex justify-content-sm-end mb-3">
+                <button type="submit" class="btn btn-orange btn-lg px-5 d-inline-flex align-items-center justify-content-center" style="min-height: 48px;">
+                    <i class="bi bi-send-check me-2"></i> Nộp bài ngay
+                </button>
+            </div>
+        </div>
+
+        <!-- Desktop Sticky Question Navigation Palette -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="hl-bento-card p-4 sticky-top" style="top: 148px;">
+                <span class="hl-eyebrow d-inline-block mb-1">Điều hướng nhanh</span>
+                <h2 class="h6 fw-bold mb-2"><i class="bi bi-grid-3x3-gap text-orange me-1"></i> Bảng câu hỏi</h2>
+                <p class="small text-muted mb-3">Chọn số thứ tự để chuyển nhanh tới câu hỏi tương ứng.</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    @for (int i = 0; i < Model.Questions.Count; i++)
                     {
-                        <label class="border rounded p-2 px-3 d-flex align-items-center gap-2 cursor-pointer">
-                            <input class="form-check-input mt-0" type="radio" name="answers[@q.Id]" value="@opt.Item1" />
-                            <span><strong>@opt.Item1.</strong> @opt.Item2</span>
-                        </label>
+                        var q = Model.Questions[i];
+                        <a href="#questionCard_@(i + 1)"
+                           data-q-pill="@q.Id"
+                           class="btn btn-sm btn-light border fw-semibold d-inline-flex align-items-center justify-content-center"
+                           style="min-width: 42px; min-height: 42px;">
+                            @(i + 1)
+                        </a>
                     }
                 </div>
+                <button type="submit" class="btn btn-orange w-100 d-inline-flex align-items-center justify-content-center" style="min-height: 46px;">
+                    <i class="bi bi-send-check me-2"></i> Nộp bài kiểm tra
+                </button>
             </div>
-        }
-    </div>
-
-    <div class="text-end">
-        <button type="submit" class="btn btn-orange btn-lg px-5">
-            <i class="bi bi-send-check me-1"></i> Nộp bài ngay
-        </button>
+        </div>
     </div>
 </form>
 
@@ -55,7 +115,34 @@
             let remaining = @Model.RemainingSeconds;
             const display = document.getElementById('countdownDisplay');
             const form = document.getElementById('quizForm');
+            const answeredSpan = document.getElementById('answeredCountSpan');
             let submitted = false;
+
+            function updateAnsweredState() {
+                const answeredIds = new Set();
+                document.querySelectorAll('.quiz-radio-input:checked').forEach(function (inp) {
+                    answeredIds.add(inp.getAttribute('data-question-id'));
+                });
+                if (answeredSpan) answeredSpan.textContent = answeredIds.size;
+
+                document.querySelectorAll('[data-q-pill]').forEach(function (pill) {
+                    const qid = pill.getAttribute('data-q-pill');
+                    if (answeredIds.has(qid)) {
+                        pill.classList.remove('btn-light', 'border');
+                        pill.classList.add('btn-orange');
+                    }
+                });
+
+                document.querySelectorAll('.quiz-option-label').forEach(function (lbl) {
+                    const radio = lbl.querySelector('input[type="radio"]');
+                    lbl.classList.toggle('bg-orange-soft', !!(radio && radio.checked));
+                    lbl.classList.toggle('border-warning', !!(radio && radio.checked));
+                });
+            }
+
+            document.querySelectorAll('.quiz-radio-input').forEach(function (inp) {
+                inp.addEventListener('change', updateAnsweredState);
+            });
 
             function render() {
                 const m = Math.floor(remaining / 60);

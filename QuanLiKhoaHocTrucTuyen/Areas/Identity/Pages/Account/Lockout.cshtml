@@ -1,16 +1,24 @@
 @page
 @{
-    ViewData["Title"] = "Tài khoản bị khóa";
+    ViewData["Title"] = "Tài khoản tạm thời bị khóa - HUIT Learning";
 }
-<div class="row justify-content-center py-5">
-    <div class="col-md-6">
-        <div class="app-card p-5 text-center">
-            <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width:64px;height:64px;font-size:1.8rem;">
-                <i class="bi bi-lock-fill"></i>
+
+<section class="hl-section py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="scale">
+                <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width: 68px; height: 68px; font-size: 2rem;">
+                    <i class="bi bi-lock-fill" aria-hidden="true"></i>
+                </div>
+                <span class="hl-eyebrow text-danger">Bảo vệ tài khoản</span>
+                <h1 class="h4 fw-bold text-danger mt-1 mb-2">Tài khoản tạm thời bị khóa</h1>
+                <p class="text-muted small mb-4">
+                    Tài khoản này đang tạm khóa do quy định bảo mật của Quản trị viên <strong>HUIT Learning</strong> hoặc nhập sai mật khẩu quá số lần cho phép.
+                </p>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-huit rounded-pill px-4">
+                    <i class="bi bi-house-door me-1" aria-hidden="true"></i> Quay về trang chủ
+                </a>
             </div>
-            <h1 class="h4 text-danger mb-2">Tài khoản tạm thời bị khóa</h1>
-            <p class="text-muted mb-4">Tài khoản này đang bị khóa do quyết định của Quản trị viên hoặc nhập sai mật khẩu quá số lần cho phép.</p>
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-orange">Quay về trang chủ</a>
         </div>
     </div>
-</div>
+</section>

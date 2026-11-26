@@ -48,7 +48,7 @@ public class ForgotPasswordModel : PageModel
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = Url.Page("/Account/ResetPassword", null, new { area = "Identity", code }, Request.Scheme);
 
-            await _emailSender.SendEmailAsync(Input.Email, "[EduSpark] Đặt lại mật khẩu",
+            await _emailSender.SendEmailAsync(Input.Email, "[HUIT Learning] Đặt lại mật khẩu",
                 $"<p>Vui lòng nhấn vào liên kết sau để đặt lại mật khẩu: <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>Đặt lại mật khẩu</a></p>");
         }
 

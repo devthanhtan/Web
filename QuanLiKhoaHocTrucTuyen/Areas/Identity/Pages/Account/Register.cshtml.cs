@@ -113,9 +113,9 @@ public class RegisterModel : PageModel
 
             await _emailSender.SendEmailAsync(
                 Input.Email,
-                "[EduSpark] Xác thực địa chỉ email tài khoản",
+                "[HUIT Learning] Xác thực địa chỉ email tài khoản",
                 $"<p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(user.FullName)}</strong>,</p>" +
-                $"<p>Cảm ơn bạn đã đăng ký tài khoản tại EduSpark. Vui lòng nhấn vào liên kết sau để kích hoạt tài khoản:</p>" +
+                $"<p>Cảm ơn bạn đã đăng ký tài khoản tại HUIT Learning. Vui lòng nhấn vào liên kết sau để kích hoạt tài khoản:</p>" +
                 $"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>Xác thực tài khoản ngay</a></p>");
 
             return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });

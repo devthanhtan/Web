@@ -1,46 +1,96 @@
+@{
+    var rawTitle = ViewData["Title"]?.ToString();
+    var pageTitle = string.IsNullOrWhiteSpace(rawTitle)
+        ? "HUIT Learning"
+        : (rawTitle.Contains("HUIT Learning", StringComparison.OrdinalIgnoreCase)
+            ? rawTitle
+            : $"{rawTitle} - HUIT Learning");
+
+    var currentArea = ViewContext.RouteData.Values["area"]?.ToString() ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var isHome = string.IsNullOrEmpty(currentArea) && string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
+    var isCourses = string.IsNullOrEmpty(currentArea) && string.Equals(currentController, "Courses", StringComparison.OrdinalIgnoreCase);
+    var isCert = string.IsNullOrEmpty(currentArea) && string.Equals(currentController, "Certificate", StringComparison.OrdinalIgnoreCase);
+    var isCart = string.Equals(currentArea, "Student", StringComparison.OrdinalIgnoreCase) && string.Equals(currentController, "Cart", StringComparison.OrdinalIgnoreCase);
+    var isSignedIn = User.Identity?.IsAuthenticated == true;
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EduSpark</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="view-transition" content="same-origin" />
+    <title>@pageTitle</title>
+    <script>
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('js-motion-ready');
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <header class="sticky-top">
-        <nav class="navbar navbar-expand-lg app-navbar py-2">
+<body class="has-mobile-bottom-nav">
+    <a class="hl-skip-link" href="#main-content">Chuyển đến nội dung chính</a>
+
+    <div class="hl-scroll-progress" aria-hidden="true">
+        <div class="hl-scroll-progress__bar"></div>
+    </div>
+
+    <header class="hl-header-wrap">
+        <nav class="navbar navbar-expand-lg navbar-light app-navbar hl-floating-nav py-2" aria-label="Điều hướng chính">
             <div class="container">
                 <a class="navbar-brand brand-mark" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-                    <span>Edu<span class="text-orange">Spark</span></span>
+                    <span class="brand-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+                    <span>
+                        HUIT <span class="text-orange">Learning</span>
+                        <span class="brand-text-sub d-none d-sm-block">Digital Academy</span>
+                    </span>
                 </a>
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Mở menu">
-                    <span class="navbar-toggler-icon"></span>
+
+                <button class="navbar-toggler hl-nav-toggle d-lg-none shadow-none"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Mở menu điều hướng">
+                    <i class="bi bi-list fs-4" aria-hidden="true"></i>
                 </button>
+
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
                         <li class="nav-item">
-                            <a class="nav-link fw-semibold text-dark" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                            <a class="nav-link @(isHome ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door text-huit me-1 d-lg-none" aria-hidden="true"></i>Trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(isCourses ? "active" : "")" asp-area="" asp-controller="Courses" asp-action="Index">
+                                <i class="bi bi-journal-code text-huit me-1 d-lg-none" aria-hidden="true"></i>Khóa học
+                            </a>
                         </li>
                         @await Component.InvokeAsync("CategoryMenu")
                         <li class="nav-item">
-                            <a class="nav-link fw-semibold text-dark" asp-area="" asp-controller="Certificate" asp-action="Verify">Tra cứu chứng chỉ</a>
+                            <a class="nav-link @(isCert ? "active" : "")" asp-area="" asp-controller="Certificate" asp-action="Verify">
+                                <i class="bi bi-patch-check text-orange me-1" aria-hidden="true"></i>Tra cứu chứng chỉ
+                            </a>
                         </li>
                     </ul>
 
-                    <form class="d-flex me-lg-3 my-2 my-lg-0" asp-area="" asp-controller="Courses" asp-action="Index" method="get" role="search">
-                        <div class="input-group input-group-sm">
-                            <input class="form-control border-end-0" type="search" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm khóa học..." aria-label="Tìm khóa học" />
-                            <button class="btn btn-orange" type="submit" title="Tìm kiếm"><i class="bi bi-search"></i></button>
+                    <form class="d-flex me-lg-3 my-2 my-lg-0 navbar-search-form" asp-area="" asp-controller="Courses" asp-action="Index" method="get" role="search">
+                        <div class="input-group input-group-sm navbar-search-group">
+                            <input class="form-control" type="search" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm khóa học, kỹ năng..." aria-label="Tìm khóa học" />
+                            <button class="btn btn-orange" type="submit" title="Tìm kiếm" aria-label="Tìm kiếm">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </form>
 
-                    <div class="mt-2 mt-lg-0">
+                    <div class="mt-2 mt-lg-0 pt-2 pt-lg-0 border-top border-lg-0">
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -48,35 +98,130 @@
         </nav>
     </header>
 
-    <main role="main" class="py-4">
+    <main id="main-content" role="main" class="py-4 flex-grow-1">
         <div class="container">
             <partial name="_AlertsPartial" />
             @RenderBody()
         </div>
     </main>
 
-    <footer class="app-footer py-4">
+    <footer class="app-footer pt-5 pb-4 mt-5">
         <div class="container">
-            <div class="row gy-3 align-items-center">
-                <div class="col-md-6">
-                    <div class="brand-mark mb-1">
-                        <span class="brand-icon" style="width:28px;height:28px;font-size:0.9rem;"><i class="bi bi-mortarboard-fill"></i></span>
-                        <span class="fs-6">Edu<span class="text-orange">Spark</span></span>
+            <div class="row g-4 pb-4 border-bottom">
+                <div class="col-12 col-lg-4">
+                    <a class="brand-mark mb-3" asp-area="" asp-controller="Home" asp-action="Index">
+                        <span class="brand-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+                        <span>
+                            HUIT <span class="text-orange">Learning</span>
+                            <span class="brand-text-sub">Nền tảng học tập số</span>
+                        </span>
+                    </a>
+                    <p class="small text-muted mb-3">
+                        Hệ sinh thái đào tạo trực tuyến hiện đại của HUIT Learning — kết nối chuẩn học thuật đại học cùng kỹ năng thực chiến doanh nghiệp, hỗ trợ học tập đa thiết bị và cấp chứng chỉ số xác thực QR.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="footer-trust-pill"><i class="bi bi-shield-check text-huit" aria-hidden="true"></i> Chứng chỉ QR chuẩn</span>
+                        <span class="footer-trust-pill"><i class="bi bi-laptop text-orange" aria-hidden="true"></i> Đa thiết bị 24/7</span>
                     </div>
-                    <p class="small text-muted mb-0">Nền tảng bán và học khóa học trực tuyến chuẩn ASP.NET Core 8 MVC.</p>
                 </div>
-                <div class="col-md-6 text-md-end small text-muted">
-                    <a class="me-3 text-muted" asp-area="" asp-controller="Courses" asp-action="Index">Khóa học</a>
-                    <a class="me-3 text-muted" asp-area="" asp-controller="Certificate" asp-action="Verify">Xác thực chứng chỉ</a>
-                    <span>&copy; 2026 EduSpark LMS</span>
+
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="footer-heading">Khám phá</div>
+                    <ul class="footer-links">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Trang chủ</a></li>
+                        <li><a asp-area="" asp-controller="Courses" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Thư viện khóa học</a></li>
+                        <li><a asp-area="" asp-controller="Certificate" asp-action="Verify"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Xác thực chứng chỉ</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="footer-heading">Không gian học tập</div>
+                    <ul class="footer-links">
+                        <li><a asp-area="Student" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Khóa học của tôi</a></li>
+                        <li><a asp-area="Student" asp-controller="Cart" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Giỏ hàng &amp; Thanh toán</a></li>
+                        <li><a asp-area="Student" asp-controller="Certificates" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Chứng chỉ đạt được</a></li>
+                        <li><a asp-area="Student" asp-controller="InstructorApplication" asp-action="Index"><i class="bi bi-chevron-right small" aria-hidden="true"></i>Trở thành Giảng viên</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="footer-heading">Liên hệ &amp; Hỗ trợ</div>
+                    <ul class="list-unstyled small text-muted mb-0 d-grid gap-2">
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-geo-alt-fill text-orange mt-1" aria-hidden="true"></i>
+                            <span>140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope-fill text-huit" aria-hidden="true"></i>
+                            <span>support@huitlearning.edu.vn</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-2">
+                            <i class="bi bi-telephone-fill text-huit" aria-hidden="true"></i>
+                            <span>(028) 3816 3318 · Hỗ trợ 08:00 – 21:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 pt-3 small text-muted">
+                <div>&copy; @DateTime.Now.Year <strong>HUIT Learning</strong>. Phát triển trên nền tảng ASP.NET Core MVC &amp; Modern Web 3D.</div>
+                <div class="d-flex align-items-center gap-3">
+                    <a class="text-muted" asp-area="" asp-controller="Courses" asp-action="Index">Danh mục đào tạo</a>
+                    <a class="text-muted" asp-area="" asp-controller="Certificate" asp-action="Verify">Tra cứu văn bằng</a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <button type="button" class="hl-back-to-top" aria-label="Cuộn lên đầu trang" title="Lên đầu trang">
+        <svg class="hl-back-to-top__ring" viewBox="0 0 48 48" aria-hidden="true">
+            <circle class="hl-back-to-top__track" cx="24" cy="24" r="21"></circle>
+            <circle class="hl-back-to-top__fill" cx="24" cy="24" r="21"></circle>
+        </svg>
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <nav class="hl-mobile-bottom-nav d-lg-none" aria-label="Điều hướng nhanh di động">
+        <a class="hl-mobile-bottom-nav__item @(isHome ? "is-active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+            <i class="bi @(isHome ? "bi-house-door-fill" : "bi-house-door")" aria-hidden="true"></i>
+            <span>Trang chủ</span>
+        </a>
+        <a class="hl-mobile-bottom-nav__item @(isCourses ? "is-active" : "")" asp-area="" asp-controller="Courses" asp-action="Index">
+            <i class="bi @(isCourses ? "bi-journal-code" : "bi-compass")" aria-hidden="true"></i>
+            <span>Khóa học</span>
+        </a>
+        @if (isSignedIn)
+        {
+            <a class="hl-mobile-bottom-nav__item @(isCart ? "is-active" : "")" asp-area="Student" asp-controller="Cart" asp-action="Index">
+                <i class="bi @(isCart ? "bi-cart-fill" : "bi-cart3")" aria-hidden="true"></i>
+                <span>Giỏ hàng</span>
+            </a>
+            <a class="hl-mobile-bottom-nav__item" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
+                <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                <span>Học tập</span>
+            </a>
+        }
+        else
+        {
+            <a class="hl-mobile-bottom-nav__item @(isCert ? "is-active" : "")" asp-area="" asp-controller="Certificate" asp-action="Verify">
+                <i class="bi bi-patch-check" aria-hidden="true"></i>
+                <span>Chứng chỉ</span>
+            </a>
+            <a class="hl-mobile-bottom-nav__item" asp-area="Identity" asp-page="/Account/Login">
+                <i class="bi bi-person-circle" aria-hidden="true"></i>
+                <span>Tài khoản</span>
+            </a>
+        }
+    </nav>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script defer src="~/js/site.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/huit-3d-hero.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

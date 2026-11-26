@@ -1,9 +1,28 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.LogoutModel
 @{
-    ViewData["Title"] = "Đăng xuất";
+    ViewData["Title"] = "Đăng xuất - HUIT Learning";
 }
-<div class="app-card p-4 text-center">
-    <h1 class="h4">Bạn đã đăng xuất khỏi hệ thống.</h1>
-    <a class="btn btn-orange mt-2" asp-area="" asp-controller="Home" asp-action="Index">Về trang chủ</a>
-</div>
+
+<section class="hl-section py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="scale">
+                <div class="stat-icon mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                </div>
+                <span class="hl-eyebrow text-orange">Phiên đăng nhập kết thúc</span>
+                <h1 class="h4 fw-bold mt-1 mb-2">Bạn đã đăng xuất thành công</h1>
+                <p class="text-muted small mb-4">Hẹn gặp lại bạn trong các buổi học tiếp theo trên <strong>HUIT Learning</strong>.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a class="btn btn-orange rounded-pill px-4 fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door me-1" aria-hidden="true"></i> Về trang chủ
+                    </a>
+                    <a class="btn btn-outline-huit rounded-pill px-4" asp-page="./Login">
+                        Đăng nhập lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

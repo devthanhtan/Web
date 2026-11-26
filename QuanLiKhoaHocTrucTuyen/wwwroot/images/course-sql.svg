@@ -1,17 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
   <defs>
-    <linearGradient id="g3" x1="0" y1="0" x2="800" y2="450" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#C2410C"/>
-      <stop offset="100%" stop-color="#FF7A1A"/>
+    <linearGradient id="sql-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#05192D"/>
+      <stop offset="50%" stop-color="#004488"/>
+      <stop offset="100%" stop-color="#0F766E"/>
     </linearGradient>
+    <radialGradient id="sql-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(980 340) scale(430)">
+      <stop offset="0%" stop-color="#2DD4BF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#2DD4BF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sql-cyl" x1="720" y1="140" x2="960" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#0054A6"/>
+    </linearGradient>
+    <pattern id="sql-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M 44 0 L 0 0 0 44" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
   </defs>
-  <rect width="800" height="450" rx="24" fill="url(#g3)"/>
-  <ellipse cx="620" cy="145" rx="95" ry="34" fill="#FFFFFF" fill-opacity="0.25"/>
-  <path d="M525 145V295C525 314 568 329 620 329C672 329 715 314 715 295V145" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="8"/>
-  <rect x="64" y="72" width="150" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.22"/>
-  <text x="139" y="96" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">SQL SERVER</text>
-  <text x="64" y="190" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="38" font-weight="800">EF Core 8</text>
-  <text x="64" y="242" fill="#FFF7ED" font-family="Segoe UI, sans-serif" font-size="24" font-weight="600">Fluent API · Index · Tối ưu CSDL</text>
-  <rect x="64" y="295" width="210" height="52" rx="14" fill="#FFFFFF"/>
-  <text x="169" y="327" text-anchor="middle" fill="#C2410C" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700">Hiệu năng doanh nghiệp</text>
+
+  <rect width="1280" height="720" fill="url(#sql-bg)"/>
+  <rect width="1280" height="720" fill="url(#sql-grid)"/>
+  <rect width="1280" height="720" fill="url(#sql-glow)"/>
+
+  <!-- Left Content -->
+  <rect x="76" y="76" width="336" height="44" rx="22" fill="#FFFFFF" fill-opacity="0.12" stroke="#2DD4BF" stroke-opacity="0.4"/>
+  <circle cx="102" cy="98" r="7" fill="#FF6B00"/>
+  <text x="120" y="104" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" letter-spacing="0.8">HUIT LEARNING · DATA &amp; ORM</text>
+
+  <text x="76" y="216" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="58" font-weight="800">EF Core 8 &amp;</text>
+  <text x="76" y="286" fill="#5EEAD4" font-family="Segoe UI, Inter, sans-serif" font-size="52" font-weight="800">SQL Server Tối Ưu</text>
+
+  <text x="76" y="352" fill="#E2E8F0" font-family="Segoe UI, Inter, sans-serif" font-size="24" font-weight="500">Fluent API · Indexing · Tối Ưu Truy Vấn Lớn</text>
+  <text x="76" y="390" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="400">Chống N+1 Query, giao dịch ACID &amp; thiết kế lược đồ chuẩn</text>
+
+  <g transform="translate(76, 438)">
+    <rect x="0" y="0" width="128" height="42" rx="12" fill="#0F766E" fill-opacity="0.55" stroke="#5EEAD4" stroke-opacity="0.6"/>
+    <text x="64" y="27" text-anchor="middle" fill="#CCFBF1" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">SQL Server</text>
+
+    <rect x="142" y="0" width="120" height="42" rx="12" fill="#0284C7" fill-opacity="0.45" stroke="#38BDF8" stroke-opacity="0.6"/>
+    <text x="202" y="27" text-anchor="middle" fill="#E0F2FE" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">EF Core 8</text>
+
+    <rect x="276" y="0" width="136" height="42" rx="12" fill="#FFFFFF" fill-opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3"/>
+    <text x="344" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">B-Tree Index</text>
+  </g>
+
+  <rect x="76" y="536" width="276" height="58" rx="16" fill="#FF6B00"/>
+  <text x="214" y="572" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="800">Hiệu Năng Doanh Nghiệp</text>
+
+  <!-- Right Column: 3D Database Cluster + ER Schema + Query Benchmark -->
+  <!-- 3D Cylinder Stack -->
+  <g transform="translate(676, 126)">
+    <!-- Bottom Tier -->
+    <path d="M20 220 V290 C20 318 78 340 150 340 C222 340 280 318 280 290 V220 Z" fill="#0B2948" stroke="#38BDF8" stroke-width="2"/>
+    <ellipse cx="150" cy="220" rx="130" ry="42" fill="#0284C7" stroke="#7DD3FC" stroke-width="2"/>
+
+    <!-- Middle Tier -->
+    <path d="M20 132 V202 C20 230 78 252 150 252 C222 252 280 230 280 202 V132 Z" fill="#003E7E" stroke="#38BDF8" stroke-width="2"/>
+    <ellipse cx="150" cy="132" rx="130" ry="42" fill="#0EA5E9" stroke="#BAE6FD" stroke-width="2"/>
+
+    <!-- Top Tier -->
+    <path d="M20 44 V114 C20 142 78 164 150 164 C222 164 280 142 280 114 V44 Z" fill="url(#sql-cyl)" stroke="#5EEAD4" stroke-width="2"/>
+    <ellipse cx="150" cy="44" rx="130" ry="42" fill="#38BDF8" stroke="#E0F2FE" stroke-width="2"/>
+    <text x="150" y="50" text-anchor="middle" fill="#082F49" font-family="Segoe UI, sans-serif" font-size="16" font-weight="800">CLUSTERED INDEX</text>
+
+    <!-- Status LEDs -->
+    <circle cx="64" cy="108" r="6" fill="#4ADE80"/>
+    <circle cx="84" cy="108" r="6" fill="#FBBF24"/>
+    <circle cx="64" cy="196" r="6" fill="#4ADE80"/>
+    <circle cx="64" cy="284" r="6" fill="#4ADE80"/>
+  </g>
+
+  <!-- ER Schema Relationship Nodes -->
+  <g transform="translate(988, 114)">
+    <rect width="212" height="126" rx="16" fill="#0F172A" fill-opacity="0.92" stroke="#38BDF8" stroke-width="1.5"/>
+    <rect width="212" height="34" rx="16" fill="#0054A6"/>
+    <rect y="18" width="212" height="16" fill="#0054A6"/>
+    <text x="106" y="23" text-anchor="middle" fill="#FFFFFF" font-family="Consolas, monospace" font-size="14" font-weight="700">dbo.Courses (PK)</text>
+    <text x="18" y="60" fill="#FDE047" font-family="Consolas, monospace" font-size="13">PK  Id : int</text>
+    <text x="18" y="84" fill="#5EEAD4" font-family="Consolas, monospace" font-size="13">UQ  Slug : nvarchar</text>
+    <text x="18" y="108" fill="#CBD5E1" font-family="Consolas, monospace" font-size="13">IX  CategoryId_Status</text>
+  </g>
+
+  <!-- Connector Line -->
+  <path d="M956 260 H1020 V296" stroke="#FB923C" stroke-width="3" stroke-linecap="round"/>
+
+  <g transform="translate(988, 286)">
+    <rect width="212" height="120" rx="16" fill="#0F172A" fill-opacity="0.92" stroke="#FB923C" stroke-width="1.5"/>
+    <rect width="212" height="34" rx="16" fill="#EA580C"/>
+    <rect y="18" width="212" height="16" fill="#EA580C"/>
+    <text x="106" y="23" text-anchor="middle" fill="#FFFFFF" font-family="Consolas, monospace" font-size="14" font-weight="700">dbo.Enrollments</text>
+    <text x="18" y="60" fill="#5EEAD4" font-family="Consolas, monospace" font-size="13">UQ (UserId, CourseId)</text>
+    <text x="18" y="84" fill="#CBD5E1" font-family="Consolas, monospace" font-size="13">FK  OrderId : Restrict</text>
+    <text x="18" y="106" fill="#4ADE80" font-family="Consolas, monospace" font-size="13">AsSplitQuery() Ready</text>
+  </g>
+
+  <!-- Query Performance Card -->
+  <g transform="translate(676, 496)">
+    <rect width="524" height="118" rx="20" fill="#0F172A" fill-opacity="0.92" stroke="#2DD4BF" stroke-opacity="0.55" stroke-width="1.5"/>
+    <text x="28" y="36" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">EXECUTION PLAN BENCHMARK · TỐI ƯU 96% ĐỘ TRỄ</text>
+
+    <text x="28" y="68" fill="#94A3B8" font-family="Consolas, monospace" font-size="13">Table Scan</text>
+    <rect x="132" y="54" width="280" height="16" rx="8" fill="#EF4444" fill-opacity="0.8"/>
+    <text x="424" y="68" fill="#FCA5A5" font-family="Consolas, monospace" font-size="14" font-weight="700">245 ms</text>
+
+    <text x="28" y="98" fill="#5EEAD4" font-family="Consolas, monospace" font-size="13" font-weight="700">Index Seek</text>
+    <rect x="132" y="84" width="46" height="16" rx="8" fill="#10B981"/>
+    <text x="192" y="98" fill="#4ADE80" font-family="Consolas, monospace" font-size="14" font-weight="700">8.2 ms  ⚡ Zero N+1</text>
+  </g>
 </svg>

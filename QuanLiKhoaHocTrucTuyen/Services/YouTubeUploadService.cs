@@ -86,7 +86,7 @@ public class YouTubeUploadService : IYouTubeUploadService
             var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "EduSpark LMS"
+                ApplicationName = "HUIT Learning"
             });
 
             var video = new YtData.Video
@@ -94,7 +94,7 @@ public class YouTubeUploadService : IYouTubeUploadService
                 Snippet = new YtData.VideoSnippet
                 {
                     Title = lesson.Title,
-                    Description = lesson.Description ?? "Bài giảng trên nền tảng EduSpark LMS",
+                    Description = lesson.Description ?? "Bài giảng trên nền tảng HUIT Learning",
                     CategoryId = "27" // Education
                 },
                 Status = new YtData.VideoStatus

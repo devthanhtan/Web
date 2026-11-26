@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <defs>
+    <linearGradient id="do-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#04152B"/>
+      <stop offset="52%" stop-color="#0054A6"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <radialGradient id="do-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1000 220) scale(440)">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="do-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#do-bg)"/>
+  <rect width="1280" height="720" fill="url(#do-grid)"/>
+  <rect width="1280" height="720" fill="url(#do-glow)"/>
+
+  <!-- Left Content -->
+  <rect x="76" y="76" width="340" height="44" rx="22" fill="#FFFFFF" fill-opacity="0.14" stroke="#7DD3FC" stroke-opacity="0.45"/>
+  <circle cx="102" cy="98" r="7" fill="#FF6B00"/>
+  <text x="120" y="104" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="15" font-weight="700" letter-spacing="0.8">HUIT LEARNING · DEVOPS &amp; CLOUD</text>
+
+  <text x="76" y="216" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="58" font-weight="800">Docker &amp; CI/CD</text>
+  <text x="76" y="286" fill="#7DD3FC" font-family="Segoe UI, Inter, sans-serif" font-size="50" font-weight="800">GitHub Actions</text>
+
+  <text x="76" y="352" fill="#F1F5F9" font-family="Segoe UI, Inter, sans-serif" font-size="24" font-weight="500">Containers · Multi-Stage Build · Linux Cloud</text>
+  <text x="76" y="390" fill="#CBD5E1" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="400">Tự động hóa kiểm thử, đóng gói &amp; triển khai Zero-Downtime</text>
+
+  <g transform="translate(76, 438)">
+    <rect x="0" y="0" width="126" height="42" rx="12" fill="#0F172A" fill-opacity="0.5" stroke="#38BDF8" stroke-opacity="0.65"/>
+    <text x="63" y="27" text-anchor="middle" fill="#E0F2FE" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">Docker</text>
+
+    <rect x="140" y="0" width="152" height="42" rx="12" fill="#0F172A" fill-opacity="0.5" stroke="#4ADE80" stroke-opacity="0.65"/>
+    <text x="216" y="27" text-anchor="middle" fill="#DCFCE7" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">GitHub Actions</text>
+
+    <rect x="306" y="0" width="126" height="42" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.35"/>
+    <text x="369" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">Nginx SSL</text>
+  </g>
+
+  <rect x="76" y="536" width="278" height="58" rx="16" fill="#FF6B00"/>
+  <text x="215" y="572" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Inter, sans-serif" font-size="20" font-weight="800">Triển Khai Tự Động</text>
+
+  <!-- Right Column: Container Blocks + CI/CD Workflow + Deploy Terminal -->
+  <!-- Cloud Container Cluster Card -->
+  <g transform="translate(672, 108)">
+    <rect width="528" height="196" rx="22" fill="#0F172A" fill-opacity="0.92" stroke="#38BDF8" stroke-opacity="0.55" stroke-width="1.5"/>
+    <text x="28" y="38" fill="#7DD3FC" font-family="Segoe UI, sans-serif" font-size="15" font-weight="800" letter-spacing="0.6">DOCKER COMPOSE CLUSTER · PRODUCTION</text>
+
+    <!-- Container blocks -->
+    <g transform="translate(28, 58)">
+      <rect width="146" height="110" rx="14" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5"/>
+      <rect x="14" y="14" width="52" height="20" rx="6" fill="#0284C7"/>
+      <text x="40" y="28" text-anchor="middle" fill="#FFFFFF" font-family="Consolas, monospace" font-size="11" font-weight="700">:8080</text>
+      <text x="14" y="58" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">webapp-net8</text>
+      <text x="14" y="82" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">alpine · 98MB</text>
+    </g>
+
+    <g transform="translate(191, 58)">
+      <rect width="146" height="110" rx="14" fill="#1E293B" stroke="#FB923C" stroke-width="1.5"/>
+      <rect x="14" y="14" width="52" height="20" rx="6" fill="#EA580C"/>
+      <text x="40" y="28" text-anchor="middle" fill="#FFFFFF" font-family="Consolas, monospace" font-size="11" font-weight="700">:1433</text>
+      <text x="14" y="58" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">sqlserver-db</text>
+      <text x="14" y="82" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">volume · ssd</text>
+    </g>
+
+    <g transform="translate(354, 58)">
+      <rect width="146" height="110" rx="14" fill="#1E293B" stroke="#34D399" stroke-width="1.5"/>
+      <rect x="14" y="14" width="52" height="20" rx="6" fill="#059669"/>
+      <text x="40" y="28" text-anchor="middle" fill="#FFFFFF" font-family="Consolas, monospace" font-size="11" font-weight="700">:443</text>
+      <text x="14" y="58" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">nginx-proxy</text>
+      <text x="14" y="82" fill="#94A3B8" font-family="Consolas, monospace" font-size="12">HTTP/3 · TLS</text>
+    </g>
+  </g>
+
+  <!-- CI/CD Pipeline Stages -->
+  <g transform="translate(672, 326)">
+    <rect width="528" height="122" rx="22" fill="#0F172A" fill-opacity="0.92" stroke="#4ADE80" stroke-opacity="0.5" stroke-width="1.5"/>
+    <text x="28" y="34" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">GITHUB ACTIONS WORKFLOW · main.yml</text>
+
+    <!-- 4 Stage Nodes -->
+    <rect x="28" y="52" width="104" height="48" rx="12" fill="#065F46" stroke="#34D399"/>
+    <text x="80" y="81" text-anchor="middle" fill="#ECFDF5" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">✓ Build</text>
+
+    <line x1="132" y1="76" x2="156" y2="76" stroke="#34D399" stroke-width="2.5"/>
+
+    <rect x="156" y="52" width="104" height="48" rx="12" fill="#065F46" stroke="#34D399"/>
+    <text x="208" y="81" text-anchor="middle" fill="#ECFDF5" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">✓ xUnit</text>
+
+    <line x1="260" y1="76" x2="284" y2="76" stroke="#34D399" stroke-width="2.5"/>
+
+    <rect x="284" y="52" width="104" height="48" rx="12" fill="#065F46" stroke="#34D399"/>
+    <text x="336" y="81" text-anchor="middle" fill="#ECFDF5" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">✓ Push GHCR</text>
+
+    <line x1="388" y1="76" x2="412" y2="76" stroke="#FB923C" stroke-width="2.5"/>
+
+    <rect x="412" y="52" width="90" height="48" rx="12" fill="#EA580C" stroke="#FDBA74"/>
+    <text x="457" y="81" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800">Deploy</text>
+  </g>
+
+  <!-- Live CLI Terminal -->
+  <g transform="translate(672, 470)">
+    <rect width="528" height="142" rx="20" fill="#090D16" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="38" fill="#38BDF8" font-family="Consolas, monospace" font-size="14" font-weight="700">$ docker compose -f compose.prod.yml up -d</text>
+    <text x="26" y="68" fill="#CBD5E1" font-family="Consolas, monospace" font-size="13">[+] Running 3/3 · Network huit_prod_net Created</text>
+    <text x="26" y="94" fill="#4ADE80" font-family="Consolas, monospace" font-size="13">✔ Container huit-learning-web   Healthy (0.4s)</text>
+    <text x="26" y="120" fill="#FBBF24" font-family="Consolas, monospace" font-size="13">✔ SSL Certificate Renewed · Zero-Downtime Active</text>
+  </g>
+</svg>

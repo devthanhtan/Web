@@ -1,33 +1,42 @@
 @page
 @model QuanLiKhoaHocTrucTuyen.Areas.Identity.Pages.Account.RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Xác thực email";
+    ViewData["Title"] = "Xác thực email tài khoản - HUIT Learning";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-md-8 col-lg-6">
-        <div class="app-card p-4 p-md-5 text-center">
-            <div class="stat-icon mx-auto mb-3" style="width:64px;height:64px;font-size:1.8rem;">
-                <i class="bi bi-envelope-check"></i>
-            </div>
-            <h1 class="h3 mb-2">Kiểm tra email để kích hoạt tài khoản</h1>
-            <p class="text-muted mb-4">
-                Chúng tôi đã gửi liên kết xác thực tới địa chỉ <strong>@Model.Email</strong>.
-                Tài khoản chỉ được kích hoạt sau khi bạn xác nhận email.
-            </p>
-
-            @if (Model.DisplayConfirmAccountLink && !string.IsNullOrEmpty(Model.EmailConfirmationUrl))
-            {
-                <div class="alert bg-orange-soft border border-warning-subtle text-start">
-                    <div class="fw-bold mb-1"><i class="bi bi-terminal me-1"></i> Chế độ giả lập Email (UseMockServices = true)</div>
-                    <p class="small mb-2">Email xác thực đã được lưu trong <code>App_Data/MockEmails</code>. Bạn có thể bấm nút bên dưới để xác thực ngay:</p>
-                    <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="btn btn-orange btn-sm">
-                        <i class="bi bi-check2-circle me-1"></i> Xác thực email ngay
-                    </a>
+<section class="hl-section py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="up">
+                <div class="stat-icon mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+                    <i class="bi bi-envelope-check-fill" aria-hidden="true"></i>
                 </div>
-            }
+                <span class="hl-eyebrow text-orange">Bước cuối cùng</span>
+                <h1 class="h3 fw-bold mt-1 mb-2">Kiểm tra email để kích hoạt tài khoản</h1>
+                <p class="text-muted small mb-4">
+                    Hệ thống <strong>HUIT Learning</strong> đã gửi liên kết xác thực tới địa chỉ <strong class="text-dark">@Model.Email</strong>.
+                    Vui lòng xác nhận email để bắt đầu học tập.
+                </p>
 
-            <a asp-page="./Login" class="btn btn-outline-orange mt-2">Quay lại trang đăng nhập</a>
+                @if (Model.DisplayConfirmAccountLink && !string.IsNullOrEmpty(Model.EmailConfirmationUrl))
+                {
+                    <div class="alert bg-light border text-start rounded-4 p-3 p-md-4 mb-4">
+                        <div class="fw-bold mb-1 text-huit">
+                            <i class="bi bi-terminal-fill me-1" aria-hidden="true"></i> Chế độ giả lập Email (UseMockServices = true)
+                        </div>
+                        <p class="small text-muted mb-3">
+                            Thư xác thực đã lưu tại <code style="font-family: 'JetBrains Mono', monospace;">App_Data/MockEmails</code>. Bạn có thể kích hoạt nhanh tài khoản bằng nút dưới đây:
+                        </p>
+                        <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="btn btn-orange btn-sm rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Xác thực email ngay
+                        </a>
+                    </div>
+                }
+
+                <a asp-page="./Login" class="btn btn-outline-huit rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Quay lại trang đăng nhập
+                </a>
+            </div>
         </div>
     </div>
-</div>
+</section>

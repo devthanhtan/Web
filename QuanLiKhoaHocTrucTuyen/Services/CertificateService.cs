@@ -78,7 +78,7 @@ public class CertificateService : ICertificateService
                 return await File.ReadAllBytesAsync(physical);
         }
 
-        var instructorName = certificate.Course?.Instructor?.FullName ?? "Giảng viên EduSpark";
+        var instructorName = certificate.Course?.Instructor?.FullName ?? "Giảng viên HUIT Learning";
         return BuildPdf(certificate, instructorName);
     }
 
@@ -102,7 +102,7 @@ public class CertificateService : ICertificateService
                 page.Margin(24);
                 page.PageColor(Colors.White);
 
-                page.Content().Border(4).BorderColor("#FF6B00").Padding(24).Column(col =>
+                page.Content().Border(4).BorderColor("#0054A6").Padding(24).Column(col =>
                 {
                     col.Spacing(10);
 
@@ -110,13 +110,13 @@ public class CertificateService : ICertificateService
                     {
                         row.RelativeItem().Column(left =>
                         {
-                            left.Item().Text("EDUSPARK ACADEMY").FontSize(14).Bold().FontColor("#EA580C");
+                            left.Item().Text("HUIT LEARNING · NỀN TẢNG HỌC TẬP SỐ").FontSize(14).Bold().FontColor("#0054A6");
                             left.Item().Text("CHỨNG NHẬN HOÀN THÀNH KHÓA HỌC").FontSize(24).Bold().FontColor("#0F172A");
                         });
                         row.ConstantItem(96).AlignRight().Image(qrBytes);
                     });
 
-                    col.Item().PaddingTop(14).LineHorizontal(1.5f).LineColor("#FED7AA");
+                    col.Item().PaddingTop(14).LineHorizontal(1.5f).LineColor("#BFDBFE");
 
                     col.Item().PaddingTop(14).Text("Chứng nhận này trân trọng trao cho:").FontSize(13).FontColor("#64748B");
                     col.Item().Text(cert.HolderName).FontSize(28).Bold().FontColor("#EA580C");
@@ -129,12 +129,12 @@ public class CertificateService : ICertificateService
                         footer.RelativeItem().Column(c =>
                         {
                             c.Item().Text($"Giảng viên hướng dẫn: {instructorName}").FontSize(12).Bold();
-                            c.Item().Text($"Ngày cấp: {cert.IssuedAt.ToLocalTime():dd/MM/yyyy}").FontSize(11).FontColor("#64748B");
+                            c.Item().Text($"Ngày cấp: {cert.IssuedAt.ToLocalTime():dd/MM/yyyy} · Đơn vị cấp: HUIT Learning").FontSize(11).FontColor("#64748B");
                         });
                         footer.RelativeItem().AlignRight().Column(c =>
                         {
                             c.Item().AlignRight().Text($"Mã chứng chỉ: {cert.Code}").FontSize(11).Bold().FontColor("#0F172A");
-                            c.Item().AlignRight().Text("Quét mã QR để tra cứu & xác thực trực tuyến").FontSize(10).FontColor("#64748B");
+                            c.Item().AlignRight().Text("Quét mã QR để tra cứu & xác thực trực tuyến trên HUIT Learning").FontSize(10).FontColor("#64748B");
                         });
                     });
                 });

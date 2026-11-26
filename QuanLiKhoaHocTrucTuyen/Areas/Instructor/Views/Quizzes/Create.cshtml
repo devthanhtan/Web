@@ -4,84 +4,118 @@
     ViewData["AreaTitle"] = "Kênh Giảng viên";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-9">
-        <div class="app-card p-4">
-            <h1 class="h4 mb-1">Tạo bài kiểm tra / Bài thi cuối khóa</h1>
-            <p class="small text-muted mb-3">Khóa học: <strong>@ViewBag.CourseTitle</strong></p>
-
-            <form asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
-                <input asp-for="CourseId" type="hidden" />
-                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-8">
-                        <label asp-for="Title" class="form-label fw-semibold"></label>
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger small"></span>
+<section class="hl-section pt-0">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-9">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+                <div>
+                    <div class="hl-eyebrow mb-2">
+                        <i class="bi bi-plus-circle me-1"></i> HUIT Learning · Khảo thí &amp; Đánh giá
                     </div>
-                    <div class="col-md-4">
-                        <label asp-for="ChapterId" class="form-label fw-semibold">Chương (nếu kiểm tra chương)</label>
-                        <select asp-for="ChapterId" class="form-select">
-                            <option value="">-- Không thuộc chương --</option>
-                            @foreach (var ch in Model.CourseChapters)
-                            {
-                                <option value="@ch.Id">Chương @ch.SortOrder: @ch.Title</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-check">
-                            <input asp-for="IsFinalExam" class="form-check-input" />
-                            <label asp-for="IsFinalExam" class="form-check-label fw-semibold"></label>
+                    <h1 class="h3 fw-bold mb-1">Tạo bài kiểm tra / Bài thi cuối khóa</h1>
+                    <p class="small text-muted mb-0">Khóa học: <strong class="text-huit">@ViewBag.CourseTitle</strong></p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-action="Index" asp-route-courseId="@Model.CourseId"
+                       class="btn btn-outline-huit d-inline-flex align-items-center"
+                       style="min-height: 44px;">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+
+            <div class="hl-bento-card p-3 p-md-4" data-reveal="up">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="CourseId" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-12 col-md-8">
+                            <label asp-for="Title" class="form-label fw-semibold"></label>
+                            <input asp-for="Title" class="form-control" placeholder="Ví dụ: Bài thi cuối khóa ASP.NET Core" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="ChapterId" class="form-label fw-semibold">Chương (nếu kiểm tra chương)</label>
+                            <select asp-for="ChapterId" class="form-select">
+                                <option value="">-- Không thuộc chương --</option>
+                                @foreach (var ch in Model.CourseChapters)
+                                {
+                                    <option value="@ch.Id">Chương @ch.SortOrder: @ch.Title</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check p-3 bg-orange-soft rounded-3 ps-5">
+                                <input asp-for="IsFinalExam" class="form-check-input" />
+                                <label asp-for="IsFinalExam" class="form-check-label fw-semibold"></label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label asp-for="DurationMinutes" class="form-label fw-semibold"></label>
+                            <input asp-for="DurationMinutes" class="form-control" />
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label asp-for="PassingScorePercent" class="form-label fw-semibold"></label>
+                            <input asp-for="PassingScorePercent" class="form-control" />
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label asp-for="MaxAttempts" class="form-label fw-semibold"></label>
+                            <input asp-for="MaxAttempts" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Description" rows="2" class="form-control"></textarea>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <label asp-for="DurationMinutes" class="form-label fw-semibold"></label>
-                        <input asp-for="DurationMinutes" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label asp-for="PassingScorePercent" class="form-label fw-semibold"></label>
-                        <input asp-for="PassingScorePercent" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label asp-for="MaxAttempts" class="form-label fw-semibold"></label>
-                        <input asp-for="MaxAttempts" class="form-control" />
-                    </div>
-                    <div class="col-12">
-                        <label asp-for="Description" class="form-label fw-semibold"></label>
-                        <textarea asp-for="Description" rows="2" class="form-control"></textarea>
-                    </div>
-                </div>
 
-                <h2 class="h6 fw-bold mb-2">Chọn câu hỏi từ Ngân hàng (@Model.AvailableQuestions.Count câu)</h2>
-                @if (!Model.AvailableQuestions.Any())
-                {
-                    <div class="alert alert-warning small">Khóa học chưa có câu hỏi nào. Hãy thêm câu hỏi ở mục Ngân hàng câu hỏi trước.</div>
-                }
-                else
-                {
-                    <div class="border rounded p-3 mb-4" style="max-height: 280px; overflow-y: auto;">
-                        @foreach (var q in Model.AvailableQuestions)
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+                        <h2 class="h6 fw-bold mb-0">Chọn câu hỏi từ Ngân hàng (@Model.AvailableQuestions.Count câu)</h2>
+                        @if (Model.AvailableQuestions.Any())
                         {
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="SelectedQuestionIds" value="@q.Id"
-                                       id="q_@q.Id" checked="@Model.SelectedQuestionIds.Contains(q.Id)" />
-                                <label class="form-check-label small" for="q_@q.Id">
-                                    <span class="badge badge-orange me-1">@(q.Topic ?? "Chung")</span> @q.Content
-                                </label>
-                            </div>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-huit"
+                                    style="min-height: 44px;"
+                                    onclick="document.querySelectorAll('input[name=SelectedQuestionIds]').forEach(c => c.checked = true)">
+                                <i class="bi bi-check2-all me-1"></i> Chọn tất cả
+                            </button>
                         }
                     </div>
-                }
+                    @if (!Model.AvailableQuestions.Any())
+                    {
+                        <div class="alert alert-warning border-0 small rounded-3">Khóa học chưa có câu hỏi nào. Hãy thêm câu hỏi ở mục Ngân hàng câu hỏi trước.</div>
+                    }
+                    else
+                    {
+                        <div class="border rounded-3 p-3 mb-4 bg-light-subtle" style="max-height: 320px; overflow-y: auto;">
+                            @foreach (var q in Model.AvailableQuestions)
+                            {
+                                <div class="form-check mb-2 pb-2 border-bottom">
+                                    <input class="form-check-input" type="checkbox" name="SelectedQuestionIds" value="@q.Id"
+                                           id="q_@q.Id" checked="@Model.SelectedQuestionIds.Contains(q.Id)" />
+                                    <label class="form-check-label small" for="q_@q.Id">
+                                        <span class="badge badge-orange me-1">@(q.Topic ?? "Chung")</span> @q.Content
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    }
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-orange px-4">Lưu bài kiểm tra</button>
-                    <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="btn btn-light border">Quay lại</a>
-                </div>
-            </form>
+                    <div class="pt-3 border-top d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-orange px-4 d-inline-flex align-items-center" style="min-height: 44px;">
+                            <i class="bi bi-save me-2"></i> Lưu bài kiểm tra
+                        </button>
+                        <a asp-action="Index" asp-route-courseId="@Model.CourseId"
+                           class="btn btn-light border px-4 d-inline-flex align-items-center"
+                           style="min-height: 44px;">
+                            Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

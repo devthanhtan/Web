@@ -15,7 +15,7 @@ public class SmtpOptions
     public string UserName { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string FromEmail { get; set; } = "no-reply@eduspark.local";
-    public string FromName { get; set; } = "EduSpark LMS";
+    public string FromName { get; set; } = "HUIT Learning";
 }
 
 public class YouTubeOptions
@@ -23,7 +23,7 @@ public class YouTubeOptions
     public string ClientId { get; set; } = string.Empty;
     public string ClientSecret { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
-    public string ChannelName { get; set; } = "EduSpark Platform";
+    public string ChannelName { get; set; } = "HUIT Learning";
     public string DefaultDemoVideoId { get; set; } = "PkZNo7MFNFg";
 }
 

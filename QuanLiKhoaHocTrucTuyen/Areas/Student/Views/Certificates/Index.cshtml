@@ -4,36 +4,69 @@
     ViewData["AreaTitle"] = "Góc Học viên";
 }
 
-<h1 class="h3 mb-4">Chứng chỉ điện tử của tôi</h1>
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" data-reveal="up">
+    <div>
+        <span class="hl-eyebrow d-inline-block mb-1">HUIT Learning · Chứng nhận năng lực</span>
+        <h1 class="h3 fw-bold mb-1">Chứng chỉ điện tử của tôi (<span data-count-to="@Model.Count">@Model.Count</span>)</h1>
+        <p class="text-muted small mb-0">Chứng chỉ PDF chuẩn kèm mã QR định danh xác thực toàn cầu từ HUIT Learning</p>
+    </div>
+    <a asp-area="Student" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-outline-huit d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+        <i class="bi bi-journal-code me-1"></i> Khóa học của tôi
+    </a>
+</div>
 
 @if (!Model.Any())
 {
-    <div class="app-card p-5 text-center text-muted">
-        Bạn chưa có chứng chỉ nào. Hãy hoàn thành 100% bài học và vượt qua bài thi cuối khóa để nhận chứng chỉ PDF kèm mã QR.
+    <div class="hl-bento-card p-5 text-center" data-reveal="scale">
+        <div class="stat-icon mx-auto mb-3"><i class="bi bi-award"></i></div>
+        <h2 class="h5 fw-bold mb-2">Bạn chưa có chứng chỉ nào</h2>
+        <p class="text-muted small mb-4">Hãy hoàn thành 100% bài học và vượt qua bài thi cuối khóa để nhận chứng chỉ điện tử PDF kèm mã QR xác thực từ HUIT Learning.</p>
+        <a asp-area="Student" asp-controller="Dashboard" asp-action="Index" class="btn btn-orange px-4" style="min-height: 44px;">Tiếp tục học tập</a>
     </div>
 }
 else
 {
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-lg-2 g-4" data-stagger-group>
         @foreach (var cert in Model)
         {
-            <div class="col">
-                <div class="app-card p-4 h-100 border-top border-4 border-warning">
-                    <div class="d-flex justify-content-between align-items-start gap-3">
-                        <div>
-                            <span class="badge badge-orange mb-2">@cert.Code</span>
-                            <h2 class="h5 mb-1">@cert.CourseTitle</h2>
-                            <div class="small text-muted mb-2">Học viên: <strong>@cert.HolderName</strong></div>
-                            <div class="small text-muted">Ngày cấp: @cert.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+            var thumbUrl = string.IsNullOrEmpty(cert.Course?.ThumbnailUrl) ? "/images/course-default.svg" : cert.Course.ThumbnailUrl;
+            <div class="col" data-reveal="up">
+                <div class="hl-bento-card app-card-hover p-3 p-md-4 h-100 border-top border-4 border-warning d-flex flex-column" data-tilt-3d>
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <img src="@thumbUrl"
+                             onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                             alt="@cert.CourseTitle"
+                             class="rounded-3 border flex-shrink-0"
+                             style="width: 96px; aspect-ratio: 16/9; object-fit: cover;" />
+                        <div class="min-w-0">
+                            <span class="badge badge-orange mb-1">@cert.Code</span>
+                            <h2 class="h6 fw-bold mb-0 text-truncate" title="@cert.CourseTitle">@cert.CourseTitle</h2>
                         </div>
-                        <img src="@Url.Action("QrImage", "Certificate", new { area = "", code = cert.Code })" alt="QR @cert.Code" style="width:84px;height:84px;" class="border rounded p-1" />
                     </div>
-                    <hr />
-                    <div class="d-flex flex-wrap gap-2">
-                        <a asp-action="DownloadPdf" asp-route-id="@cert.Id" class="btn btn-orange btn-sm">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> Tải PDF
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-3">
+                        <div class="small">
+                            <div class="mb-1 text-muted">Cấp cho học viên: <strong class="text-dark">@cert.HolderName</strong></div>
+                            @if (cert.Course?.Instructor != null)
+                            {
+                                <div class="mb-1 text-muted">Giảng viên hướng dẫn: <strong>@cert.Course.Instructor.FullName</strong></div>
+                            }
+                            <div class="text-muted text-nowrap"><i class="bi bi-calendar-check me-1"></i>Ngày cấp: @cert.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <img src="@Url.Action("QrImage", "Certificate", new { area = "", code = cert.Code })"
+                             alt="QR @cert.Code"
+                             style="width: 88px; height: 88px;"
+                             class="border rounded-3 p-1 bg-white flex-shrink-0 shadow-sm" />
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top d-flex flex-wrap gap-2">
+                        <a asp-action="DownloadPdf" asp-route-id="@cert.Id"
+                           class="btn btn-orange btn-sm d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
+                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Tải PDF chuẩn in
                         </a>
-                        <a asp-area="" asp-controller="Certificate" asp-action="Verify" asp-route-code="@cert.Code" class="btn btn-outline-orange btn-sm">
+                        <a asp-area="" asp-controller="Certificate" asp-action="Verify" asp-route-code="@cert.Code"
+                           class="btn btn-outline-huit btn-sm d-inline-flex align-items-center justify-content-center" style="min-height: 44px;">
                             <i class="bi bi-qr-code-scan me-1"></i> Trang xác thực công khai
                         </a>
                     </div>

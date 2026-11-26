@@ -1,16 +1,29 @@
 @page
 @{
-    ViewData["Title"] = "Không có quyền truy cập";
+    ViewData["Title"] = "Không có quyền truy cập - HUIT Learning";
 }
-<div class="row justify-content-center py-5">
-    <div class="col-md-6">
-        <div class="app-card p-5 text-center">
-            <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width:64px;height:64px;font-size:1.8rem;">
-                <i class="bi bi-shield-exclamation"></i>
+
+<section class="hl-section py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <div class="hl-bento-card app-card p-4 p-md-5 text-center shadow-sm" data-reveal="scale">
+                <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width: 68px; height: 68px; font-size: 2rem;">
+                    <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                </div>
+                <span class="hl-eyebrow text-danger">Hạn chế phân quyền</span>
+                <h1 class="h4 fw-bold text-danger mt-1 mb-2">Không có quyền truy cập</h1>
+                <p class="text-muted small mb-4">
+                    Tài khoản hiện tại của bạn chưa được phân quyền cho khu vực này trên hệ thống <strong>HUIT Learning</strong>.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-huit rounded-pill px-4">
+                        <i class="bi bi-house-door me-1" aria-hidden="true"></i> Về trang chủ
+                    </a>
+                    <a asp-area="" asp-controller="Courses" asp-action="Index" class="btn btn-outline-orange rounded-pill px-4">
+                        Khám phá khóa học
+                    </a>
+                </div>
             </div>
-            <h1 class="h4 text-danger mb-2">Không có quyền truy cập</h1>
-            <p class="text-muted mb-4">Tài khoản của bạn không có quyền thực hiện chức năng này.</p>
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-orange">Quay về trang chủ</a>
         </div>
     </div>
-</div>
+</section>

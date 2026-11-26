@@ -1,50 +1,73 @@
 @model QuanLiKhoaHocTrucTuyen.ViewModels.MockPaymentViewModel
 @{
-    ViewData["Title"] = $"Cổng thanh toán {Model.Provider} (Sandbox Mock)";
+    ViewData["Title"] = $"Cổng thanh toán {Model.Provider} - HUIT Learning";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-md-8 col-lg-6">
-        <div class="app-card p-4 p-md-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="badge badge-orange">@Model.Provider Sandbox Simulator</span>
-                <span class="small text-muted">UseMockServices = true</span>
+<section class="hl-section py-3 py-md-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-6">
+            <div class="hl-bento-card app-card overflow-hidden shadow-sm" data-reveal="up">
+                <!-- Dark-navy Payment Header Strip -->
+                <div class="p-4 text-white" style="background: linear-gradient(135deg, #0b162c 0%, #102a5c 100%);">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                        <span class="badge bg-orange text-white rounded-pill px-3 py-2">
+                            <i class="bi bi-shield-lock-fill me-1" aria-hidden="true"></i> @Model.Provider Sandbox Simulator
+                        </span>
+                        <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-3">
+                            HUIT Learning Secure Pay
+                        </span>
+                    </div>
+                    <h1 class="h4 fw-bold text-white mb-1 mt-2">Xác nhận thanh toán học phí</h1>
+                    <p class="small text-white-50 mb-0">
+                        Cổng mô phỏng tạo chữ ký số HMAC trước khi gọi về <code class="text-warning">ReturnUrl</code> để kiểm chứng toàn vẹn chữ ký &amp; cơ chế idempotent.
+                    </p>
+                </div>
+
+                <div class="p-4 p-md-5">
+                    <!-- ORDER SUMMARY BENTO BOX -->
+                    <div class="p-3 p-md-4 bg-light rounded-4 border mb-4">
+                        <div class="d-flex justify-content-between align-items-center small mb-2">
+                            <span class="text-muted">Mã đơn hàng:</span>
+                            <code class="fw-bold text-dark fs-6" style="font-family: 'JetBrains Mono', monospace;">@Model.Order.OrderCode</code>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center small mb-2">
+                            <span class="text-muted">Phương thức thanh toán:</span>
+                            <strong class="text-dark">@Model.Provider</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center small mb-3">
+                            <span class="text-muted">Số lượng khóa học:</span>
+                            <strong class="text-dark">@Model.Order.Items.Count khóa học</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                            <span class="fw-bold text-dark">Tổng thanh toán:</span>
+                            <strong class="fs-4 text-orange" style="font-family: 'JetBrains Mono', monospace;">@Model.Order.TotalAmount.ToString("N0") đ</strong>
+                        </div>
+                    </div>
+
+                    <!-- SIMULATION ACTIONS -->
+                    <form asp-action="SimulateMockCallback" method="post" class="vstack gap-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderCode" value="@Model.Order.OrderCode" />
+                        <input type="hidden" name="provider" value="@Model.Provider" />
+
+                        <button type="submit" name="outcome" value="success" class="btn btn-success rounded-pill py-2 fw-semibold">
+                            <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i> Xác nhận Thanh toán thành công (Ký HMAC chuẩn)
+                        </button>
+                        <button type="submit" name="outcome" value="fail" class="btn btn-outline-danger rounded-pill py-2">
+                            <i class="bi bi-x-circle me-1" aria-hidden="true"></i> Mô phỏng: Giao dịch thất bại
+                        </button>
+                        <button type="submit" name="outcome" value="cancel" class="btn btn-light border rounded-pill py-2">
+                            <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i> Hủy thanh toán &amp; Quay lại (Giữ giỏ hàng)
+                        </button>
+                    </form>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4 pt-3 border-top text-muted" style="font-size: 0.78rem;">
+                        <span><i class="bi bi-lock-fill text-success me-1" aria-hidden="true"></i>Chữ ký HMAC chuẩn</span>
+                        <span><i class="bi bi-arrow-repeat text-huit me-1" aria-hidden="true"></i>Idempotent an toàn</span>
+                        <span><i class="bi bi-lightning-charge-fill text-orange me-1" aria-hidden="true"></i>Kích hoạt tức thì</span>
+                    </div>
+                </div>
             </div>
-            <h1 class="h4 mb-2">Xác nhận thanh toán đơn hàng</h1>
-            <p class="small text-muted mb-3">
-                Hệ thống mô phỏng cổng thanh toán và tạo chữ ký HMAC chuẩn trước khi gọi về <code>ReturnUrl</code> để kiểm chứng xác thực chữ ký &amp; idempotent.
-            </p>
-
-            <div class="p-3 bg-orange-soft rounded mb-4">
-                <div class="d-flex justify-content-between small mb-1">
-                    <span>Mã đơn hàng:</span>
-                    <strong>@Model.Order.OrderCode</strong>
-                </div>
-                <div class="d-flex justify-content-between small mb-2">
-                    <span>Số khóa học:</span>
-                    <strong>@Model.Order.Items.Count</strong>
-                </div>
-                <div class="d-flex justify-content-between border-top pt-2">
-                    <span class="fw-semibold">Tổng thanh toán:</span>
-                    <strong class="fs-5 text-orange">@Model.Order.TotalAmount.ToString("N0") đ</strong>
-                </div>
-            </div>
-
-            <form asp-action="SimulateMockCallback" method="post" class="vstack gap-2">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="orderCode" value="@Model.Order.OrderCode" />
-                <input type="hidden" name="provider" value="@Model.Provider" />
-
-                <button type="submit" name="outcome" value="success" class="btn btn-success py-2">
-                    <i class="bi bi-check-circle-fill me-1"></i> Mô phỏng: Thanh toán thành công (Ký HMAC chuẩn)
-                </button>
-                <button type="submit" name="outcome" value="fail" class="btn btn-outline-danger py-2">
-                    <i class="bi bi-x-circle me-1"></i> Mô phỏng: Giao dịch thất bại
-                </button>
-                <button type="submit" name="outcome" value="cancel" class="btn btn-light border py-2">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Mô phỏng: Hủy thanh toán (Giữ lại giỏ hàng)
-                </button>
-            </form>
         </div>
     </div>
-</div>
+</section>

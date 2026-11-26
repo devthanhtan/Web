@@ -1,43 +1,68 @@
 @model QuanLiKhoaHocTrucTuyen.ViewModels.CourseCardViewModel
-<div class="col">
-    <div class="card app-card app-card-hover h-100 border-0">
-        <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none">
-            <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/course-dotnet.svg" : Model.ThumbnailUrl)"
-                 alt="@Model.Title"
-                 class="course-thumb" />
-        </a>
-        <div class="card-body d-flex flex-column p-3">
-            <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
-                <span class="badge badge-orange rounded-pill text-truncate">@Model.CategoryName</span>
-                <span class="small text-muted fw-medium">@Model.Level</span>
+<div class="col" data-reveal="up">
+    <article class="card app-card app-card-hover hl-course-card h-100" data-tilt-3d>
+        <div class="course-card-media">
+            <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none d-block" tabindex="-1" aria-hidden="true">
+                <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/course-default.svg" : Model.ThumbnailUrl)"
+                     onerror="this.onerror=null;this.src='/images/course-default.svg';"
+                     alt="@Model.Title"
+                     loading="lazy"
+                     decoding="async"
+                     style="view-transition-name: course-thumb-@Model.Id;"
+                     class="course-thumb" />
+            </a>
+            <div class="course-card-badges">
+                @if (!string.IsNullOrWhiteSpace(Model.CategoryName))
+                {
+                    <span class="course-cat-glass">@Model.CategoryName</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Level))
+                {
+                    <span class="course-level-chip">@Model.Level</span>
+                }
             </div>
-            <h3 class="h6 fw-bold mb-2">
-                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Id" class="text-dark text-decoration-none stretched-link">
+        </div>
+
+        <div class="card-body d-flex flex-column p-3 p-sm-4">
+            <h3 class="hl-course-title mb-2">
+                <a asp-area="" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Id" class="text-ink text-decoration-none stretched-link">
                     @Model.Title
                 </a>
             </h3>
-            <p class="small text-muted mb-3 flex-grow-1">@Model.ShortDescription</p>
-            <div class="d-flex align-items-center justify-content-between small text-muted mb-2">
-                <span><i class="bi bi-person-circle me-1 text-orange"></i>@Model.InstructorName</span>
-                <span><i class="bi bi-people me-1"></i>@Model.StudentCount học viên</span>
+
+            <div class="d-flex align-items-center justify-content-between gap-2 small text-muted mb-3">
+                <span class="d-inline-flex align-items-center gap-1 text-truncate">
+                    <i class="bi bi-person-workspace text-huit flex-shrink-0" aria-hidden="true"></i>
+                    <span class="text-truncate">@Model.InstructorName</span>
+                </span>
+                <span class="d-inline-flex align-items-center gap-1 flex-shrink-0 hl-tabular">
+                    <i class="bi bi-people text-huit" aria-hidden="true"></i>@Model.StudentCount
+                </span>
             </div>
-            <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-                <div class="small fw-semibold">
-                    @if (Model.ReviewCount > 0)
-                    {
-                        <span class="text-warning"><i class="bi bi-star-fill"></i></span>
-                        <span>@Model.AverageRating.ToString("0.0")</span>
-                        <span class="text-muted fw-normal">(@Model.ReviewCount)</span>
-                    }
-                    else
-                    {
-                        <span class="text-muted fw-normal">Chưa có đánh giá</span>
-                    }
-                </div>
-                <div class="fw-bold text-orange fs-6">
+
+            <div class="d-flex align-items-center gap-2 small mb-3">
+                @if (Model.ReviewCount > 0)
+                {
+                    <span class="d-inline-flex align-items-center gap-1 fw-bold text-ink hl-tabular">
+                        <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                        @Model.AverageRating.ToString("0.0")
+                    </span>
+                    <span class="text-muted hl-tabular">(@Model.ReviewCount đánh giá)</span>
+                }
+                else
+                {
+                    <span class="badge badge-huit rounded-pill fw-semibold">Mới ra mắt</span>
+                }
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between gap-2 pt-3 border-top mt-auto">
+                <div class="fw-bold @(Model.Price == 0 ? "text-success" : "text-orange") fs-5 lh-1 hl-tabular">
                     @(Model.Price == 0 ? "Miễn phí" : $"{Model.Price:N0} đ")
                 </div>
+                <span class="hl-course-cta-pill" aria-hidden="true">
+                    Chi tiết <i class="bi bi-arrow-right"></i>
+                </span>
             </div>
         </div>
-    </div>
+    </article>
 </div>

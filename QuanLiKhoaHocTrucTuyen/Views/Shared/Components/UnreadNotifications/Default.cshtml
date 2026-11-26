@@ -2,15 +2,21 @@
 @if (User.Identity?.IsAuthenticated == true)
 {
     <div class="dropdown">
-        <button class="btn btn-light border position-relative rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" style="width:40px;height:40px;">
+        <button class="btn btn-light border position-relative rounded-circle d-inline-flex align-items-center justify-content-center"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Thông báo"
+                aria-label="Thông báo"
+                style="width: 38px; height: 38px;">
             <i class="bi bi-bell text-orange"></i>
             @if (Model.UnreadCount > 0)
             {
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@Model.UnreadCount</span>
             }
         </button>
-        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 330px; max-width: 90vw;">
-            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-orange-soft">
+        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-0 overflow-hidden mt-2" style="width: 336px; max-width: 92vw;">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-huit-soft">
                 <span class="fw-bold small">Thông báo (@Model.UnreadCount chưa đọc)</span>
                 @if (Model.UnreadCount > 0)
                 {
@@ -23,13 +29,16 @@
             <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
                 @if (!Model.Items.Any())
                 {
-                    <div class="p-3 text-center text-muted small">Chưa có thông báo nào.</div>
+                    <div class="p-4 text-center text-muted small">
+                        <i class="bi bi-bell-slash d-block fs-4 mb-1 opacity-50"></i>
+                        Chưa có thông báo mới.
+                    </div>
                 }
                 else
                 {
                     @foreach (var item in Model.Items)
                     {
-                        <a href="@(string.IsNullOrEmpty(item.LinkUrl) ? "#" : item.LinkUrl)" class="list-group-item list-group-item-action py-2 @(item.IsRead ? "" : "bg-orange-soft")">
+                        <a href="@(string.IsNullOrEmpty(item.LinkUrl) ? "#" : item.LinkUrl)" class="list-group-item list-group-item-action py-2 px-3 @(item.IsRead ? "" : "bg-orange-soft")">
                             <div class="fw-semibold small text-dark">@item.Title</div>
                             <div class="small text-muted">@item.Message</div>
                             <div class="text-muted" style="font-size: 0.72rem;">@item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>

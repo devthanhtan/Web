@@ -1,62 +1,138 @@
 @model QuanLiKhoaHocTrucTuyen.Models.Certificate?
 @{
-    ViewData["Title"] = "Tra cứu & Xác thực chứng chỉ";
+    ViewData["Title"] = "Tra cứu & Xác thực chứng chỉ - HUIT Learning";
     var searchCode = ViewBag.SearchCode as string;
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-lg-8">
-        <div class="app-card p-4 p-md-5 mb-4">
-            <div class="text-center mb-4">
-                <div class="stat-icon mx-auto mb-3"><i class="bi bi-qr-code-scan"></i></div>
-                <h1 class="h3 mb-1">Tra cứu &amp; Xác thực chứng chỉ</h1>
-                <p class="text-muted small mb-0">Nhập mã chứng chỉ định danh (ví dụ: <code>CERT-2026-...</code>) để kiểm tra tính hợp lệ.</p>
+<style>
+    .hl-cert-hero {
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(circle at 85% 20%, rgba(249, 115, 22, 0.22), transparent 45%),
+            linear-gradient(145deg, #0b162c 0%, #102a5c 60%, #0f172a 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .hl-cert-diploma {
+        background:
+            radial-gradient(circle at 90% 10%, rgba(249, 115, 22, 0.08), transparent 40%),
+            linear-gradient(145deg, #ffffff 0%, #f8fafc 60%, #eff6ff 100%);
+        border: 2px solid rgba(29, 78, 216, 0.22);
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 44px -16px rgba(15, 23, 42, 0.14);
+    }
+
+    .hl-mono-code {
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.02em;
+    }
+</style>
+
+<section class="hl-section py-2 py-md-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <!-- EDITORIAL SEARCH PORTAL -->
+            <div class="hl-cert-hero p-4 p-md-5 mb-4 shadow-sm" data-reveal="up">
+                <div class="text-center mb-4">
+                    <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-3 py-2 mb-3">
+                        <i class="bi bi-qr-code-scan text-orange me-1" aria-hidden="true"></i> Cổng xác thực văn bằng số HUIT Learning
+                    </span>
+                    <h1 class="h2 fw-bold text-white mb-2">Tra cứu &amp; Xác thực chứng chỉ</h1>
+                    <p class="text-white-50 small mb-0 mx-auto" style="max-width: 540px;">
+                        Nhập mã định danh trên chứng chỉ (ví dụ: <code class="hl-mono-code text-warning">CERT-2026-...</code>) hoặc quét mã QR trên bản PDF để đối chiếu dữ liệu gốc thời gian thực.
+                    </p>
+                </div>
+
+                <form method="get" asp-action="Verify" class="mx-auto" style="max-width: 640px;">
+                    <div class="bg-white rounded-pill p-1 p-sm-2 d-flex flex-column flex-sm-row gap-2 shadow">
+                        <div class="input-group flex-grow-1">
+                            <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+                                <i class="bi bi-upc-scan" aria-hidden="true"></i>
+                            </span>
+                            <input type="text"
+                                   name="code"
+                                   value="@searchCode"
+                                   class="form-control border-0 shadow-none bg-transparent hl-mono-code"
+                                   placeholder="Nhập mã chứng chỉ (VD: CERT-2026-...)"
+                                   aria-label="Mã chứng chỉ định danh"
+                                   required />
+                        </div>
+                        <button type="submit" class="btn btn-orange rounded-pill px-4 py-2 fw-semibold flex-shrink-0">
+                            <i class="bi bi-search me-1" aria-hidden="true"></i> Tra cứu ngay
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <form method="get" asp-action="Verify" class="input-group input-group-lg mb-3">
-                <input type="text" name="code" value="@searchCode" class="form-control" placeholder="Nhập mã chứng chỉ..." required />
-                <button type="submit" class="btn btn-orange px-4"><i class="bi bi-search me-1"></i> Tra cứu</button>
-            </form>
-        </div>
-
-        @if (!string.IsNullOrWhiteSpace(searchCode))
-        {
-            if (Model == null)
+            <!-- VERIFICATION RESULT -->
+            @if (!string.IsNullOrWhiteSpace(searchCode))
             {
-                <div class="app-card p-4 text-center border-danger">
-                    <i class="bi bi-x-octagon-fill text-danger fs-1 d-block mb-2"></i>
-                    <h2 class="h5 text-danger">Không tìm thấy chứng chỉ</h2>
-                    <p class="text-muted small mb-0">Mã chứng chỉ <code>@searchCode</code> không tồn tại trên hệ thống EduSpark.</p>
-                </div>
-            }
-            else
-            {
-                <div class="app-card p-4 p-md-5 border border-2 border-warning">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-                        <span class="badge bg-success fs-6"><i class="bi bi-patch-check-fill me-1"></i> CHỨNG CHỈ HỢP LỆ</span>
-                        <code class="fs-6">@Model.Code</code>
-                    </div>
-
-                    <div class="row align-items-center g-4">
-                        <div class="col-md-8">
-                            <div class="small text-muted">Cấp cho học viên:</div>
-                            <h2 class="h3 text-orange mb-2">@Model.HolderName</h2>
-                            <div class="small text-muted">Hoàn thành khóa học:</div>
-                            <div class="h5 mb-3">@Model.CourseTitle</div>
-                            <div class="small text-muted">Giảng viên: <strong>@Model.Course.Instructor.FullName</strong></div>
-                            <div class="small text-muted">Ngày cấp: <strong>@Model.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</strong></div>
+                if (Model == null)
+                {
+                    <div class="hl-bento-card app-card p-4 p-md-5 text-center border-danger" data-reveal="scale">
+                        <div class="stat-icon mx-auto mb-3 text-danger bg-danger-subtle" style="width: 64px; height: 64px; font-size: 1.85rem;">
+                            <i class="bi bi-x-octagon-fill" aria-hidden="true"></i>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <img src="@Url.Action("QrImage", "Certificate", new { code = Model.Code })" alt="QR Code" class="img-fluid border rounded p-2 mb-2" style="max-width: 150px;" />
-                            <div class="d-grid">
-                                <a asp-action="DownloadPdf" asp-route-code="@Model.Code" class="btn btn-orange btn-sm">
-                                    <i class="bi bi-file-earmark-pdf me-1"></i> Tải bản PDF
-                                </a>
+                        <h2 class="h5 fw-bold text-danger mb-2">Không tìm thấy chứng chỉ hợp lệ</h2>
+                        <p class="text-muted small mb-4 mx-auto" style="max-width: 460px;">
+                            Mã chứng chỉ <code class="hl-mono-code text-dark fw-semibold">@searchCode</code> không tồn tại trên hệ thống chứng thực điện tử <strong>HUIT Learning</strong>. Vui lòng kiểm tra lại ký tự nhập vào.
+                        </p>
+                        <a asp-action="Verify" class="btn btn-outline-huit rounded-pill px-4 btn-sm py-2">
+                            <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i> Nhập lại mã khác
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="hl-cert-diploma p-4 p-md-5" data-reveal="scale">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-3 mb-4 border-bottom">
+                            <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                                <i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i> CHỨNG CHỈ HỢP LỆ · HUIT LEARNING
+                            </span>
+                            <div class="small text-muted">
+                                Mã định danh: <code class="hl-mono-code fs-6 fw-bold text-dark">@Model.Code</code>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center g-4">
+                            <div class="col-12 col-md-8">
+                                <span class="hl-eyebrow text-muted">Chứng nhận cấp cho học viên</span>
+                                <h2 class="h2 fw-bold text-gradient-huit mt-1 mb-3">@Model.HolderName</h2>
+
+                                <span class="hl-eyebrow text-muted">Đã hoàn thành xuất sắc khóa học</span>
+                                <div class="h5 fw-bold text-dark mt-1 mb-4">@Model.CourseTitle</div>
+
+                                <div class="row row-cols-1 row-cols-sm-2 g-3 pt-3 border-top small">
+                                    <div class="col">
+                                        <span class="text-muted d-block mb-1">Giảng viên hướng dẫn</span>
+                                        <strong class="text-dark"><i class="bi bi-person-check text-huit me-1" aria-hidden="true"></i>@Model.Course.Instructor.FullName</strong>
+                                    </div>
+                                    <div class="col">
+                                        <span class="text-muted d-block mb-1">Ngày cấp chứng chỉ</span>
+                                        <strong class="text-dark hl-mono-code"><i class="bi bi-calendar-event text-orange me-1" aria-hidden="true"></i>@Model.IssuedAt.ToLocalTime().ToString("dd/MM/yyyy")</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4 text-center">
+                                <div class="p-3 bg-white border rounded-4 d-inline-block shadow-sm mb-3">
+                                    <img src="@Url.Action("QrImage", "Certificate", new { code = Model.Code })"
+                                         alt="Mã QR xác thực chứng chỉ @Model.Code"
+                                         class="img-fluid d-block mx-auto"
+                                         style="width: 152px; height: 152px;" />
+                                    <div class="text-muted mt-2" style="font-size: 0.72rem;">Quét để đối chiếu trực tuyến</div>
+                                </div>
+                                <div class="d-grid">
+                                    <a asp-action="DownloadPdf" asp-route-code="@Model.Code" class="btn btn-orange rounded-pill py-2 fw-semibold">
+                                        <i class="bi bi-file-earmark-pdf-fill me-1" aria-hidden="true"></i> Tải bản chứng chỉ PDF
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
             }
-        }
+        </div>
     </div>
-</div>
+</section>

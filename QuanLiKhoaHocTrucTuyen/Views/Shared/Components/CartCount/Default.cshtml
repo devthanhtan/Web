@@ -1,9 +1,14 @@
 @model int
 @if (User.Identity?.IsAuthenticated == true)
 {
-    <a class="btn btn-light border position-relative rounded-pill px-3" asp-area="Student" asp-controller="Cart" asp-action="Index" title="Giỏ hàng">
-        <i class="bi bi-cart3 text-orange"></i>
-        <span class="d-none d-xl-inline ms-1 small fw-semibold">Giỏ hàng</span>
+    <a class="btn btn-light border position-relative rounded-pill px-2 px-sm-3 d-inline-flex align-items-center justify-content-center"
+       style="min-height: 38px;"
+       asp-area="Student"
+       asp-controller="Cart"
+       asp-action="Index"
+       title="Giỏ hàng">
+        <i class="bi bi-cart3 text-huit"></i>
+        <span class="d-none d-xl-inline ms-1 small fw-semibold text-dark">Giỏ hàng</span>
         @if (Model > 0)
         {
             <span id="navCartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@Model</span>
